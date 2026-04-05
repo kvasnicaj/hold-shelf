@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1775316051722,
+      "tag": "0000_little_malice",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1775329965963,
+      "tag": "0001_big_gauntlet",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1775345719928,
+      "tag": "0002_serious_sheva_callister",
+      "breakpoints": true
+    }
+  ]
+}

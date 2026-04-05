@@ -1,0 +1,24 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "hold-shelf",
+	"compatibility_date": "2026-04-03",
+	"compatibility_flags": ["nodejs_compat"],
+	"main": "src/server-entry.ts",
+	"observability": { "enabled": true },
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "hold-shelf-db",
+			"database_id": "7606b36f-db0c-40b6-a2fc-4fc155cf05ec",
+			"migrations_dir": "drizzle"
+		}
+	],
+	"routes": [
+		{ "pattern": "hold-shelf.com", "zone_name": "hold-shelf.com" },
+		{ "pattern": "www.hold-shelf.com", "zone_name": "hold-shelf.com" }
+	],
+	"vars": {
+		"TRUST_PROXY_HEADERS": "true",
+		"BETTER_AUTH_URL": "https://hold-shelf.com"
+	}
+}
