@@ -47,7 +47,6 @@ export function ArchivePage() {
 			<h1 className="display-title text-2xl font-bold">Archive</h1>
 
 			<ArchiveFilters
-				total={total}
 				activeTag={activeTag ?? null}
 				tag={tag}
 				filter={filter}
@@ -58,6 +57,10 @@ export function ArchivePage() {
 				onFilterChange={updateFilter}
 				onSortChange={updateSort}
 			/>
+
+			<p className="text-sm text-muted-foreground">
+				{total} article{total !== 1 ? "s" : ""}
+			</p>
 
 			{selectedIds.length > 0 && (
 				<BulkActionsPanel

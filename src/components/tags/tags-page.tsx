@@ -50,6 +50,7 @@ export function TagsPage() {
 							filteredTags={filteredTags}
 							filter={filter}
 							activeTagId={selectedTagId}
+							mobile
 							onSelectTag={navigateToTag}
 							onRename={handleRename}
 							onDelete={handleDeleteTag}

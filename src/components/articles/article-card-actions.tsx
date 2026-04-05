@@ -8,6 +8,7 @@ type ArticleCardActionsProps = {
 	isRead: boolean;
 	tagIds: string[];
 	availableTags?: Tag[];
+	persistent?: boolean;
 	onToggleRead: (id: string, isRead: boolean) => void;
 	onDelete: (id: string) => void;
 	onAddTag?: (tagId: string, articleIds: string[]) => void;
@@ -20,6 +21,7 @@ export function ArticleCardActions({
 	isRead,
 	tagIds,
 	availableTags,
+	persistent = false,
 	onToggleRead,
 	onDelete,
 	onAddTag,
@@ -27,7 +29,13 @@ export function ArticleCardActions({
 	onCreateTag,
 }: ArticleCardActionsProps) {
 	return (
-		<div className="flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+		<div
+			className={
+				persistent
+					? "flex shrink-0 items-center gap-1"
+					: "flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100"
+			}
+		>
 			{availableTags && onAddTag && onRemoveTag && onCreateTag && (
 				<TagPicker
 					availableTags={availableTags}

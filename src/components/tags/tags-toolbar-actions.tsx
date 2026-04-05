@@ -34,7 +34,7 @@ export function TagsToolbarActions({
 			</ToolbarSlot>
 			{showSearch && (
 				<ToolbarSearch
-					placeholder="Filter tags..."
+					placeholder="Search tags..."
 					value={searchValue}
 					onSearch={onSearch}
 				/>

@@ -14,7 +14,7 @@ export function ArticlesToolbarActions({
 	return (
 		<SaveArticleToolbarAction
 			onAdd={onAdd}
-			searchPlaceholder="Search unread articles..."
+			searchPlaceholder="Search articles..."
 			searchValue={searchValue}
 			onSearch={onSearch}
 		/>

@@ -49,7 +49,7 @@ export function AppToolbar({
 		<div className="flex w-full items-center justify-end gap-2">
 			{showSearch ? (
 				<form onSubmit={handleSearchSubmit} className="relative">
-					<ToolBox className="w-32 shrink-0 gap-1.5 px-2 sm:w-44 lg:w-56">
+					<ToolBox className="w-44 shrink-0 gap-1.5 px-2 lg:w-56">
 						<Search className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
 						<ToolBoxInput
 							type="search"

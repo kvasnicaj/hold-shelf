@@ -1,6 +1,8 @@
 import { ArticleCard } from "#/components/articles/article-card";
+import { ArticleCardMobile } from "#/components/articles/article-card-mobile";
 import type { ArticleWithTags } from "#/components/articles/types";
 import type { Tag } from "#/components/tags/types";
+import { useIsMobile } from "#/hooks/use-mobile";
 
 type ArticleListProps = {
 	articles: ArticleWithTags[];
@@ -25,14 +27,18 @@ export function ArticleList({
 	onRemoveTag,
 	onCreateTag,
 }: ArticleListProps) {
+	const isMobile = useIsMobile();
+
 	if (articles.length === 0) {
 		return null;
 	}
 
+	const CardComponent = isMobile ? ArticleCardMobile : ArticleCard;
+
 	return (
 		<div className="space-y-2">
 			{articles.map((article) => (
-				<ArticleCard
+				<CardComponent
 					key={article.id}
 					article={article}
 					selected={selected.has(article.id)}

@@ -1,21 +1,8 @@
 import { ArticleCardActions } from "#/components/articles/article-card-actions";
 import { ArticleCardContent } from "#/components/articles/article-card-content";
-import type { ArticleWithTags } from "#/components/articles/types";
-import type { Tag } from "#/components/tags/types";
+import type { ArticleCardProps } from "#/components/articles/types";
 import { Checkbox } from "#/components/ui/checkbox";
 import { formatTimeAgo } from "#/lib/formatters";
-
-type ArticleCardProps = {
-	article: ArticleWithTags;
-	selected: boolean;
-	onSelect: (id: string, selected: boolean) => void;
-	onToggleRead: (id: string, isRead: boolean) => void;
-	onDelete: (id: string) => void;
-	availableTags?: Tag[];
-	onAddTag?: (tagId: string, articleIds: string[]) => void;
-	onRemoveTag?: (tagId: string, articleIds: string[]) => void;
-	onCreateTag?: (name: string) => Promise<Tag>;
-};
 
 export function ArticleCard({
 	article,

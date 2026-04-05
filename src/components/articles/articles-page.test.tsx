@@ -125,7 +125,7 @@ vi.mock("#/components/layout/toolbar-actions", () => ({
 	ToolbarSlot: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 	ToolbarSearch: ({ onSearch }: { onSearch: (value: string) => void }) => (
 		<input
-			aria-label="Search unread articles"
+			aria-label="Search articles..."
 			onChange={(event) => onSearch(event.target.value)}
 		/>
 	),
