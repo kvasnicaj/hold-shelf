@@ -7,12 +7,14 @@ import { CreateTagDialog } from "#/components/tags/create-tag-dialog";
 
 type TagsToolbarActionsProps = {
 	showSearch: boolean;
+	searchValue: string;
 	onCreate: (name: string) => Promise<void>;
 	onSearch: (query: string) => void;
 };
 
 export function TagsToolbarActions({
 	showSearch,
+	searchValue,
 	onCreate,
 	onSearch,
 }: TagsToolbarActionsProps) {
@@ -24,12 +26,18 @@ export function TagsToolbarActions({
 						onCreate={onCreate}
 						triggerVariant="ghost"
 						triggerSize="sm"
-						triggerClassName="h-8 rounded-lg border-0 shadow-none"
+						triggerClassName="h-8 rounded-lg border-0 px-2 shadow-none sm:px-3"
+						triggerAriaLabel="Create tag"
+						collapseLabelOnMobile
 					/>
 				</ToolBox>
 			</ToolbarSlot>
 			{showSearch && (
-				<ToolbarSearch placeholder="Filter tags..." onSearch={onSearch} />
+				<ToolbarSearch
+					placeholder="Filter tags..."
+					value={searchValue}
+					onSearch={onSearch}
+				/>
 			)}
 		</>
 	);

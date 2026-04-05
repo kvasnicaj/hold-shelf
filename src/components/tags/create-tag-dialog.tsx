@@ -19,6 +19,8 @@ type CreateTagDialogProps = {
 	triggerVariant?: VariantProps<typeof buttonVariants>["variant"];
 	triggerSize?: VariantProps<typeof buttonVariants>["size"];
 	triggerClassName?: string;
+	triggerAriaLabel?: string;
+	collapseLabelOnMobile?: boolean;
 };
 
 export function CreateTagDialog({
@@ -26,6 +28,8 @@ export function CreateTagDialog({
 	triggerVariant = "outline",
 	triggerSize = "sm",
 	triggerClassName,
+	triggerAriaLabel,
+	collapseLabelOnMobile = false,
 }: CreateTagDialogProps) {
 	const {
 		open,
@@ -46,9 +50,12 @@ export function CreateTagDialog({
 					variant={triggerVariant}
 					size={triggerSize}
 					className={triggerClassName}
+					aria-label={triggerAriaLabel}
 				>
 					<Plus className="h-4 w-4" />
-					Create tag
+					<span className={collapseLabelOnMobile ? "hidden sm:inline" : ""}>
+						Create tag
+					</span>
 				</Button>
 			</DialogTrigger>
 			<DialogContent className="sm:max-w-md">

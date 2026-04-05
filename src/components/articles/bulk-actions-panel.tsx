@@ -68,10 +68,14 @@ export function BulkActionsPanel({
 			<div className="@min-[260px]:hidden">
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
-						<ToolBox>
-							<Button variant="ghost" size="icon-sm" className="rounded-lg">
+						<ToolBox asChild>
+							<button
+								type="button"
+								className="flex size-8 items-center justify-center rounded-lg hover:bg-accent hover:text-accent-foreground"
+								aria-label="Bulk actions"
+							>
 								<ListChecks className="h-4 w-4" />
-							</Button>
+							</button>
 						</ToolBox>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align="center">

@@ -44,6 +44,7 @@ function TopBar() {
 			<div className="mb-4 flex items-center justify-end">
 				<AppToolbar
 					actions={actions}
+					searchValue={searchConfig?.value}
 					searchPlaceholder={searchConfig?.placeholder}
 					onSearch={searchConfig?.onSearch}
 				/>
@@ -52,15 +53,18 @@ function TopBar() {
 	}
 
 	return (
-		<div className="mb-4 grid grid-cols-[1fr_auto] items-center gap-2">
-			<div className="@container flex min-w-0 justify-end @min-[260px]:justify-center">
+		<div className="mb-4 grid gap-2 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
+			<div className="order-2 @container flex min-w-0 justify-center md:order-1 md:justify-end @min-[260px]:justify-center">
 				{centerContent}
 			</div>
-			<AppToolbar
-				actions={actions}
-				searchPlaceholder={searchConfig?.placeholder}
-				onSearch={searchConfig?.onSearch}
-			/>
+			<div className="order-1 flex justify-end md:order-2">
+				<AppToolbar
+					actions={actions}
+					searchValue={searchConfig?.value}
+					searchPlaceholder={searchConfig?.placeholder}
+					onSearch={searchConfig?.onSearch}
+				/>
+			</div>
 		</div>
 	);
 }

@@ -24,6 +24,7 @@ export function ArticlesPage() {
 		handleAddTag,
 		handleRemoveTag,
 		handleCreateTag,
+		updateQuery,
 		updateSort,
 		goToPreviousPage,
 		goToNextPage,
@@ -32,7 +33,11 @@ export function ArticlesPage() {
 
 	return (
 		<div className="mx-auto max-w-5xl space-y-4">
-			<ArticlesToolbarActions onAdd={handleAdd} />
+			<ArticlesToolbarActions
+				onAdd={handleAdd}
+				searchValue={q ?? ""}
+				onSearch={updateQuery}
+			/>
 
 			{selected.size > 0 && (
 				<BulkActionsPanel

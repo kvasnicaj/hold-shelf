@@ -19,6 +19,8 @@ type AddArticleDialogProps = {
 	triggerVariant?: VariantProps<typeof buttonVariants>["variant"];
 	triggerSize?: VariantProps<typeof buttonVariants>["size"];
 	triggerClassName?: string;
+	triggerAriaLabel?: string;
+	collapseLabelOnMobile?: boolean;
 };
 
 export function AddArticleDialog({
@@ -26,6 +28,8 @@ export function AddArticleDialog({
 	triggerVariant = "outline",
 	triggerSize = "sm",
 	triggerClassName,
+	triggerAriaLabel,
+	collapseLabelOnMobile = false,
 }: AddArticleDialogProps) {
 	const [open, setOpen] = useState(false);
 	const [url, setUrl] = useState("");
@@ -62,9 +66,12 @@ export function AddArticleDialog({
 					variant={triggerVariant}
 					size={triggerSize}
 					className={triggerClassName}
+					aria-label={triggerAriaLabel}
 				>
 					<Plus className="h-4 w-4" />
-					Add article
+					<span className={collapseLabelOnMobile ? "hidden sm:inline" : ""}>
+						Add article
+					</span>
 				</Button>
 			</DialogTrigger>
 			<DialogContent className="sm:max-w-md">

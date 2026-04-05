@@ -38,6 +38,7 @@ export function TagsPage() {
 		<>
 			<TagsToolbarActions
 				showSearch={!selectedTagId || !isMobile}
+				searchValue={filter}
 				onCreate={handleCreateTag}
 				onSearch={setFilter}
 			/>

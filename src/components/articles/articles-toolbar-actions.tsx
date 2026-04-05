@@ -2,8 +2,21 @@ import { SaveArticleToolbarAction } from "#/components/articles/save-article-too
 
 type ArticlesToolbarActionsProps = {
 	onAdd: (url: string) => Promise<void>;
+	searchValue: string;
+	onSearch: (query: string) => void;
 };
 
-export function ArticlesToolbarActions({ onAdd }: ArticlesToolbarActionsProps) {
-	return <SaveArticleToolbarAction onAdd={onAdd} />;
+export function ArticlesToolbarActions({
+	onAdd,
+	searchValue,
+	onSearch,
+}: ArticlesToolbarActionsProps) {
+	return (
+		<SaveArticleToolbarAction
+			onAdd={onAdd}
+			searchPlaceholder="Search unread articles..."
+			searchValue={searchValue}
+			onSearch={onSearch}
+		/>
+	);
 }
