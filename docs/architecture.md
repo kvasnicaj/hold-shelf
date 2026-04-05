@@ -32,6 +32,9 @@ High-level flow:
 |
 |- /                          -> LandingPage
 |- /login                     -> LoginPage
+|- /privacy                   -> PrivacyPage
+|- /extension/save            -> ExtensionSavePage
+|- /api/extension/articles    -> Chrome extension save endpoint
 |- /app                       -> AppLayout (auth-gated)
    |- /app/home               -> HomePage
    |- /app/articles           -> ArticlesPage
@@ -104,11 +107,30 @@ LandingPage
 |- hero icon
 |- app title / tagline
 |- CTA button -> /login
+|- footer link -> /privacy
 ```
 
 Purpose:
 
 - marketing-style entry screen for signed-out users
+- provides a public privacy-policy link for the website and extension listing
+
+### Privacy page
+
+Route: `/privacy`
+
+Component tree:
+
+```text
+PrivacyPage
+|- page header / branding
+|- back link
+|- privacy policy cards
+```
+
+Purpose:
+
+- provides a public privacy policy for Hold Shelf and the Chrome extension
 
 ### Login page
 
@@ -130,6 +152,43 @@ Core functionality:
 - creates the user account on first successful GitHub sign-in
 - signs returning GitHub users back into the app
 - redirects authenticated users to `/app/home`
+- accepts an optional `redirectTo` search param so extension handoff flows can
+  return users to a save page after login
+
+### Extension save handoff
+
+Route: `/extension/save`
+
+Component tree:
+
+```text
+ExtensionSavePage
+|- status icon
+|- save result copy
+|- saved URL
+|- CTA -> /app/articles
+|- CTA -> /app/home
+```
+
+Core functionality:
+
+- accepts a `url` search param from the extension or login handoff
+- redirects signed-out users to `/login?redirectTo=...`
+- calls `createArticle()` once the user has an authenticated session
+- treats duplicate URLs as a successful handoff state
+
+### Extension save API
+
+Route: `/api/extension/articles`
+
+Responsibilities:
+
+- accepts extension POST requests with `{ url }`
+- authenticates the request from the Hold Shelf session cookie
+- returns `401` with a `loginUrl` when the user needs to sign in on the site
+- saves the article with the same metadata extraction flow as the web app
+- returns `409` for duplicates so the extension can treat repeat saves as
+  success
 
 ## Authenticated routes
 
@@ -381,6 +440,16 @@ Flow when saving an article:
 3. extract title, description, favicon, and hostname
 4. fall back to hostname-based metadata if extraction fails
 5. persist the article row in D1
+
+Chrome extension flow:
+
+1. extension background script POSTs `{ url }` to `/api/extension/articles`
+2. the API checks the current session from request headers
+3. if authenticated, the server saves the article immediately
+4. if not authenticated, the API returns a `loginUrl` pointing at
+   `/extension/save?url=...`
+5. the site redirects through `/login` and returns to `/extension/save`
+6. the extension handoff page saves the article in the normal web session
 
 ### Tags domain
 

@@ -1,7 +1,15 @@
 import { useState } from "react";
 import { authClient } from "#/lib/auth-client";
 
-export function useLoginPage() {
+type UseLoginPageOptions = {
+	callbackURL: string;
+	errorCallbackURL: string;
+};
+
+export function useLoginPage({
+	callbackURL,
+	errorCallbackURL,
+}: UseLoginPageOptions) {
 	const [error, setError] = useState("");
 	const [socialLoading, setSocialLoading] = useState(false);
 
@@ -12,15 +20,15 @@ export function useLoginPage() {
 		try {
 			const result = await authClient.signIn.social({
 				provider: "github",
-				callbackURL: "/app/home",
-				errorCallbackURL: "/login",
+				callbackURL,
+				errorCallbackURL,
 			});
 			if (result.error) {
 				setError(result.error.message ?? "GitHub sign in failed");
+				setSocialLoading(false);
 			}
 		} catch {
 			setError("GitHub sign in failed");
-		} finally {
 			setSocialLoading(false);
 		}
 	}

@@ -67,6 +67,30 @@ describe("LoginPage", () => {
 		);
 	});
 
+	it("forwards custom callback URLs for login handoff flows", async () => {
+		const user = userEvent.setup();
+		signInSocialMock.mockResolvedValue({});
+		renderWithProviders(
+			<LoginPage
+				callbackURL="/extension/save?url=https%3A%2F%2Fexample.com"
+				errorCallbackURL="/login?redirectTo=%2Fextension%2Fsave%3Furl%3Dhttps%253A%252F%252Fexample.com"
+			/>,
+		);
+
+		await user.click(
+			screen.getByRole("button", { name: /continue with github/i }),
+		);
+
+		await waitFor(() =>
+			expect(signInSocialMock).toHaveBeenCalledWith({
+				provider: "github",
+				callbackURL: "/extension/save?url=https%3A%2F%2Fexample.com",
+				errorCallbackURL:
+					"/login?redirectTo=%2Fextension%2Fsave%3Furl%3Dhttps%253A%252F%252Fexample.com",
+			}),
+		);
+	});
+
 	it("shows a redirecting state while OAuth starts", async () => {
 		const user = userEvent.setup();
 		let resolveSignIn: (() => void) | undefined;
@@ -87,8 +111,8 @@ describe("LoginPage", () => {
 		resolveSignIn?.();
 		await waitFor(() =>
 			expect(
-				screen.getByRole("button", { name: /continue with github/i }),
-			).toBeEnabled(),
+				screen.getByRole("button", { name: /redirecting/i }),
+			).toBeDisabled(),
 		);
 	});
 
