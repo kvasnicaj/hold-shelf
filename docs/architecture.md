@@ -31,6 +31,7 @@ High-level flow:
 |  |- TanStack Devtools
 |
 |- /                          -> LandingPage
+|- /about                     -> AboutPage
 |- /login                     -> LoginPage
 |- /privacy                   -> PrivacyPage
 |- /extension/save            -> ExtensionSavePage
@@ -107,13 +108,32 @@ LandingPage
 |- hero icon
 |- app title / tagline
 |- CTA button -> /login
-|- footer link -> /privacy
+|- footer links -> /about, /privacy
 ```
 
 Purpose:
 
 - marketing-style entry screen for signed-out users
-- provides a public privacy-policy link for the website and extension listing
+- provides public about and privacy links for the website and extension listing
+
+### About page
+
+Route: `/about`
+
+Component tree:
+
+```text
+AboutPage
+|- page header / branding
+|- back link
+|- description cards
+|- contact email
+```
+
+Purpose:
+
+- provides a public description of Hold Shelf
+- offers a simple contact address for questions and support
 
 ### Privacy page
 
