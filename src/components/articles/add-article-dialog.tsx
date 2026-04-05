@@ -1,5 +1,5 @@
 import type { VariantProps } from "class-variance-authority";
-import { Plus } from "lucide-react";
+import { BookmarkPlus } from "lucide-react";
 import { useState } from "react";
 import type { buttonVariants } from "#/components/ui/button";
 import { Button } from "#/components/ui/button";
@@ -68,7 +68,7 @@ export function AddArticleDialog({
 					className={triggerClassName}
 					aria-label={triggerAriaLabel}
 				>
-					<Plus className="h-4 w-4" />
+					<BookmarkPlus className="h-4 w-4" />
 					<span className={collapseLabelOnMobile ? "hidden sm:inline" : ""}>
 						Add article
 					</span>

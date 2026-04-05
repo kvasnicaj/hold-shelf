@@ -40,9 +40,9 @@ export function AccountSummaryCard() {
 							GitHub is the only sign-in method for this account.
 						</p>
 					</div>
-					<div className="flex items-center gap-2 rounded-full border px-3 py-1 text-sm font-medium">
+					<div className="flex items-center gap-2 rounded-full border px-2 py-1 text-sm font-medium sm:px-3">
 						<Github className="h-4 w-4" />
-						GitHub
+						<span className="sr-only sm:not-sr-only">GitHub</span>
 					</div>
 				</div>
 			</CardContent>

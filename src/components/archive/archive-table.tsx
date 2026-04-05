@@ -4,9 +4,11 @@ import {
 	useReactTable,
 } from "@tanstack/react-table";
 import type * as React from "react";
+import { ArchiveTableMobile } from "#/components/archive/archive-table-mobile";
 import { createArchiveColumns } from "#/components/archive/helpers";
 import type { ArticleWithTags } from "#/components/articles/types";
 import type { Tag } from "#/components/tags/types";
+import { useIsMobile } from "#/hooks/use-mobile";
 
 type ArchiveTableProps = {
 	articles: ArticleWithTags[];
@@ -33,6 +35,7 @@ export function ArchiveTable({
 	onToggleRead,
 	onDelete,
 }: ArchiveTableProps) {
+	const isMobile = useIsMobile();
 	const table = useReactTable({
 		data: articles,
 		columns: createArchiveColumns({
@@ -48,6 +51,22 @@ export function ArchiveTable({
 		getCoreRowModel: getCoreRowModel(),
 		getRowId: (row) => row.id,
 	});
+
+	if (isMobile) {
+		return (
+			<ArchiveTableMobile
+				articles={articles}
+				rowSelection={rowSelection}
+				onRowSelectionChange={onRowSelectionChange}
+				availableTags={availableTags}
+				onAddTag={onAddTag}
+				onRemoveTag={onRemoveTag}
+				onCreateTag={onCreateTag}
+				onToggleRead={onToggleRead}
+				onDelete={onDelete}
+			/>
+		);
+	}
 
 	return (
 		<div className="overflow-hidden rounded-xl border bg-card shadow-sm">

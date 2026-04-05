@@ -4,7 +4,6 @@ import { Badge } from "#/components/ui/badge";
 import { NativeSelect } from "#/components/ui/native-select";
 
 type ArchiveFiltersProps = {
-	total: number;
 	activeTag: Tag | null;
 	tag?: string;
 	filter?: "all" | "read" | "unread";
@@ -17,7 +16,6 @@ type ArchiveFiltersProps = {
 };
 
 export function ArchiveFilters({
-	total,
 	activeTag,
 	tag,
 	filter,
@@ -29,10 +27,7 @@ export function ArchiveFilters({
 	onSortChange,
 }: ArchiveFiltersProps) {
 	return (
-		<div className="flex items-center gap-2">
-			<p className="text-sm text-muted-foreground">
-				{total} article{total !== 1 ? "s" : ""}
-			</p>
+		<div className="flex flex-wrap items-center gap-2">
 			{activeTag && (
 				<Badge variant="secondary" className="gap-1">
 					{activeTag.name}
@@ -46,7 +41,7 @@ export function ArchiveFilters({
 					</button>
 				</Badge>
 			)}
-			<div className="ml-auto flex gap-2">
+			<div className="flex w-full flex-wrap gap-2 md:ml-auto md:w-auto">
 				<NativeSelect
 					value={tag ?? ""}
 					onChange={(event) => onTagChange(event.target.value || undefined)}

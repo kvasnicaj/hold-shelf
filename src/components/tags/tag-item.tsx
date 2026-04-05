@@ -1,10 +1,13 @@
 import { Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { Badge } from "#/components/ui/badge";
+import { Button } from "#/components/ui/button";
 import { Input } from "#/components/ui/input";
 
 type TagItemProps = {
 	tag: { id: string; name: string; articleCount: number };
 	isActive: boolean;
+	mobile?: boolean;
 	onSelect: () => void;
 	onRename: (id: string, name: string) => Promise<void>;
 	onDelete: (id: string) => Promise<void>;
@@ -13,6 +16,7 @@ type TagItemProps = {
 export function TagItem({
 	tag,
 	isActive,
+	mobile = false,
 	onSelect,
 	onRename,
 	onDelete,
@@ -30,7 +34,7 @@ export function TagItem({
 	if (editing) {
 		return (
 			<form
-				className="flex items-center gap-1 px-2 py-1"
+				className={mobile ? "px-0" : "flex items-center gap-1 px-2 py-1"}
 				onSubmit={(event) => {
 					event.preventDefault();
 					void handleSave();
@@ -39,7 +43,7 @@ export function TagItem({
 				<Input
 					value={name}
 					onChange={(event) => setName(event.target.value)}
-					className="h-7 text-sm"
+					className={mobile ? "h-10 text-sm" : "h-7 text-sm"}
 					autoFocus
 					onBlur={() => void handleSave()}
 					onKeyDown={(event) => {
@@ -55,27 +59,45 @@ export function TagItem({
 
 	return (
 		<div
-			className={`group/tag flex w-full items-center justify-between rounded-md px-2 py-1.5 text-left text-sm transition-colors ${
-				isActive
-					? "bg-accent text-accent-foreground"
-					: "text-foreground hover:bg-accent/50"
-			}`}
+			className={
+				mobile
+					? `group/tag flex w-full items-center justify-between rounded-xl border bg-card px-3 py-3 text-left text-sm shadow-sm transition-colors ${
+							isActive
+								? "border-accent bg-accent/60 text-accent-foreground"
+								: "text-foreground hover:bg-accent/40"
+						}`
+					: `group/tag flex w-full items-center justify-between rounded-md px-2 py-1.5 text-left text-sm transition-colors ${
+							isActive
+								? "bg-accent text-accent-foreground"
+								: "text-foreground hover:bg-accent/50"
+						}`
+			}
 		>
 			<button
 				type="button"
 				onClick={onSelect}
-				className="min-w-0 flex-1 truncate text-left"
+				className="min-w-0 flex-1 text-left"
 			>
-				<span className="truncate">{tag.name}</span>
+				<span className="block truncate font-medium">{tag.name}</span>
 			</button>
-			<div className="flex items-center gap-1">
-				<span className="text-xs text-muted-foreground">
+			<div className="flex items-center gap-1.5">
+				<Badge
+					variant={mobile ? "secondary" : "outline"}
+					className="px-1.5 py-0 text-[10px]"
+				>
 					{tag.articleCount}
-				</span>
-				<div className="flex items-center gap-0.5 opacity-0 group-hover/tag:opacity-100">
-					<button
+				</Badge>
+				<div
+					className={
+						mobile
+							? "flex items-center gap-0.5"
+							: "flex items-center gap-0.5 opacity-0 group-hover/tag:opacity-100"
+					}
+				>
+					<Button
 						type="button"
-						className="rounded p-0.5 hover:bg-foreground/10"
+						variant="ghost"
+						size="icon-xs"
 						onClick={(event) => {
 							event.stopPropagation();
 							setEditing(true);
@@ -84,10 +106,11 @@ export function TagItem({
 						aria-label={`Rename ${tag.name}`}
 					>
 						<Pencil className="h-3 w-3" />
-					</button>
-					<button
+					</Button>
+					<Button
 						type="button"
-						className="rounded p-0.5 hover:bg-foreground/10"
+						variant="ghost"
+						size="icon-xs"
 						onClick={(event) => {
 							event.stopPropagation();
 							void onDelete(tag.id);
@@ -96,7 +119,7 @@ export function TagItem({
 						aria-label={`Delete ${tag.name}`}
 					>
 						<Trash2 className="h-3 w-3" />
-					</button>
+					</Button>
 				</div>
 			</div>
 		</div>

@@ -20,16 +20,16 @@ export function RecentArticlesSection({
 	oldestUnread,
 }: RecentArticlesSectionProps) {
 	return (
-		<div className="grid gap-6 lg:grid-cols-2">
+		<div className="grid min-w-0 gap-6 lg:grid-cols-2">
 			{recentlySaved.length > 0 && (
-				<Card>
+				<Card className="min-w-0 gap-4 overflow-hidden">
 					<CardHeader>
-						<CardTitle className="flex items-center gap-2 text-base">
+						<CardTitle className="flex min-w-0 items-center gap-2 text-base">
 							<Clock className="h-4 w-4" />
 							Recently saved
 						</CardTitle>
 					</CardHeader>
-					<CardContent className="space-y-3">
+					<CardContent className="min-w-0 space-y-2">
 						{recentlySaved.map((article) => (
 							<ArticleLink key={article.id} article={article} />
 						))}
@@ -38,14 +38,14 @@ export function RecentArticlesSection({
 			)}
 
 			{oldestUnread.length > 0 && (
-				<Card>
+				<Card className="min-w-0 gap-4 overflow-hidden">
 					<CardHeader>
-						<CardTitle className="flex items-center gap-2 text-base">
+						<CardTitle className="flex min-w-0 items-center gap-2 text-base">
 							<BookOpen className="h-4 w-4" />
 							Oldest unread
 						</CardTitle>
 					</CardHeader>
-					<CardContent className="space-y-3">
+					<CardContent className="min-w-0 space-y-2">
 						{oldestUnread.map((article) => (
 							<ArticleLink key={article.id} article={article} />
 						))}

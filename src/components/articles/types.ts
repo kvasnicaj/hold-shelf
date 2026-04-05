@@ -12,3 +12,15 @@ export type ArticleWithTags = {
 	createdAt: Date | null;
 	tags: Tag[];
 };
+
+export type ArticleCardProps = {
+	article: ArticleWithTags;
+	selected: boolean;
+	onSelect: (id: string, selected: boolean) => void;
+	onToggleRead: (id: string, isRead: boolean) => void;
+	onDelete: (id: string) => void;
+	availableTags?: Tag[];
+	onAddTag?: (tagId: string, articleIds: string[]) => void;
+	onRemoveTag?: (tagId: string, articleIds: string[]) => void;
+	onCreateTag?: (name: string) => Promise<Tag>;
+};

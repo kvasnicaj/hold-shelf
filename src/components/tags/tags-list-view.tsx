@@ -4,6 +4,7 @@ type TagsListViewProps = {
 	filteredTags: Array<{ id: string; name: string; articleCount: number }>;
 	filter: string;
 	activeTagId?: string;
+	mobile?: boolean;
 	onSelectTag: (tagId: string) => void;
 	onRename: (id: string, name: string) => Promise<void>;
 	onDelete: (id: string) => Promise<void>;
@@ -15,6 +16,7 @@ export function TagsListView({
 	filteredTags,
 	filter,
 	activeTagId,
+	mobile = false,
 	onSelectTag,
 	onRename,
 	onDelete,
@@ -33,6 +35,7 @@ export function TagsListView({
 						key={tag.id}
 						tag={tag}
 						isActive={activeTagId === tag.id}
+						mobile={mobile}
 						onSelect={() => onSelectTag(tag.id)}
 						onRename={onRename}
 						onDelete={onDelete}

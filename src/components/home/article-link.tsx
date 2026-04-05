@@ -16,7 +16,7 @@ export function ArticleLink({ article }: ArticleLinkProps) {
 			href={article.url}
 			target="_blank"
 			rel="noopener noreferrer"
-			className="flex items-center gap-2 rounded-md p-2 text-sm no-underline transition-colors hover:bg-accent"
+			className="flex w-full min-w-0 items-center gap-2 overflow-hidden rounded-md px-2 py-1.5 text-sm no-underline transition-colors hover:bg-accent"
 		>
 			{article.faviconUrl && (
 				<img
@@ -28,10 +28,10 @@ export function ArticleLink({ article }: ArticleLinkProps) {
 					}}
 				/>
 			)}
-			<span className="min-w-0 truncate">
+			<span className="min-w-0 flex-1 truncate">
 				{article.title ?? article.hostname}
 			</span>
-			<ExternalLink className="ml-auto h-3 w-3 shrink-0 text-muted-foreground" />
+			<ExternalLink className="h-3 w-3 shrink-0 text-muted-foreground" />
 		</a>
 	);
 }
