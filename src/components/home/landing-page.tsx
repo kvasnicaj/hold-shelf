@@ -36,6 +36,13 @@ export function LandingPage() {
 			<footer className="relative z-10 flex justify-center pb-8 pt-4">
 				<p className="text-sm text-(--sea-ink-soft)">
 					<Link
+						to="/about"
+						className="underline-offset-4 transition-colors hover:text-(--sea-ink) hover:underline"
+					>
+						About
+					</Link>
+					<span className="px-2">|</span>
+					<Link
 						to="/privacy"
 						className="underline-offset-4 transition-colors hover:text-(--sea-ink) hover:underline"
 					>
