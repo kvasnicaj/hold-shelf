@@ -3,8 +3,19 @@ import { useLoginPage } from "#/components/auth/use-login-page";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 
-export function LoginPage() {
-	const { error, socialLoading, handleGitHubSignIn } = useLoginPage();
+type LoginPageProps = {
+	callbackURL?: string;
+	errorCallbackURL?: string;
+};
+
+export function LoginPage({
+	callbackURL = "/app/home",
+	errorCallbackURL = "/login",
+}: LoginPageProps) {
+	const { error, socialLoading, handleGitHubSignIn } = useLoginPage({
+		callbackURL,
+		errorCallbackURL,
+	});
 
 	return (
 		<div className="flex min-h-screen items-center justify-center bg-background p-4">

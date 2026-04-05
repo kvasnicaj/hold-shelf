@@ -9,16 +9,24 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ExtensionSaveRouteImport } from './routes/extension/save'
 import { Route as AppTagsRouteImport } from './routes/app/tags'
 import { Route as AppSettingsRouteImport } from './routes/app/settings'
 import { Route as AppHomeRouteImport } from './routes/app/home'
 import { Route as AppArticlesRouteImport } from './routes/app/articles'
 import { Route as AppArchiveRouteImport } from './routes/app/archive'
+import { Route as ApiExtensionArticlesRouteImport } from './routes/api/extension/articles'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -32,6 +40,11 @@ const AppRoute = AppRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExtensionSaveRoute = ExtensionSaveRouteImport.update({
+  id: '/extension/save',
+  path: '/extension/save',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppTagsRoute = AppTagsRouteImport.update({
@@ -59,6 +72,11 @@ const AppArchiveRoute = AppArchiveRouteImport.update({
   path: '/archive',
   getParentRoute: () => AppRoute,
 } as any)
+const ApiExtensionArticlesRoute = ApiExtensionArticlesRouteImport.update({
+  id: '/api/extension/articles',
+  path: '/api/extension/articles',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -69,35 +87,44 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
   '/app/archive': typeof AppArchiveRoute
   '/app/articles': typeof AppArticlesRoute
   '/app/home': typeof AppHomeRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/tags': typeof AppTagsRoute
+  '/extension/save': typeof ExtensionSaveRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/extension/articles': typeof ApiExtensionArticlesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
   '/app/archive': typeof AppArchiveRoute
   '/app/articles': typeof AppArticlesRoute
   '/app/home': typeof AppHomeRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/tags': typeof AppTagsRoute
+  '/extension/save': typeof ExtensionSaveRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/extension/articles': typeof ApiExtensionArticlesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
   '/app/archive': typeof AppArchiveRoute
   '/app/articles': typeof AppArticlesRoute
   '/app/home': typeof AppHomeRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/tags': typeof AppTagsRoute
+  '/extension/save': typeof ExtensionSaveRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/extension/articles': typeof ApiExtensionArticlesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -105,45 +132,64 @@ export interface FileRouteTypes {
     | '/'
     | '/app'
     | '/login'
+    | '/privacy'
     | '/app/archive'
     | '/app/articles'
     | '/app/home'
     | '/app/settings'
     | '/app/tags'
+    | '/extension/save'
     | '/api/auth/$'
+    | '/api/extension/articles'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/app'
     | '/login'
+    | '/privacy'
     | '/app/archive'
     | '/app/articles'
     | '/app/home'
     | '/app/settings'
     | '/app/tags'
+    | '/extension/save'
     | '/api/auth/$'
+    | '/api/extension/articles'
   id:
     | '__root__'
     | '/'
     | '/app'
     | '/login'
+    | '/privacy'
     | '/app/archive'
     | '/app/articles'
     | '/app/home'
     | '/app/settings'
     | '/app/tags'
+    | '/extension/save'
     | '/api/auth/$'
+    | '/api/extension/articles'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   LoginRoute: typeof LoginRoute
+  PrivacyRoute: typeof PrivacyRoute
+  ExtensionSaveRoute: typeof ExtensionSaveRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiExtensionArticlesRoute: typeof ApiExtensionArticlesRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -163,6 +209,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/extension/save': {
+      id: '/extension/save'
+      path: '/extension/save'
+      fullPath: '/extension/save'
+      preLoaderRoute: typeof ExtensionSaveRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/tags': {
@@ -200,6 +253,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppArchiveRouteImport
       parentRoute: typeof AppRoute
     }
+    '/api/extension/articles': {
+      id: '/api/extension/articles'
+      path: '/api/extension/articles'
+      fullPath: '/api/extension/articles'
+      preLoaderRoute: typeof ApiExtensionArticlesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -232,7 +292,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   LoginRoute: LoginRoute,
+  PrivacyRoute: PrivacyRoute,
+  ExtensionSaveRoute: ExtensionSaveRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiExtensionArticlesRoute: ApiExtensionArticlesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

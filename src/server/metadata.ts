@@ -139,7 +139,11 @@ export async function extractMetadata(url: string): Promise<ArticleMetadata> {
 			extractFavicon(html, finalUrl.origin) ?? fallback.faviconUrl;
 
 		return { title, description, faviconUrl, hostname };
-	} catch {
+	} catch (error) {
+		console.warn("Metadata extraction fell back to hostname metadata.", {
+			url,
+			error: error instanceof Error ? error.message : String(error),
+		});
 		return fallback;
 	}
 }
