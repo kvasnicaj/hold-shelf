@@ -14,8 +14,8 @@
 		}
 	],
 	"routes": [
-		{ "pattern": "hold-shelf.com", "zone_name": "hold-shelf.com" },
-		{ "pattern": "www.hold-shelf.com", "zone_name": "hold-shelf.com" }
+		{ "pattern": "hold-shelf.com/*", "zone_name": "hold-shelf.com" },
+		{ "pattern": "www.hold-shelf.com/*", "zone_name": "hold-shelf.com" }
 	],
 	"vars": {
 		"TRUST_PROXY_HEADERS": "true",
