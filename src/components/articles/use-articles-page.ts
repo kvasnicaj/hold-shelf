@@ -106,6 +106,17 @@ export function useArticlesPage() {
 		});
 	}
 
+	function updateQuery(query: string) {
+		navigate({
+			search: (prev) => ({
+				...prev,
+				q: query.trim() ? query : undefined,
+				page: undefined,
+			}),
+			replace: true,
+		});
+	}
+
 	function goToPreviousPage() {
 		navigate({
 			search: (prev) => ({
@@ -144,6 +155,7 @@ export function useArticlesPage() {
 		handleAddTag,
 		handleRemoveTag,
 		handleCreateTag,
+		updateQuery,
 		updateSort,
 		goToPreviousPage,
 		goToNextPage,

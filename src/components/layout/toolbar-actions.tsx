@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 type SearchConfig = {
 	placeholder: string;
+	value: string;
 	onSearch: (query: string) => void;
 } | null;
 
@@ -80,17 +81,19 @@ export function ToolbarCenter({ children }: { children: React.ReactNode }) {
 
 export function ToolbarSearch({
 	placeholder,
+	value,
 	onSearch,
 }: {
 	placeholder: string;
+	value: string;
 	onSearch: (query: string) => void;
 }) {
 	const { setSearchConfig } = useContext(ToolbarActionsContext);
 
 	useEffect(() => {
-		setSearchConfig({ placeholder, onSearch });
+		setSearchConfig({ placeholder, value, onSearch });
 		return () => setSearchConfig(null);
-	}, [placeholder, onSearch, setSearchConfig]);
+	}, [placeholder, value, onSearch, setSearchConfig]);
 
 	return null;
 }

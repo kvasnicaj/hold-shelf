@@ -1,24 +1,44 @@
 import { AddArticleDialog } from "#/components/articles/add-article-dialog";
 import { ToolBox } from "#/components/layout/tool-box";
-import { ToolbarSlot } from "#/components/layout/toolbar-actions";
+import {
+	ToolbarSearch,
+	ToolbarSlot,
+} from "#/components/layout/toolbar-actions";
 
 type SaveArticleToolbarActionProps = {
 	onAdd: (url: string) => Promise<void>;
+	searchPlaceholder?: string;
+	searchValue?: string;
+	onSearch?: (query: string) => void;
 };
 
 export function SaveArticleToolbarAction({
 	onAdd,
+	searchPlaceholder,
+	searchValue,
+	onSearch,
 }: SaveArticleToolbarActionProps) {
 	return (
-		<ToolbarSlot>
-			<ToolBox>
-				<AddArticleDialog
-					onAdd={onAdd}
-					triggerVariant="ghost"
-					triggerSize="sm"
-					triggerClassName="h-8 rounded-lg border-0 shadow-none"
+		<>
+			<ToolbarSlot>
+				<ToolBox>
+					<AddArticleDialog
+						onAdd={onAdd}
+						triggerVariant="ghost"
+						triggerSize="sm"
+						triggerClassName="h-8 rounded-lg border-0 px-2 shadow-none sm:px-3"
+						triggerAriaLabel="Add article"
+						collapseLabelOnMobile
+					/>
+				</ToolBox>
+			</ToolbarSlot>
+			{searchPlaceholder && onSearch ? (
+				<ToolbarSearch
+					placeholder={searchPlaceholder}
+					value={searchValue ?? ""}
+					onSearch={onSearch}
 				/>
-			</ToolBox>
-		</ToolbarSlot>
+			) : null}
+		</>
 	);
 }

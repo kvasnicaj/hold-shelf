@@ -98,6 +98,7 @@ export function useArchivePage() {
 	}
 
 	function updateSearch(partial: {
+		q?: string;
 		tag?: string;
 		filter?: "all" | "read" | "unread";
 		sort?: "newest" | "oldest" | "title";
@@ -133,6 +134,11 @@ export function useArchivePage() {
 		handleAddTag,
 		handleRemoveTag,
 		handleCreateTag,
+		updateQuery: (nextQuery: string) =>
+			updateSearch({
+				q: nextQuery.trim() ? nextQuery : undefined,
+				page: undefined,
+			}),
 		clearTag: () => updateSearch({ tag: undefined, page: undefined }),
 		updateTag: (nextTag?: string) =>
 			updateSearch({ tag: nextTag, page: undefined }),

@@ -27,6 +27,7 @@ export function ArchivePage() {
 		handleAddTag,
 		handleRemoveTag,
 		handleCreateTag,
+		updateQuery,
 		clearTag,
 		updateTag,
 		updateFilter,
@@ -38,7 +39,11 @@ export function ArchivePage() {
 
 	return (
 		<div className="mx-auto max-w-5xl space-y-4">
-			<ArchiveToolbarActions onAdd={handleAdd} />
+			<ArchiveToolbarActions
+				onAdd={handleAdd}
+				searchValue={q ?? ""}
+				onSearch={updateQuery}
+			/>
 			<h1 className="display-title text-2xl font-bold">Archive</h1>
 
 			<ArchiveFilters

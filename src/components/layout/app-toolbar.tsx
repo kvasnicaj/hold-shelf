@@ -1,11 +1,6 @@
-import {
-	Link,
-	useNavigate,
-	useRouter,
-	useRouterState,
-} from "@tanstack/react-router";
+import { Link, useRouter, useRouterState } from "@tanstack/react-router";
 import { LogOut, Search, Settings, User } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ToolBox, ToolBoxInput } from "#/components/layout/tool-box";
 import ThemeToggle from "#/components/theme-toggle";
 import { Button } from "#/components/ui/button";
@@ -19,51 +14,52 @@ import { authClient } from "#/lib/auth-client";
 
 type AppToolbarProps = {
 	actions?: React.ReactNode;
+	searchValue?: string;
 	searchPlaceholder?: string;
 	onSearch?: (query: string) => void;
 };
 
 export function AppToolbar({
 	actions,
+	searchValue,
 	searchPlaceholder,
 	onSearch,
 }: AppToolbarProps) {
-	const [search, setSearch] = useState("");
-	const navigate = useNavigate();
+	const [search, setSearch] = useState(searchValue ?? "");
 	const router = useRouter();
 	const routerState = useRouterState();
 	const currentPath = routerState.location.pathname;
 	const { data: session } = authClient.useSession();
+	const showSearch = Boolean(onSearch);
 
-	const placeholder = searchPlaceholder ?? "Search articles...";
+	useEffect(() => {
+		setSearch(searchValue ?? "");
+	}, [searchValue]);
 
 	function handleSearchChange(value: string) {
 		setSearch(value);
-		if (onSearch) {
-			onSearch(value);
-		}
+		onSearch?.(value);
 	}
 
 	function handleSearchSubmit(e: React.FormEvent) {
 		e.preventDefault();
-		if (!onSearch && search.trim()) {
-			navigate({ to: "/app/archive", search: { q: search.trim() } });
-		}
 	}
 
 	return (
-		<div className="flex items-center gap-2">
-			<form onSubmit={handleSearchSubmit} className="relative">
-				<ToolBox className="w-44 gap-1.5 px-2 lg:w-56">
-					<Search className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-					<ToolBoxInput
-						type="search"
-						placeholder={placeholder}
-						value={search}
-						onChange={(e) => handleSearchChange(e.target.value)}
-					/>
-				</ToolBox>
-			</form>
+		<div className="flex w-full items-center justify-end gap-2">
+			{showSearch ? (
+				<form onSubmit={handleSearchSubmit} className="relative">
+					<ToolBox className="w-32 shrink-0 gap-1.5 px-2 sm:w-44 lg:w-56">
+						<Search className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+						<ToolBoxInput
+							type="search"
+							placeholder={searchPlaceholder}
+							value={search}
+							onChange={(e) => handleSearchChange(e.target.value)}
+						/>
+					</ToolBox>
+				</form>
+			) : null}
 
 			{actions}
 
