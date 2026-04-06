@@ -21,6 +21,7 @@ type ArchiveTableProps = {
 	onRemoveTag: (tagId: string, articleIds: string[]) => Promise<void>;
 	onCreateTag: (name: string) => Promise<Tag>;
 	onToggleRead: (id: string, isRead: boolean) => Promise<void>;
+	onToggleFavorite: (id: string, isFavorite: boolean) => Promise<void>;
 	onDelete: (ids: string[]) => Promise<void>;
 };
 
@@ -33,6 +34,7 @@ export function ArchiveTable({
 	onRemoveTag,
 	onCreateTag,
 	onToggleRead,
+	onToggleFavorite,
 	onDelete,
 }: ArchiveTableProps) {
 	const isMobile = useIsMobile();
@@ -44,6 +46,7 @@ export function ArchiveTable({
 			onRemoveTag,
 			onCreateTag,
 			onToggleRead,
+			onToggleFavorite,
 			onDelete,
 		}),
 		state: { rowSelection },
@@ -63,6 +66,7 @@ export function ArchiveTable({
 				onRemoveTag={onRemoveTag}
 				onCreateTag={onCreateTag}
 				onToggleRead={onToggleRead}
+				onToggleFavorite={onToggleFavorite}
 				onDelete={onDelete}
 			/>
 		);
@@ -94,7 +98,7 @@ export function ArchiveTable({
 								) : (
 									<th
 										key={header.id}
-										className="px-3 py-2 text-xs font-medium text-muted-foreground"
+										className="px-2 py-2 text-xs font-medium text-muted-foreground"
 										style={{
 											width:
 												header.getSize() !== 150 ? header.getSize() : undefined,
@@ -127,7 +131,7 @@ export function ArchiveTable({
 										{flexRender(cell.column.columnDef.cell, cell.getContext())}
 									</td>
 								) : (
-									<td key={cell.id} className="overflow-hidden px-3 py-2">
+									<td key={cell.id} className="overflow-hidden px-2 py-2">
 										{flexRender(cell.column.columnDef.cell, cell.getContext())}
 									</td>
 								),

@@ -25,6 +25,7 @@ export function HomePage() {
 			<HomeStatsSection stats={stats} />
 			<RecentArticlesSection
 				recentlySaved={recent.recentlySaved}
+				recentlyFavorite={recent.recentlyFavorite}
 				oldestUnread={recent.oldestUnread}
 			/>
 

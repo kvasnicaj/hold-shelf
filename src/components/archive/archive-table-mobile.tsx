@@ -3,6 +3,7 @@ import {
 	Check,
 	EllipsisVertical,
 	ExternalLink,
+	Star,
 	Trash2,
 } from "lucide-react";
 import type { ArticleWithTags } from "#/components/articles/types";
@@ -28,6 +29,7 @@ type ArchiveTableMobileProps = {
 	onRemoveTag: (tagId: string, articleIds: string[]) => Promise<void>;
 	onCreateTag: (name: string) => Promise<Tag>;
 	onToggleRead: (id: string, isRead: boolean) => Promise<void>;
+	onToggleFavorite: (id: string, isFavorite: boolean) => Promise<void>;
 	onDelete: (ids: string[]) => Promise<void>;
 };
 
@@ -36,6 +38,7 @@ export function ArchiveTableMobile({
 	rowSelection,
 	onRowSelectionChange,
 	onToggleRead,
+	onToggleFavorite,
 	onDelete,
 }: ArchiveTableMobileProps) {
 	const hasSelection = Object.values(rowSelection).some(Boolean);
@@ -129,6 +132,22 @@ export function ArchiveTableMobile({
 												<Check className="h-4 w-4" />
 											)}
 											{article.isRead ? "Mark unread" : "Mark read"}
+										</DropdownMenuItem>
+										<DropdownMenuItem
+											onClick={() =>
+												onToggleFavorite(article.id, !article.isFavorite)
+											}
+										>
+											<Star
+												className={
+													article.isFavorite
+														? "h-4 w-4 fill-current text-amber-500"
+														: "h-4 w-4"
+												}
+											/>
+											{article.isFavorite
+												? "Remove from favorites"
+												: "Add to favorites"}
 										</DropdownMenuItem>
 										<DropdownMenuItem
 											variant="destructive"

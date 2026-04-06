@@ -1,21 +1,25 @@
 import { NativeSelect } from "#/components/ui/native-select";
 
 type ArticlesHeaderProps = {
+	title: string;
 	total: number;
-	q?: string;
 	sort?: "newest" | "oldest" | "title";
 	onSortChange: (sort: "newest" | "oldest" | "title") => void;
+	emptyStateMessage: string;
+	emptyStateHint?: string;
 };
 
 export function ArticlesHeader({
+	title,
 	total,
-	q,
 	sort,
 	onSortChange,
+	emptyStateMessage,
+	emptyStateHint,
 }: ArticlesHeaderProps) {
 	return (
 		<>
-			<h1 className="display-title text-2xl font-bold">Unread</h1>
+			<h1 className="display-title text-2xl font-bold">{title}</h1>
 
 			<div className="flex items-center gap-2">
 				<p className="text-sm text-muted-foreground">
@@ -37,12 +41,10 @@ export function ArticlesHeader({
 
 			{total === 0 && (
 				<div className="flex flex-col items-center justify-center py-20 text-center">
-					<p className="text-lg text-muted-foreground">
-						{q ? "No articles match your search." : "No unread articles yet."}
-					</p>
-					{!q && (
+					<p className="text-lg text-muted-foreground">{emptyStateMessage}</p>
+					{emptyStateHint && (
 						<p className="mt-1 text-sm text-muted-foreground">
-							Save an article to get started.
+							{emptyStateHint}
 						</p>
 					)}
 				</div>

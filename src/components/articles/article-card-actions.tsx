@@ -1,4 +1,4 @@
-import { BookOpen, Check, Trash2 } from "lucide-react";
+import { BookOpen, Check, Star, Trash2 } from "lucide-react";
 import { TagPicker } from "#/components/tags/tag-picker";
 import type { Tag } from "#/components/tags/types";
 import { Button } from "#/components/ui/button";
@@ -6,10 +6,12 @@ import { Button } from "#/components/ui/button";
 type ArticleCardActionsProps = {
 	articleId: string;
 	isRead: boolean;
+	isFavorite: boolean;
 	tagIds: string[];
 	availableTags?: Tag[];
 	persistent?: boolean;
 	onToggleRead: (id: string, isRead: boolean) => void;
+	onToggleFavorite: (id: string, isFavorite: boolean) => void;
 	onDelete: (id: string) => void;
 	onAddTag?: (tagId: string, articleIds: string[]) => void;
 	onRemoveTag?: (tagId: string, articleIds: string[]) => void;
@@ -19,10 +21,12 @@ type ArticleCardActionsProps = {
 export function ArticleCardActions({
 	articleId,
 	isRead,
+	isFavorite,
 	tagIds,
 	availableTags,
 	persistent = false,
 	onToggleRead,
+	onToggleFavorite,
 	onDelete,
 	onAddTag,
 	onRemoveTag,
@@ -46,6 +50,23 @@ export function ArticleCardActions({
 					articleIds={[articleId]}
 				/>
 			)}
+			<Button
+				variant="ghost"
+				size="icon-xs"
+				onClick={() => onToggleFavorite(articleId, !isFavorite)}
+				title={isFavorite ? "Remove from favorites" : "Add to favorites"}
+				className={
+					isFavorite ? "text-amber-500 hover:text-amber-600" : undefined
+				}
+			>
+				<Star
+					className={
+						isFavorite
+							? "h-[1.125rem] w-[1.125rem] fill-current"
+							: "h-[1.125rem] w-[1.125rem]"
+					}
+				/>
+			</Button>
 			<Button
 				variant="ghost"
 				size="icon-xs"

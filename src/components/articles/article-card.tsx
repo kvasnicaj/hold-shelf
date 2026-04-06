@@ -9,6 +9,7 @@ export function ArticleCard({
 	selected,
 	onSelect,
 	onToggleRead,
+	onToggleFavorite,
 	onDelete,
 	availableTags,
 	onAddTag,
@@ -29,9 +30,11 @@ export function ArticleCard({
 			<ArticleCardActions
 				articleId={article.id}
 				isRead={article.isRead}
+				isFavorite={article.isFavorite}
 				tagIds={article.tags.map((tag) => tag.id)}
 				availableTags={availableTags}
 				onToggleRead={onToggleRead}
+				onToggleFavorite={onToggleFavorite}
 				onDelete={onDelete}
 				onAddTag={onAddTag}
 				onRemoveTag={onRemoveTag}

@@ -67,6 +67,11 @@ export function useArchivePage() {
 		invalidateAll();
 	}
 
+	async function handleToggleFavorite(id: string, favoriteState: boolean) {
+		await updateArticle({ data: { id, isFavorite: favoriteState } });
+		invalidateAll();
+	}
+
 	async function handleDelete(ids: string[]) {
 		await deleteArticles({ data: { ids } });
 		setRowSelection({});
@@ -138,6 +143,7 @@ export function useArchivePage() {
 		setRowSelection,
 		handleAdd,
 		handleToggleRead,
+		handleToggleFavorite,
 		handleDelete,
 		handleBulkToggleRead,
 		handleAddTag,

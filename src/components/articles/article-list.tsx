@@ -9,6 +9,7 @@ type ArticleListProps = {
 	selected: Set<string>;
 	onSelect: (id: string, selected: boolean) => void;
 	onToggleRead: (id: string, isRead: boolean) => void;
+	onToggleFavorite: (id: string, isFavorite: boolean) => void;
 	onDelete: (ids: string[]) => void;
 	availableTags?: Tag[];
 	onAddTag?: (tagId: string, articleIds: string[]) => void;
@@ -21,6 +22,7 @@ export function ArticleList({
 	selected,
 	onSelect,
 	onToggleRead,
+	onToggleFavorite,
 	onDelete,
 	availableTags,
 	onAddTag,
@@ -44,6 +46,7 @@ export function ArticleList({
 					selected={selected.has(article.id)}
 					onSelect={onSelect}
 					onToggleRead={onToggleRead}
+					onToggleFavorite={onToggleFavorite}
 					onDelete={(id) => onDelete([id])}
 					availableTags={availableTags}
 					onAddTag={onAddTag}

@@ -44,6 +44,7 @@ describe("ArchiveTableMobile", () => {
 				onRemoveTag={vi.fn().mockResolvedValue(undefined)}
 				onCreateTag={vi.fn().mockResolvedValue(availableTags[0])}
 				onToggleRead={vi.fn().mockResolvedValue(undefined)}
+				onToggleFavorite={vi.fn().mockResolvedValue(undefined)}
 				onDelete={vi.fn().mockResolvedValue(undefined)}
 			/>,
 		);
@@ -64,6 +65,7 @@ describe("ArchiveTableMobile", () => {
 		const user = userEvent.setup();
 		const onRowSelectionChange = vi.fn();
 		const onToggleRead = vi.fn().mockResolvedValue(undefined);
+		const onToggleFavorite = vi.fn().mockResolvedValue(undefined);
 		const onDelete = vi.fn().mockResolvedValue(undefined);
 
 		renderWithProviders(
@@ -76,6 +78,7 @@ describe("ArchiveTableMobile", () => {
 				onRemoveTag={vi.fn().mockResolvedValue(undefined)}
 				onCreateTag={vi.fn().mockResolvedValue(availableTags[0])}
 				onToggleRead={onToggleRead}
+				onToggleFavorite={onToggleFavorite}
 				onDelete={onDelete}
 			/>,
 		);
@@ -101,6 +104,16 @@ describe("ArchiveTableMobile", () => {
 				name: /article actions for archived article/i,
 			}),
 		);
+		await user.click(
+			screen.getByRole("menuitem", { name: /add to favorites/i }),
+		);
+		expect(onToggleFavorite).toHaveBeenCalledWith("a1", true);
+
+		await user.click(
+			screen.getByRole("button", {
+				name: /article actions for archived article/i,
+			}),
+		);
 		await user.click(screen.getByRole("menuitem", { name: /^delete$/i }));
 		expect(onDelete).toHaveBeenCalledWith(["a1"]);
 	});
@@ -116,6 +129,7 @@ describe("ArchiveTableMobile", () => {
 				onRemoveTag={vi.fn().mockResolvedValue(undefined)}
 				onCreateTag={vi.fn().mockResolvedValue(availableTags[0])}
 				onToggleRead={vi.fn().mockResolvedValue(undefined)}
+				onToggleFavorite={vi.fn().mockResolvedValue(undefined)}
 				onDelete={vi.fn().mockResolvedValue(undefined)}
 			/>,
 		);

@@ -1,11 +1,19 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Archive, Bookmark, BookOpen, Home, Tags } from "lucide-react";
+import {
+	Archive,
+	BookMarked,
+	Bookmark,
+	BookOpen,
+	Home,
+	Tags,
+} from "lucide-react";
 import { ToolBox } from "#/components/layout/tool-box";
 import { Button } from "#/components/ui/button";
 
 const navItems = [
 	{ href: "/app/home", icon: Home, label: "Home" },
 	{ href: "/app/articles", icon: BookOpen, label: "Unread" },
+	{ href: "/app/favorites", icon: BookMarked, label: "Favorites" },
 	{ href: "/app/archive", icon: Archive, label: "Archive" },
 	{ href: "/app/tags", icon: Tags, label: "Tags" },
 ] as const;
