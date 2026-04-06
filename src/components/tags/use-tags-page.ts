@@ -124,21 +124,16 @@ export function useTagsPage() {
 		navigate({ search: {}, replace: true });
 	}
 
-	function goToPreviousPage() {
-		navigate({
-			search: (prev) => ({
-				...prev,
-				page: page > 2 ? page - 1 : undefined,
-			}),
-			replace: true,
-		});
-	}
+	function goToPage(nextPage: number) {
+		const clampedPage = Math.min(
+			Math.max(nextPage, 1),
+			Math.max(totalPages, 1),
+		);
 
-	function goToNextPage() {
 		navigate({
 			search: (prev) => ({
 				...prev,
-				page: page + 1,
+				page: clampedPage > 1 ? clampedPage : undefined,
 			}),
 			replace: true,
 		});
@@ -167,7 +162,6 @@ export function useTagsPage() {
 		handleCreateTagFromPicker,
 		navigateToTag,
 		goBackToTags,
-		goToPreviousPage,
-		goToNextPage,
+		goToPage,
 	};
 }
