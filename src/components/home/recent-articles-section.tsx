@@ -1,4 +1,4 @@
-import { BookOpen, Clock, Star } from "lucide-react";
+import { BookMarked, BookOpen, Clock } from "lucide-react";
 import { ArticleLink } from "#/components/home/article-link";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 
@@ -29,7 +29,7 @@ export function RecentArticlesSection({
 				<Card className="min-w-0 gap-4 overflow-hidden">
 					<CardHeader>
 						<CardTitle className="flex min-w-0 items-center gap-2 text-base">
-							<Star className="h-4 w-4 fill-current text-amber-500" />
+							<BookMarked className="h-4 w-4" />
 							Favorites
 						</CardTitle>
 					</CardHeader>

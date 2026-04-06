@@ -53,7 +53,7 @@ export function MobileBottomBar() {
 							aria-label={item.label}
 						>
 							<Link to={item.href} className="no-underline">
-								<Icon className="h-8 w-8" />
+								<Icon className="h-8 w-8 opacity-60" />
 							</Link>
 						</Button>
 					);

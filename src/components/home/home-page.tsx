@@ -2,6 +2,7 @@ import { getRouteApi } from "@tanstack/react-router";
 import { SaveArticleToolbarAction } from "#/components/articles/save-article-toolbar-action";
 import { useSaveArticle } from "#/components/articles/use-save-article";
 import { EmptyLibraryCta } from "#/components/home/empty-library-cta";
+import { HomeArchiveSearch } from "#/components/home/home-archive-search";
 import { HomeStatsSection } from "#/components/home/home-stats-section";
 import { RecentArticlesSection } from "#/components/home/recent-articles-section";
 
@@ -22,6 +23,7 @@ export function HomePage() {
 				<p className="text-muted-foreground">Your reading list, organized.</p>
 			</div>
 
+			<HomeArchiveSearch />
 			<HomeStatsSection stats={stats} />
 			<RecentArticlesSection
 				recentlySaved={recent.recentlySaved}

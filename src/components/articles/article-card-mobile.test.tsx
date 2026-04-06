@@ -87,4 +87,23 @@ describe("ArticleCardMobile", () => {
 		await user.click(screen.getByTitle("Delete"));
 		expect(onDelete).toHaveBeenCalledWith("a1");
 	});
+
+	it("uses larger mobile action icons", () => {
+		renderWithProviders(
+			<ArticleCardMobile
+				article={buildArticle({ tags: [] })}
+				selected={false}
+				onSelect={vi.fn()}
+				onToggleRead={vi.fn()}
+				onToggleFavorite={vi.fn()}
+				onDelete={vi.fn()}
+			/>,
+		);
+
+		const favoriteIcon = screen
+			.getByTitle("Add to favorites")
+			.querySelector("svg");
+
+		expect(favoriteIcon).toHaveClass("h-5", "w-5");
+	});
 });

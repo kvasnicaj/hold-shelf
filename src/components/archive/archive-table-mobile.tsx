@@ -91,6 +91,12 @@ export function ArchiveTableMobile({
 								</div>
 
 								<div className="min-w-0 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
+									<span
+										className={`h-2 w-2 shrink-0 rounded-full ${article.isRead ? "bg-muted-foreground/30" : "bg-primary"}`}
+										role="img"
+										aria-label={article.isRead ? "Read" : "Unread"}
+										title={article.isRead ? "Read" : "Unread"}
+									/>
 									<span className="truncate">
 										{article.hostname ?? article.url}
 									</span>
