@@ -146,21 +146,16 @@ export function useArticleCollectionPage({
 		});
 	}
 
-	function goToPreviousPage() {
-		void navigate({
-			search: (prev) => ({
-				...prev,
-				page: page > 2 ? page - 1 : undefined,
-			}),
-			replace: true,
-		});
-	}
+	function goToPage(nextPage: number) {
+		const clampedPage = Math.min(
+			Math.max(nextPage, 1),
+			Math.max(totalPages, 1),
+		);
 
-	function goToNextPage() {
 		void navigate({
 			search: (prev) => ({
 				...prev,
-				page: Math.min(page + 1, Math.max(totalPages, 1)),
+				page: clampedPage > 1 ? clampedPage : undefined,
 			}),
 			replace: true,
 		});
@@ -187,8 +182,7 @@ export function useArticleCollectionPage({
 		handleCreateTag,
 		updateQuery,
 		updateSort,
-		goToPreviousPage,
-		goToNextPage,
+		goToPage,
 		clearSelection: () => setSelected(new Set()),
 	};
 }
