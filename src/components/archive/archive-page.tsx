@@ -1,9 +1,9 @@
 import { ArchiveFilters } from "#/components/archive/archive-filters";
-import { ArchivePagination } from "#/components/archive/archive-pagination";
 import { ArchiveTable } from "#/components/archive/archive-table";
 import { ArchiveToolbarActions } from "#/components/archive/archive-toolbar-actions";
 import { useArchivePage } from "#/components/archive/use-archive-page";
 import { BulkActionsPanel } from "#/components/articles/bulk-actions-panel";
+import { AppPagination } from "#/components/pagination/app-pagination";
 
 export function ArchivePage() {
 	const {
@@ -32,8 +32,7 @@ export function ArchivePage() {
 		updateTag,
 		updateFilter,
 		updateSort,
-		goToPreviousPage,
-		goToNextPage,
+		goToPage,
 		clearSelection,
 	} = useArchivePage();
 
@@ -92,11 +91,10 @@ export function ArchivePage() {
 						onDelete={handleDelete}
 					/>
 
-					<ArchivePagination
+					<AppPagination
 						page={page}
 						totalPages={totalPages}
-						onPrevious={goToPreviousPage}
-						onNext={goToNextPage}
+						onPageChange={goToPage}
 					/>
 				</>
 			)}

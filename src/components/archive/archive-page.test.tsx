@@ -243,10 +243,52 @@ describe("ArchivePage", () => {
 		expect(routerInvalidateMock).toHaveBeenCalled();
 	});
 
-	it("renders pagination controls when multiple pages exist", () => {
+	it("renders numeric pagination and keeps the current page inactive", async () => {
+		const user = userEvent.setup();
 		renderWithProviders(<ArchivePage />);
 
-		expect(screen.getByText("Page 2 of 2")).toBeInTheDocument();
-		expect(screen.getByRole("button", { name: /previous/i })).toBeEnabled();
+		expect(
+			screen.getByRole("link", { name: /go to page 1/i }),
+		).toBeInTheDocument();
+		expect(screen.getByRole("link", { name: /go to page 2/i })).toHaveAttribute(
+			"aria-current",
+			"page",
+		);
+		expect(
+			screen.getByRole("link", { name: /go to previous page/i }),
+		).toHaveAttribute("aria-disabled", "false");
+
+		await user.click(screen.getByRole("link", { name: /go to page 2/i }));
+
+		expect(navigateMock).not.toHaveBeenCalled();
+	});
+
+	it("removes the page param when going back from page two", async () => {
+		const user = userEvent.setup();
+		renderWithProviders(<ArchivePage />);
+
+		await user.click(
+			screen.getByRole("link", { name: /go to previous page/i }),
+		);
+
+		expect(navigateMock).toHaveBeenCalledTimes(1);
+		const latestNavigateCall = navigateMock.mock.calls.at(-1);
+		expect(latestNavigateCall?.[0]?.replace).toBe(true);
+		expect(latestNavigateCall?.[0]?.search).toEqual(expect.any(Function));
+		expect(
+			latestNavigateCall?.[0]?.search({
+				q: "query",
+				filter: "read",
+				sort: "title",
+				tag: "t1",
+				page: 2,
+			}),
+		).toEqual({
+			q: "query",
+			filter: "read",
+			sort: "title",
+			tag: "t1",
+			page: undefined,
+		});
 	});
 });

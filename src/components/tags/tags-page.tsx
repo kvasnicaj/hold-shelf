@@ -29,8 +29,7 @@ export function TagsPage() {
 		handleCreateTagFromPicker,
 		navigateToTag,
 		goBackToTags,
-		goToPreviousPage,
-		goToNextPage,
+		goToPage,
 	} = useTagsPage();
 	const isMobile = useIsMobile();
 
@@ -71,8 +70,7 @@ export function TagsPage() {
 							onAddTag={handleAddTag}
 							onRemoveTag={handleRemoveTag}
 							onCreateTag={handleCreateTagFromPicker}
-							onPreviousPage={goToPreviousPage}
-							onNextPage={goToNextPage}
+							onPageChange={goToPage}
 						/>
 					)}
 				</div>
@@ -110,8 +108,7 @@ export function TagsPage() {
 								onAddTag={handleAddTag}
 								onRemoveTag={handleRemoveTag}
 								onCreateTag={handleCreateTagFromPicker}
-								onPreviousPage={goToPreviousPage}
-								onNextPage={goToNextPage}
+								onPageChange={goToPage}
 								showBackButton={false}
 								variant="desktop"
 							/>

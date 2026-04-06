@@ -1,9 +1,9 @@
 import { ArticleList } from "#/components/articles/article-list";
 import { ArticlesHeader } from "#/components/articles/articles-header";
-import { ArticlesPagination } from "#/components/articles/articles-pagination";
 import { ArticlesToolbarActions } from "#/components/articles/articles-toolbar-actions";
 import { BulkActionsPanel } from "#/components/articles/bulk-actions-panel";
 import { useArticlesPage } from "#/components/articles/use-articles-page";
+import { AppPagination } from "#/components/pagination/app-pagination";
 
 export function ArticlesPage() {
 	const {
@@ -26,8 +26,7 @@ export function ArticlesPage() {
 		handleCreateTag,
 		updateQuery,
 		updateSort,
-		goToPreviousPage,
-		goToNextPage,
+		goToPage,
 		clearSelection,
 	} = useArticlesPage();
 
@@ -70,11 +69,10 @@ export function ArticlesPage() {
 						onCreateTag={handleCreateTag}
 					/>
 
-					<ArticlesPagination
+					<AppPagination
 						page={page}
 						totalPages={totalPages}
-						onPrevious={goToPreviousPage}
-						onNext={goToNextPage}
+						onPageChange={goToPage}
 					/>
 				</>
 			)}

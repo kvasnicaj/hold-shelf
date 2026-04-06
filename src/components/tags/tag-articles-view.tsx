@@ -1,6 +1,7 @@
 import { ArrowLeft } from "lucide-react";
 import { ArticleList } from "#/components/articles/article-list";
 import type { ArticleWithTags } from "#/components/articles/types";
+import { AppPagination } from "#/components/pagination/app-pagination";
 import type { Tag } from "#/components/tags/types";
 import { Button } from "#/components/ui/button";
 
@@ -19,8 +20,7 @@ type TagArticlesViewProps = {
 	onAddTag: (tagId: string, articleIds: string[]) => Promise<void>;
 	onRemoveTag: (tagId: string, articleIds: string[]) => Promise<void>;
 	onCreateTag: (name: string) => Promise<Tag>;
-	onPreviousPage: () => void;
-	onNextPage: () => void;
+	onPageChange: (page: number) => void;
 	showBackButton?: boolean;
 	variant?: "mobile" | "desktop";
 };
@@ -40,8 +40,7 @@ export function TagArticlesView({
 	onAddTag,
 	onRemoveTag,
 	onCreateTag,
-	onPreviousPage,
-	onNextPage,
+	onPageChange,
 	showBackButton = true,
 	variant = "mobile",
 }: TagArticlesViewProps) {
@@ -126,29 +125,11 @@ export function TagArticlesView({
 			/>
 
 			{totalPages > 1 && (
-				<div className="flex items-center justify-between">
-					<p className="text-sm text-muted-foreground">
-						Page {page} of {totalPages}
-					</p>
-					<div className="flex items-center gap-1">
-						<Button
-							variant="outline"
-							size="sm"
-							disabled={page <= 1}
-							onClick={onPreviousPage}
-						>
-							Previous
-						</Button>
-						<Button
-							variant="outline"
-							size="sm"
-							disabled={page >= totalPages}
-							onClick={onNextPage}
-						>
-							Next
-						</Button>
-					</div>
-				</div>
+				<AppPagination
+					page={page}
+					totalPages={totalPages}
+					onPageChange={onPageChange}
+				/>
 			)}
 		</div>
 	);
