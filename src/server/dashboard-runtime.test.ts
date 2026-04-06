@@ -36,6 +36,7 @@ describe("dashboard-runtime", () => {
 		const requireUserIdFn = vi.fn().mockResolvedValue("user-1");
 		const recentResult = {
 			recentlySaved: [{ id: "a1" }],
+			recentlyFavorite: [{ id: "a3" }],
 			oldestUnread: [{ id: "a2" }],
 		};
 		const repo = {

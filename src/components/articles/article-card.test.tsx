@@ -40,6 +40,7 @@ describe("ArticleCard", () => {
 				selected={false}
 				onSelect={vi.fn()}
 				onToggleRead={vi.fn()}
+				onToggleFavorite={vi.fn()}
 				onDelete={vi.fn()}
 				availableTags={availableTags}
 				onAddTag={vi.fn()}
@@ -58,6 +59,7 @@ describe("ArticleCard", () => {
 		const user = userEvent.setup();
 		const onSelect = vi.fn();
 		const onToggleRead = vi.fn();
+		const onToggleFavorite = vi.fn();
 		const onDelete = vi.fn();
 
 		renderWithProviders(
@@ -70,6 +72,7 @@ describe("ArticleCard", () => {
 				selected={true}
 				onSelect={onSelect}
 				onToggleRead={onToggleRead}
+				onToggleFavorite={onToggleFavorite}
 				onDelete={onDelete}
 			/>,
 		);
@@ -83,6 +86,9 @@ describe("ArticleCard", () => {
 
 		await user.click(screen.getByTitle("Mark as read"));
 		expect(onToggleRead).toHaveBeenCalledWith("a1", true);
+
+		await user.click(screen.getByTitle("Add to favorites"));
+		expect(onToggleFavorite).toHaveBeenCalledWith("a1", true);
 
 		await user.click(screen.getByTitle("Delete"));
 		expect(onDelete).toHaveBeenCalledWith("a1");

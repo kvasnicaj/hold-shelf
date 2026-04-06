@@ -18,6 +18,7 @@ import { Route as ExtensionSaveRouteImport } from './routes/extension/save'
 import { Route as AppTagsRouteImport } from './routes/app/tags'
 import { Route as AppSettingsRouteImport } from './routes/app/settings'
 import { Route as AppHomeRouteImport } from './routes/app/home'
+import { Route as AppFavoritesRouteImport } from './routes/app/favorites'
 import { Route as AppArticlesRouteImport } from './routes/app/articles'
 import { Route as AppArchiveRouteImport } from './routes/app/archive'
 import { Route as ApiExtensionArticlesRouteImport } from './routes/api/extension/articles'
@@ -68,6 +69,11 @@ const AppHomeRoute = AppHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => AppRoute,
 } as any)
+const AppFavoritesRoute = AppFavoritesRouteImport.update({
+  id: '/favorites',
+  path: '/favorites',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppArticlesRoute = AppArticlesRouteImport.update({
   id: '/articles',
   path: '/articles',
@@ -97,6 +103,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/app/archive': typeof AppArchiveRoute
   '/app/articles': typeof AppArticlesRoute
+  '/app/favorites': typeof AppFavoritesRoute
   '/app/home': typeof AppHomeRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/tags': typeof AppTagsRoute
@@ -112,6 +119,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/app/archive': typeof AppArchiveRoute
   '/app/articles': typeof AppArticlesRoute
+  '/app/favorites': typeof AppFavoritesRoute
   '/app/home': typeof AppHomeRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/tags': typeof AppTagsRoute
@@ -128,6 +136,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/app/archive': typeof AppArchiveRoute
   '/app/articles': typeof AppArticlesRoute
+  '/app/favorites': typeof AppFavoritesRoute
   '/app/home': typeof AppHomeRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/tags': typeof AppTagsRoute
@@ -145,6 +154,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/app/archive'
     | '/app/articles'
+    | '/app/favorites'
     | '/app/home'
     | '/app/settings'
     | '/app/tags'
@@ -160,6 +170,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/app/archive'
     | '/app/articles'
+    | '/app/favorites'
     | '/app/home'
     | '/app/settings'
     | '/app/tags'
@@ -175,6 +186,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/app/archive'
     | '/app/articles'
+    | '/app/favorites'
     | '/app/home'
     | '/app/settings'
     | '/app/tags'
@@ -259,6 +271,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppHomeRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/favorites': {
+      id: '/app/favorites'
+      path: '/favorites'
+      fullPath: '/app/favorites'
+      preLoaderRoute: typeof AppFavoritesRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/articles': {
       id: '/app/articles'
       path: '/articles'
@@ -293,6 +312,7 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppArchiveRoute: typeof AppArchiveRoute
   AppArticlesRoute: typeof AppArticlesRoute
+  AppFavoritesRoute: typeof AppFavoritesRoute
   AppHomeRoute: typeof AppHomeRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppTagsRoute: typeof AppTagsRoute
@@ -301,6 +321,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppArchiveRoute: AppArchiveRoute,
   AppArticlesRoute: AppArticlesRoute,
+  AppFavoritesRoute: AppFavoritesRoute,
   AppHomeRoute: AppHomeRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppTagsRoute: AppTagsRoute,

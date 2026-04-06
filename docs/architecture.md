@@ -232,6 +232,8 @@ HomePage
 |- recent content grid
 |  |- recently saved card
 |  |  |- ArticleLink*
+|  |- favorites card
+|  |  |- ArticleLink*
 |  |- oldest unread card
 |     |- ArticleLink*
 |- empty state CTA -> /app/articles
@@ -281,6 +283,43 @@ Core functionality:
 - assign/remove tags with `addTagToArticles()` and
   `removeTagFromArticles()`
 - create tags inline from `TagPicker`
+
+### Favorites
+
+Route: `/app/favorites`
+
+Loader dependencies:
+
+- `getArticles({ isFavorite: true, search, sort, limit, offset })`
+- `getTags()`
+
+Component tree:
+
+```text
+FavoritesPage
+|- ToolbarSlot
+|  |- AddArticleDialog
+|- BulkActionsPanel? (when rows selected)
+|- page title
+|- sort control
+|- empty state
+|- ArticleList
+|  |- ArticleCard*
+|     |- Checkbox
+|     |- article link / favicon / metadata
+|     |- tag badges
+|     |- TagPicker
+|     |- favorite toggle button
+|     |- mark read/unread button
+|     |- delete button
+|- pagination
+```
+
+Core functionality:
+
+- fetch favorite articles with search/sort/pagination
+- remove or add one article to favorites with `updateArticle()`
+- supports the same tag, delete, and read/unread controls as the unread page
 
 ### Tags
 
@@ -392,7 +431,7 @@ Core functionality:
 
 ### Layout
 
-- `AppSidebar`: desktop navigation, unread counter, dynamic tag links
+- `AppSidebar`: desktop navigation, unread counter, favorites link, dynamic tag links
 - `MobileBottomBar`: mobile navigation
 - `AppToolbar`: search, page actions, theme toggle, user menu, sign out
 - `ToolBox`: shared chrome for toolbar controls

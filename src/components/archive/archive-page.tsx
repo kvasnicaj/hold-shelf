@@ -22,6 +22,7 @@ export function ArchivePage() {
 		setRowSelection,
 		handleAdd,
 		handleToggleRead,
+		handleToggleFavorite,
 		handleDelete,
 		handleBulkToggleRead,
 		handleAddTag,
@@ -88,6 +89,7 @@ export function ArchivePage() {
 						onRemoveTag={handleRemoveTag}
 						onCreateTag={handleCreateTag}
 						onToggleRead={handleToggleRead}
+						onToggleFavorite={handleToggleFavorite}
 						onDelete={handleDelete}
 					/>
 

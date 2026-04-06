@@ -2,32 +2,32 @@ import { getRouteApi, useNavigate } from "@tanstack/react-router";
 import { ArticleCollectionPage } from "#/components/articles/article-collection-page";
 import { useArticleCollectionPage } from "#/components/articles/use-article-collection-page";
 
-const route = getRouteApi("/app/articles");
+const route = getRouteApi("/app/favorites");
 
-export function ArticlesPage() {
+export function FavoritesPage() {
 	const initialData = route.useLoaderData();
 	const search = route.useSearch();
-	const navigate = useNavigate({ from: "/app/articles" });
+	const navigate = useNavigate({ from: "/app/favorites" });
 	const pageState = useArticleCollectionPage({
 		initialData,
 		search,
-		queryKey: "unread",
-		filters: { isRead: false },
+		queryKey: "favorites",
+		filters: { isFavorite: true },
 		navigate,
 	});
 
 	return (
 		<ArticleCollectionPage
 			{...pageState}
-			title="Unread"
-			searchPlaceholder="Search articles..."
+			title="Favorites"
+			searchPlaceholder="Search favorites..."
 			emptyStateMessage={
 				pageState.q
-					? "No articles match your search."
-					: "No unread articles yet."
+					? "No favorite articles match your search."
+					: "No favorite articles yet."
 			}
 			emptyStateHint={
-				pageState.q ? undefined : "Save an article to get started."
+				pageState.q ? undefined : "Star an article to add it to Favorites."
 			}
 		/>
 	);

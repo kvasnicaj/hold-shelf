@@ -16,6 +16,7 @@ export type DashboardRepository = {
 	getStats: (userId: string) => Promise<DashboardStatsRow | null>;
 	getRecentArticles: (userId: string) => Promise<{
 		recentlySaved: DashboardRecentArticle[];
+		recentlyFavorite: DashboardRecentArticle[];
 		oldestUnread: DashboardRecentArticle[];
 	}>;
 };

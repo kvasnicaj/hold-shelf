@@ -1,6 +1,10 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getRouteApi, useNavigate, useRouter } from "@tanstack/react-router";
+import { useRouter } from "@tanstack/react-router";
 import { useState } from "react";
+import type {
+	ArticleCollectionLoaderData,
+	ArticleCollectionSearch,
+} from "#/components/articles/types";
 import { useSaveArticle } from "#/components/articles/use-save-article";
 import { deleteArticles, getArticles, updateArticle } from "#/server/articles";
 import {
@@ -10,28 +14,48 @@ import {
 	removeTagFromArticles,
 } from "#/server/tags";
 
-const route = getRouteApi("/app/articles");
+type UseArticleCollectionPageOptions = {
+	initialData: ArticleCollectionLoaderData;
+	search: ArticleCollectionSearch;
+	queryKey: "unread" | "favorites";
+	filters: {
+		isRead?: boolean;
+		isFavorite?: boolean;
+	};
+	navigate: (options: {
+		search: (
+			prev: ArticleCollectionSearch,
+		) => Partial<ArticleCollectionSearch> | ArticleCollectionSearch;
+		replace: boolean;
+	}) => void | Promise<void>;
+};
 
-export function useArticlesPage() {
-	const initialData = route.useLoaderData();
-	const { q, sort, page: searchPage } = route.useSearch();
+const PAGE_SIZE = 20;
+
+export function useArticleCollectionPage({
+	initialData,
+	search,
+	queryKey,
+	filters,
+	navigate,
+}: UseArticleCollectionPageOptions) {
+	const { q, sort, page: searchPage } = search;
 	const page = searchPage ?? 1;
 	const queryClient = useQueryClient();
 	const router = useRouter();
-	const navigate = useNavigate({ from: "/app/articles" });
 	const [selected, setSelected] = useState<Set<string>>(new Set());
 	const { handleAdd } = useSaveArticle();
 
 	const { data: result } = useQuery({
-		queryKey: ["articles", "unread", q, sort, page],
+		queryKey: ["articles", queryKey, q, sort, page],
 		queryFn: () =>
 			getArticles({
 				data: {
-					isRead: false,
+					...filters,
 					search: q,
 					sort,
-					limit: 20,
-					offset: (page - 1) * 20,
+					limit: PAGE_SIZE,
+					offset: (page - 1) * PAGE_SIZE,
 				},
 			}),
 		initialData: initialData.articles,
@@ -44,13 +68,13 @@ export function useArticlesPage() {
 
 	const articles = result?.items ?? [];
 	const total = result?.total ?? 0;
-	const totalPages = Math.ceil(total / 20);
+	const totalPages = Math.ceil(total / PAGE_SIZE);
 	const selectedIds = Array.from(selected);
 
 	function invalidateAll() {
-		queryClient.invalidateQueries({ queryKey: ["articles"] });
-		queryClient.invalidateQueries({ queryKey: ["tags"] });
-		router.invalidate();
+		void queryClient.invalidateQueries({ queryKey: ["articles"] });
+		void queryClient.invalidateQueries({ queryKey: ["tags"] });
+		void router.invalidate();
 	}
 
 	function handleSelect(id: string, isSelected: boolean) {
@@ -64,6 +88,11 @@ export function useArticlesPage() {
 
 	async function handleToggleRead(id: string, isRead: boolean) {
 		await updateArticle({ data: { id, isRead } });
+		invalidateAll();
+	}
+
+	async function handleToggleFavorite(id: string, isFavorite: boolean) {
+		await updateArticle({ data: { id, isFavorite } });
 		invalidateAll();
 	}
 
@@ -96,7 +125,7 @@ export function useArticlesPage() {
 	}
 
 	function updateSort(nextSort: "newest" | "oldest" | "title") {
-		navigate({
+		void navigate({
 			search: (prev) => ({
 				...prev,
 				sort: nextSort === "newest" ? undefined : nextSort,
@@ -107,7 +136,7 @@ export function useArticlesPage() {
 	}
 
 	function updateQuery(query: string) {
-		navigate({
+		void navigate({
 			search: (prev) => ({
 				...prev,
 				q: query.trim() ? query : undefined,
@@ -123,7 +152,7 @@ export function useArticlesPage() {
 			Math.max(totalPages, 1),
 		);
 
-		navigate({
+		void navigate({
 			search: (prev) => ({
 				...prev,
 				page: clampedPage > 1 ? clampedPage : undefined,
@@ -145,6 +174,7 @@ export function useArticlesPage() {
 		handleSelect,
 		handleAdd,
 		handleToggleRead,
+		handleToggleFavorite,
 		handleDelete,
 		handleBulkToggleRead,
 		handleAddTag,

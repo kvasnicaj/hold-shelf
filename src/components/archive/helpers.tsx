@@ -1,11 +1,24 @@
 import { createColumnHelper } from "@tanstack/react-table";
-import { BookOpen, Check, ExternalLink, Trash2 } from "lucide-react";
+import {
+	BookOpen,
+	Check,
+	EllipsisVertical,
+	ExternalLink,
+	Star,
+	Trash2,
+} from "lucide-react";
 import type { ArticleWithTags } from "#/components/articles/types";
 import { TagPicker } from "#/components/tags/tag-picker";
 import type { Tag } from "#/components/tags/types";
 import { Badge } from "#/components/ui/badge";
 import { Button } from "#/components/ui/button";
 import { Checkbox } from "#/components/ui/checkbox";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "#/components/ui/dropdown-menu";
 import { formatDate } from "#/lib/formatters";
 
 const columnHelper = createColumnHelper<ArticleWithTags>();
@@ -16,6 +29,7 @@ type CreateArchiveColumnsOptions = {
 	onRemoveTag: (tagId: string, articleIds: string[]) => Promise<void>;
 	onCreateTag: (name: string) => Promise<Tag>;
 	onToggleRead: (id: string, isRead: boolean) => Promise<void>;
+	onToggleFavorite: (id: string, isFavorite: boolean) => Promise<void>;
 	onDelete: (ids: string[]) => Promise<void>;
 };
 
@@ -25,6 +39,7 @@ export function createArchiveColumns({
 	onRemoveTag,
 	onCreateTag,
 	onToggleRead,
+	onToggleFavorite,
 	onDelete,
 }: CreateArchiveColumnsOptions) {
 	return [
@@ -82,6 +97,9 @@ export function createArchiveColumns({
 							>
 								{article.title ?? article.url}
 							</a>
+							{article.isFavorite && (
+								<Star className="h-3.5 w-3.5 shrink-0 fill-current text-amber-500" />
+							)}
 							<ExternalLink className="h-3 w-3 shrink-0 text-muted-foreground opacity-0 group-hover/row:opacity-100" />
 						</div>
 						{article.hostname && (
@@ -108,7 +126,7 @@ export function createArchiveColumns({
 					))}
 				</div>
 			),
-			size: 140,
+			size: 168,
 		}),
 		columnHelper.accessor("createdAt", {
 			header: "Saved",
@@ -125,7 +143,7 @@ export function createArchiveColumns({
 			cell: ({ row }) => {
 				const article = row.original;
 				return (
-					<div className="flex items-center gap-0.5 opacity-0 group-hover/row:opacity-100">
+					<div className="flex min-w-[3.75rem] items-center justify-end gap-px whitespace-nowrap opacity-0 group-hover/row:opacity-100">
 						<TagPicker
 							availableTags={availableTags}
 							selectedTagIds={article.tags.map((tag) => tag.id)}
@@ -134,30 +152,57 @@ export function createArchiveColumns({
 							onCreateTag={onCreateTag}
 							articleIds={[article.id]}
 						/>
-						<Button
-							variant="ghost"
-							size="icon-xs"
-							onClick={() => onToggleRead(article.id, !article.isRead)}
-							title={article.isRead ? "Mark unread" : "Mark read"}
-						>
-							{article.isRead ? (
-								<BookOpen className="h-3.5 w-3.5" />
-							) : (
-								<Check className="h-3.5 w-3.5" />
-							)}
-						</Button>
-						<Button
-							variant="ghost"
-							size="icon-xs"
-							onClick={() => onDelete([article.id])}
-							title="Delete"
-						>
-							<Trash2 className="h-3.5 w-3.5" />
-						</Button>
+						<DropdownMenu>
+							<DropdownMenuTrigger asChild>
+								<Button
+									variant="ghost"
+									size="icon-xs"
+									aria-label={`Article actions for ${article.title ?? article.url}`}
+									title="More actions"
+								>
+									<EllipsisVertical className="h-3.5 w-3.5" />
+								</Button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent align="end">
+								<DropdownMenuItem
+									onClick={() =>
+										onToggleFavorite(article.id, !article.isFavorite)
+									}
+								>
+									<Star
+										className={
+											article.isFavorite
+												? "h-4 w-4 fill-current text-amber-500"
+												: "h-4 w-4"
+										}
+									/>
+									{article.isFavorite
+										? "Remove from favorites"
+										: "Add to favorites"}
+								</DropdownMenuItem>
+								<DropdownMenuItem
+									onClick={() => onToggleRead(article.id, !article.isRead)}
+								>
+									{article.isRead ? (
+										<BookOpen className="h-4 w-4" />
+									) : (
+										<Check className="h-4 w-4" />
+									)}
+									{article.isRead ? "Mark unread" : "Mark read"}
+								</DropdownMenuItem>
+								<DropdownMenuItem
+									variant="destructive"
+									onClick={() => onDelete([article.id])}
+								>
+									<Trash2 className="h-4 w-4" />
+									Delete
+								</DropdownMenuItem>
+							</DropdownMenuContent>
+						</DropdownMenu>
 					</div>
 				);
 			},
-			size: 90,
+			size: 72,
 		}),
 	];
 }
