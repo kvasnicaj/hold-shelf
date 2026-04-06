@@ -53,6 +53,10 @@ const { routeState } = vi.hoisted(() => ({
 	},
 }));
 
+const { navigateMock } = vi.hoisted(() => ({
+	navigateMock: vi.fn(),
+}));
+
 vi.mock("@tanstack/react-router", async () => {
 	const actual = await vi.importActual<typeof import("@tanstack/react-router")>(
 		"@tanstack/react-router",
@@ -63,6 +67,7 @@ vi.mock("@tanstack/react-router", async () => {
 		getRouteApi: () => ({
 			useLoaderData: () => routeState.loaderData,
 		}),
+		useNavigate: () => navigateMock,
 		Link: ({
 			children,
 			to,
@@ -87,6 +92,7 @@ vi.mock("#/components/articles/use-save-article", () => ({
 
 describe("HomePage", () => {
 	beforeEach(() => {
+		navigateMock.mockReset();
 		routeState.loaderData = {
 			stats: {
 				unread: 3,
@@ -130,6 +136,9 @@ describe("HomePage", () => {
 		renderWithProviders(<HomePage />);
 
 		expect(screen.getByText("Welcome to Hold Shelf")).toBeInTheDocument();
+		expect(
+			screen.getByRole("searchbox", { name: /search all archived articles/i }),
+		).toBeInTheDocument();
 		expect(screen.getAllByText("Unread")).not.toHaveLength(0);
 		expect(screen.getAllByText("Total")).not.toHaveLength(0);
 		expect(screen.getByText("Recently saved")).toBeInTheDocument();
@@ -161,5 +170,25 @@ describe("HomePage", () => {
 		expect(
 			screen.getByText(/use the add article button in the top bar/i),
 		).toBeInTheDocument();
+	});
+
+	it("navigates to archive search from the dashboard search bar", async () => {
+		const user = (await import("@testing-library/user-event")).default.setup();
+		renderWithProviders(<HomePage />);
+
+		await user.type(
+			screen.getByRole("searchbox", {
+				name: /search all archived articles/i,
+			}),
+			"design systems",
+		);
+		await user.click(screen.getByRole("button", { name: /^search$/i }));
+
+		expect(navigateMock).toHaveBeenCalledWith({
+			to: "/app/archive",
+			search: {
+				q: "design systems",
+			},
+		});
 	});
 });

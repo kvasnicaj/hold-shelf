@@ -34,7 +34,7 @@ function buildArticle(
 
 describe("ArchiveTableMobile", () => {
 	it("renders the compact mobile layout with title, controls, hostname, and side tags", () => {
-		renderWithProviders(
+		const { container } = renderWithProviders(
 			<ArchiveTableMobile
 				articles={[buildArticle()]}
 				rowSelection={{}}
@@ -51,7 +51,8 @@ describe("ArchiveTableMobile", () => {
 
 		expect(screen.getByText("Archived article")).toBeInTheDocument();
 		expect(screen.getByText("example.com")).toBeInTheDocument();
-		expect(screen.queryByRole("img")).not.toBeInTheDocument();
+		expect(screen.getByLabelText("Unread")).toBeInTheDocument();
+		expect(container.querySelector("img")).toBeNull();
 		expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
 		expect(screen.getAllByText("Design")).not.toHaveLength(0);
 		expect(
@@ -135,5 +136,24 @@ describe("ArchiveTableMobile", () => {
 		);
 
 		expect(screen.getByRole("checkbox")).toBeInTheDocument();
+	});
+
+	it("shows a read indicator for read articles", () => {
+		renderWithProviders(
+			<ArchiveTableMobile
+				articles={[buildArticle({ isRead: true, tags: [] })]}
+				rowSelection={{}}
+				onRowSelectionChange={vi.fn()}
+				availableTags={availableTags}
+				onAddTag={vi.fn().mockResolvedValue(undefined)}
+				onRemoveTag={vi.fn().mockResolvedValue(undefined)}
+				onCreateTag={vi.fn().mockResolvedValue(availableTags[0])}
+				onToggleRead={vi.fn().mockResolvedValue(undefined)}
+				onToggleFavorite={vi.fn().mockResolvedValue(undefined)}
+				onDelete={vi.fn().mockResolvedValue(undefined)}
+			/>,
+		);
+
+		expect(screen.getByLabelText("Read")).toBeInTheDocument();
 	});
 });

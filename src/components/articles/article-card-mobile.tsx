@@ -49,6 +49,7 @@ export function ArticleCardMobile({
 							tagIds={article.tags.map((tag) => tag.id)}
 							availableTags={availableTags}
 							persistent
+							iconSize="mobile"
 							onToggleRead={onToggleRead}
 							onToggleFavorite={onToggleFavorite}
 							onDelete={onDelete}

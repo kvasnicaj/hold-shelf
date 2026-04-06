@@ -2,6 +2,7 @@ import { BookOpen, Check, Star, Trash2 } from "lucide-react";
 import { TagPicker } from "#/components/tags/tag-picker";
 import type { Tag } from "#/components/tags/types";
 import { Button } from "#/components/ui/button";
+import { cn } from "#/lib/utils";
 
 type ArticleCardActionsProps = {
 	articleId: string;
@@ -10,6 +11,7 @@ type ArticleCardActionsProps = {
 	tagIds: string[];
 	availableTags?: Tag[];
 	persistent?: boolean;
+	iconSize?: "default" | "mobile";
 	onToggleRead: (id: string, isRead: boolean) => void;
 	onToggleFavorite: (id: string, isFavorite: boolean) => void;
 	onDelete: (id: string) => void;
@@ -25,6 +27,7 @@ export function ArticleCardActions({
 	tagIds,
 	availableTags,
 	persistent = false,
+	iconSize = "default",
 	onToggleRead,
 	onToggleFavorite,
 	onDelete,
@@ -32,6 +35,9 @@ export function ArticleCardActions({
 	onRemoveTag,
 	onCreateTag,
 }: ArticleCardActionsProps) {
+	const iconClassName =
+		iconSize === "mobile" ? "h-5 w-5" : "h-[1.125rem] w-[1.125rem]";
+
 	return (
 		<div
 			className={
@@ -59,13 +65,7 @@ export function ArticleCardActions({
 					isFavorite ? "text-amber-500 hover:text-amber-600" : undefined
 				}
 			>
-				<Star
-					className={
-						isFavorite
-							? "h-[1.125rem] w-[1.125rem] fill-current"
-							: "h-[1.125rem] w-[1.125rem]"
-					}
-				/>
+				<Star className={cn(iconClassName, isFavorite && "fill-current")} />
 			</Button>
 			<Button
 				variant="ghost"
@@ -74,9 +74,9 @@ export function ArticleCardActions({
 				title={isRead ? "Mark as unread" : "Mark as read"}
 			>
 				{isRead ? (
-					<BookOpen className="h-[1.125rem] w-[1.125rem]" />
+					<BookOpen className={iconClassName} />
 				) : (
-					<Check className="h-[1.125rem] w-[1.125rem]" />
+					<Check className={iconClassName} />
 				)}
 			</Button>
 			<Button
@@ -85,7 +85,7 @@ export function ArticleCardActions({
 				onClick={() => onDelete(articleId)}
 				title="Delete"
 			>
-				<Trash2 className="h-[1.125rem] w-[1.125rem]" />
+				<Trash2 className={iconClassName} />
 			</Button>
 		</div>
 	);

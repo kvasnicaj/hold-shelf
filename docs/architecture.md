@@ -226,6 +226,7 @@ Component tree:
 ```text
 HomePage
 |- page header
+|- archive search bar -> /app/archive?q=...
 |- mobile stats card
 |- desktop stat card grid
 |  |- StatCard x4
@@ -242,6 +243,7 @@ HomePage
 Purpose:
 
 - dashboard and entry point after login
+- quick archive search shortcut that deep-links into full archive results
 - surfaces reading volume and quick links into saved content
 
 ### Unread articles
