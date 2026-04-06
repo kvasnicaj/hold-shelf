@@ -13,6 +13,17 @@ const plugins = [
 
 export default defineConfig({
 	test: {
+		coverage: {
+			provider: "v8",
+			reporter: ["text", "html"],
+			include: ["src/**/*.{ts,tsx}"],
+			exclude: [
+				"src/**/*.test.{ts,tsx}",
+				"src/test/**",
+				"src/routeTree.gen.ts",
+				"src/env.d.ts",
+			],
+		},
 		projects: [
 			{
 				plugins,
