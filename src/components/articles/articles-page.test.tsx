@@ -232,6 +232,43 @@ describe("ArticlesPage", () => {
 		expect(screen.getByText("1 selected")).toBeInTheDocument();
 	});
 
+	it("renders numeric pagination and navigates directly to a selected page", async () => {
+		const user = userEvent.setup();
+		routeState.search = { page: 2 };
+		routeState.loaderData = {
+			articles: { items: articleFixtures, total: 60 },
+			tags: tagFixtures,
+		};
+		getArticlesMock.mockResolvedValue(routeState.loaderData.articles);
+
+		renderWithProviders(<ArticlesPage />);
+
+		expect(
+			screen.getByRole("link", { name: /go to page 1/i }),
+		).toBeInTheDocument();
+		expect(screen.getByRole("link", { name: /go to page 2/i })).toHaveAttribute(
+			"aria-current",
+			"page",
+		);
+		expect(
+			screen.getByRole("link", { name: /go to page 3/i }),
+		).toBeInTheDocument();
+
+		await user.click(screen.getByRole("link", { name: /go to page 1/i }));
+
+		expect(navigateMock).toHaveBeenCalledTimes(1);
+		const latestNavigateCall = navigateMock.mock.calls.at(-1);
+		expect(latestNavigateCall?.[0]?.replace).toBe(true);
+		expect(latestNavigateCall?.[0]?.search).toEqual(expect.any(Function));
+		expect(
+			latestNavigateCall?.[0]?.search({ q: "saved", sort: "title", page: 2 }),
+		).toEqual({
+			q: "saved",
+			sort: "title",
+			page: undefined,
+		});
+	});
+
 	it("runs add, toggle, and delete mutations and invalidates cached state", async () => {
 		const user = userEvent.setup();
 		routeState.loaderData = {

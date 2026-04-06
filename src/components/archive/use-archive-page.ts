@@ -113,6 +113,15 @@ export function useArchivePage() {
 		});
 	}
 
+	function goToPage(nextPage: number) {
+		const clampedPage = Math.min(
+			Math.max(nextPage, 1),
+			Math.max(totalPages, 1),
+		);
+
+		updateSearch({ page: clampedPage > 1 ? clampedPage : undefined });
+	}
+
 	return {
 		q,
 		filter,
@@ -149,9 +158,7 @@ export function useArchivePage() {
 				sort: nextSort === "newest" ? undefined : nextSort,
 				page: undefined,
 			}),
-		goToPreviousPage: () =>
-			updateSearch({ page: page > 2 ? page - 1 : undefined }),
-		goToNextPage: () => updateSearch({ page: page + 1 }),
+		goToPage,
 		clearSelection: () => setRowSelection({}),
 	};
 }

@@ -219,7 +219,13 @@ describe("TagsPage", () => {
 		const invalidateQueriesSpy = vi.spyOn(queryClient, "invalidateQueries");
 
 		expect(screen.getByText("Article one")).toBeInTheDocument();
-		expect(screen.getByText("Page 1 of 2")).toBeInTheDocument();
+		expect(screen.getByRole("link", { name: /go to page 1/i })).toHaveAttribute(
+			"aria-current",
+			"page",
+		);
+		expect(
+			screen.getByRole("link", { name: /go to page 2/i }),
+		).toBeInTheDocument();
 		expect(screen.getAllByText("Design")).toHaveLength(2);
 		expect(screen.getByLabelText("Filter tags")).toBeInTheDocument();
 		expect(
@@ -244,6 +250,26 @@ describe("TagsPage", () => {
 			queryKey: ["articles"],
 		});
 		expect(routerInvalidateMock).toHaveBeenCalled();
+	});
+
+	it("increments the page when using the next control in a selected tag view", async () => {
+		const user = userEvent.setup();
+		routeState.search = { tag: "t1", page: 1 };
+		routeState.loaderData.articles = { items: articleFixtures, total: 25 };
+		getArticlesMock.mockResolvedValue(routeState.loaderData.articles);
+
+		renderWithProviders(<TagsPage />);
+
+		await user.click(screen.getByRole("link", { name: /go to next page/i }));
+
+		expect(navigateMock).toHaveBeenCalledTimes(1);
+		const latestNavigateCall = navigateMock.mock.calls.at(-1);
+		expect(latestNavigateCall?.[0]?.replace).toBe(true);
+		expect(latestNavigateCall?.[0]?.search).toEqual(expect.any(Function));
+		expect(latestNavigateCall?.[0]?.search({ tag: "t1", page: 1 })).toEqual({
+			tag: "t1",
+			page: 2,
+		});
 	});
 
 	it("shows the empty selected-tag state when no articles match", () => {
