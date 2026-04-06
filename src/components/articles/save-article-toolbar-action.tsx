@@ -26,7 +26,7 @@ export function SaveArticleToolbarAction({
 						onAdd={onAdd}
 						triggerVariant="ghost"
 						triggerSize="sm"
-						triggerClassName="h-8 rounded-lg border-0 px-2 shadow-none sm:px-3"
+						triggerClassName="h-9 rounded-lg border-0 px-2.5 shadow-none sm:px-3.5"
 						triggerAriaLabel="Add article"
 						collapseLabelOnMobile
 					/>

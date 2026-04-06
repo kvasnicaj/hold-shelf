@@ -76,7 +76,7 @@ export function TagArticlesView({
 									aria-label="Back to tags"
 									title="Back to tags"
 								>
-									<ArrowLeft className="h-4 w-4" />
+									<ArrowLeft className="h-[1.125rem] w-[1.125rem]" />
 								</Button>
 							)}
 							<h2 className="display-title truncate text-xl font-bold">
@@ -104,7 +104,7 @@ export function TagArticlesView({
 						aria-label="Back to tags"
 						title="Back to tags"
 					>
-						<ArrowLeft className="h-4 w-4" />
+						<ArrowLeft className="h-[1.125rem] w-[1.125rem]" />
 					</Button>
 				)}
 				<h2 className="display-title text-xl font-bold">{activeTagName}</h2>

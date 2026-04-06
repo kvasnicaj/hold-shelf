@@ -45,7 +45,7 @@ export function TagPicker({
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
 				<Button variant="ghost" size="icon-xs" title="Manage tags">
-					<Tags className="h-4 w-4" />
+					<Tags className="h-[1.125rem] w-[1.125rem]" />
 				</Button>
 			</PopoverTrigger>
 			<PopoverContent className="w-56 p-2" align="start">
@@ -70,10 +70,12 @@ export function TagPicker({
 										onAddTag(tag.id, articleIds);
 									}
 								}}
-								className="flex w-full items-center justify-between rounded px-2 py-1 text-sm hover:bg-accent"
+								className="flex w-full items-center justify-between rounded px-2 py-1.5 text-sm hover:bg-accent"
 							>
 								<Badge variant="secondary">{tag.name}</Badge>
-								{isSelected && <X className="h-3 w-3 text-muted-foreground" />}
+								{isSelected && (
+									<X className="h-3.5 w-3.5 text-muted-foreground" />
+								)}
 							</button>
 						);
 					})}
@@ -89,9 +91,9 @@ export function TagPicker({
 								setSearch("");
 								setCreating(false);
 							}}
-							className="flex w-full items-center gap-1 rounded px-2 py-1 text-sm text-muted-foreground hover:bg-accent"
+							className="flex w-full items-center gap-1 rounded px-2 py-1.5 text-sm text-muted-foreground hover:bg-accent"
 						>
-							<Plus className="h-3 w-3" />
+							<Plus className="h-3.5 w-3.5" />
 							Create "{search.trim()}"
 						</button>
 					)}

@@ -33,11 +33,11 @@ export function ArchiveFilters({
 					{activeTag.name}
 					<button
 						type="button"
-						className="ml-0.5 cursor-pointer rounded-full hover:bg-foreground/10"
+						className="ml-0.5 inline-flex size-5 cursor-pointer items-center justify-center rounded-full hover:bg-foreground/10"
 						onClick={onClearTag}
 					>
 						<span className="sr-only">Clear tag filter</span>
-						<X className="h-3 w-3" />
+						<X className="h-3.5 w-3.5" />
 					</button>
 				</Badge>
 			)}

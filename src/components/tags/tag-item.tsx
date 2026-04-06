@@ -105,7 +105,7 @@ export function TagItem({
 						title="Rename"
 						aria-label={`Rename ${tag.name}`}
 					>
-						<Pencil className="h-3 w-3" />
+						<Pencil className="h-3.5 w-3.5" />
 					</Button>
 					<Button
 						type="button"
@@ -118,7 +118,7 @@ export function TagItem({
 						title="Delete"
 						aria-label={`Delete ${tag.name}`}
 					>
-						<Trash2 className="h-3 w-3" />
+						<Trash2 className="h-3.5 w-3.5" />
 					</Button>
 				</div>
 			</div>

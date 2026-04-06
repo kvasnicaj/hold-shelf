@@ -141,9 +141,9 @@ export function createArchiveColumns({
 							title={article.isRead ? "Mark unread" : "Mark read"}
 						>
 							{article.isRead ? (
-								<BookOpen className="h-3 w-3" />
+								<BookOpen className="h-3.5 w-3.5" />
 							) : (
-								<Check className="h-3 w-3" />
+								<Check className="h-3.5 w-3.5" />
 							)}
 						</Button>
 						<Button
@@ -152,7 +152,7 @@ export function createArchiveColumns({
 							onClick={() => onDelete([article.id])}
 							title="Delete"
 						>
-							<Trash2 className="h-3 w-3" />
+							<Trash2 className="h-3.5 w-3.5" />
 						</Button>
 					</div>
 				);
