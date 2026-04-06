@@ -1,9 +1,9 @@
 import { ArticleList } from "#/components/articles/article-list";
 import { ArticlesHeader } from "#/components/articles/articles-header";
+import { ArticlesPagination } from "#/components/articles/articles-pagination";
 import { ArticlesToolbarActions } from "#/components/articles/articles-toolbar-actions";
 import { BulkActionsPanel } from "#/components/articles/bulk-actions-panel";
 import type { ArticleWithTags } from "#/components/articles/types";
-import { AppPagination } from "#/components/pagination/app-pagination";
 import type { Tag } from "#/components/tags/types";
 
 type ArticleCollectionPageProps = {
@@ -31,7 +31,8 @@ type ArticleCollectionPageProps = {
 	handleCreateTag: (name: string) => Promise<Tag>;
 	updateQuery: (query: string) => void;
 	updateSort: (sort: "newest" | "oldest" | "title") => void;
-	goToPage: (page: number) => void;
+	goToPreviousPage: () => void;
+	goToNextPage: () => void;
 	clearSelection: () => void;
 };
 
@@ -60,7 +61,8 @@ export function ArticleCollectionPage({
 	handleCreateTag,
 	updateQuery,
 	updateSort,
-	goToPage,
+	goToPreviousPage,
+	goToNextPage,
 	clearSelection,
 }: ArticleCollectionPageProps) {
 	return (
@@ -106,10 +108,11 @@ export function ArticleCollectionPage({
 						onCreateTag={handleCreateTag}
 					/>
 
-					<AppPagination
+					<ArticlesPagination
 						page={page}
 						totalPages={totalPages}
-						onPageChange={goToPage}
+						onPrevious={goToPreviousPage}
+						onNext={goToNextPage}
 					/>
 				</>
 			)}
