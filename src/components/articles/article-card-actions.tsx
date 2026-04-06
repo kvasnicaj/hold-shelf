@@ -53,9 +53,9 @@ export function ArticleCardActions({
 				title={isRead ? "Mark as unread" : "Mark as read"}
 			>
 				{isRead ? (
-					<BookOpen className="h-4 w-4" />
+					<BookOpen className="h-[1.125rem] w-[1.125rem]" />
 				) : (
-					<Check className="h-4 w-4" />
+					<Check className="h-[1.125rem] w-[1.125rem]" />
 				)}
 			</Button>
 			<Button
@@ -64,7 +64,7 @@ export function ArticleCardActions({
 				onClick={() => onDelete(articleId)}
 				title="Delete"
 			>
-				<Trash2 className="h-4 w-4" />
+				<Trash2 className="h-[1.125rem] w-[1.125rem]" />
 			</Button>
 		</div>
 	);

@@ -111,7 +111,7 @@ export function ArchiveTableMobile({
 											size="icon-xs"
 											aria-label={`Article actions for ${article.title ?? article.url}`}
 										>
-											<EllipsisVertical className="h-4 w-4" />
+											<EllipsisVertical className="h-[1.125rem] w-[1.125rem]" />
 										</Button>
 									</DropdownMenuTrigger>
 									<DropdownMenuContent align="end">

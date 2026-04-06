@@ -33,6 +33,7 @@ Configured features:
 
 - email/password login disabled
 - GitHub provider enabled as the required sign-in method
+- Better Auth account deletion enabled for signed-in users
 - Drizzle adapter backed by D1
 - TanStack Start cookie plugin
 
@@ -141,6 +142,22 @@ In `AccountSummaryCard`:
 1. settings reads the current session with `authClient.useSession()`
 2. UI shows the current GitHub-backed profile name, email, and avatar
 3. UI states that GitHub is the only sign-in method for the account
+
+### Delete account
+
+In `DeleteAccountCard`:
+
+1. settings opens a confirmation dialog from the danger zone card
+2. the user must type `DELETE` before the destructive action is enabled
+3. `authClient.deleteUser()` calls Better Auth's `/delete-user` endpoint
+4. Better Auth deletes the auth user, clears sessions, and D1 cascades app data
+5. the client routes the now-signed-out user back to `/login`
+
+Important behavior:
+
+- Better Auth account deletion must be enabled in `getAuth()`
+- deletion can fail with `SESSION_EXPIRED` if the current session is no longer fresh
+- app tables such as `articles`, `tags`, and `article_tags` are removed through foreign-key cascades from `user.id`
 
 ## Environment configuration
 

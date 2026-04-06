@@ -16,7 +16,7 @@ export const ToolBox = React.forwardRef<HTMLDivElement, ToolBoxProps>(
 				ref={ref}
 				className={cn(
 					"inline-flex items-center rounded-lg border bg-card shadow-sm focus-within:border-ring focus-within:ring-[3px] focus-within:ring-ring/50",
-					size === "sm" ? "h-8" : "h-9",
+					size === "sm" ? "h-9" : "h-10",
 					className,
 				)}
 				{...props}

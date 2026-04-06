@@ -378,6 +378,7 @@ SettingsPage
 |- Appearance card
 |  |- ThemeToggle
 |- AccountSummaryCard
+|- DeleteAccountCard
 ```
 
 Core functionality:
@@ -385,6 +386,7 @@ Core functionality:
 - cycles theme between light, dark, and auto
 - persists theme to `localStorage`
 - shows the signed-in GitHub account details and provider summary
+- provides a guarded account-deletion flow that removes the auth user and cascades app data
 
 ## Shared components
 

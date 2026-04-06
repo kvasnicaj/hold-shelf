@@ -68,7 +68,7 @@ export function AddArticleDialog({
 					className={triggerClassName}
 					aria-label={triggerAriaLabel}
 				>
-					<BookmarkPlus className="h-4 w-4" />
+					<BookmarkPlus className="h-[1.125rem] w-[1.125rem]" />
 					<span className={collapseLabelOnMobile ? "hidden sm:inline" : ""}>
 						Add article
 					</span>

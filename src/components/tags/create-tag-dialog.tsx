@@ -52,7 +52,7 @@ export function CreateTagDialog({
 					className={triggerClassName}
 					aria-label={triggerAriaLabel}
 				>
-					<Plus className="h-4 w-4" />
+					<Plus className="h-[1.125rem] w-[1.125rem]" />
 					<span className={collapseLabelOnMobile ? "hidden sm:inline" : ""}>
 						Create tag
 					</span>

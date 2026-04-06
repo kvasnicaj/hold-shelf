@@ -79,9 +79,9 @@ export default function ThemeToggle({
 			aria-label={label}
 			title={label}
 		>
-			{mode === "light" && <Sun className="h-4 w-4" />}
-			{mode === "dark" && <Moon className="h-4 w-4" />}
-			{mode === "auto" && <Monitor className="h-4 w-4" />}
+			{mode === "light" && <Sun className="h-[1.125rem] w-[1.125rem]" />}
+			{mode === "dark" && <Moon className="h-[1.125rem] w-[1.125rem]" />}
+			{mode === "auto" && <Monitor className="h-[1.125rem] w-[1.125rem]" />}
 		</Button>
 	);
 }

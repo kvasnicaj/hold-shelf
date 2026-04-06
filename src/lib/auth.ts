@@ -19,6 +19,11 @@ export function getAuth() {
 		secret: env.BETTER_AUTH_SECRET as string,
 		baseURL: getAuthBaseUrlConfig(env.BETTER_AUTH_URL as string),
 		database: drizzleAdapter(getDb(), { provider: "sqlite" }),
+		user: {
+			deleteUser: {
+				enabled: true,
+			},
+		},
 		emailAndPassword: {
 			enabled: false,
 		},

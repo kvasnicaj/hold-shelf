@@ -15,16 +15,19 @@ export function MobileBottomBar() {
 
 	return (
 		<nav className="fixed inset-x-0 bottom-0 z-40 flex justify-center p-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] md:hidden">
-			<ToolBox size="default" className="h-11 gap-0 rounded-xl px-1">
+			<ToolBox
+				size="default"
+				className="h-[3.75rem] gap-1 rounded-2xl px-2.5 shadow-md"
+			>
 				<Link
 					to="/app/home"
-					className="inline-flex h-10 w-10 items-center justify-center rounded-lg no-underline"
+					className="inline-flex h-[3.25rem] w-[3.25rem] items-center justify-center rounded-xl no-underline"
 					aria-label="Hold Shelf home"
 					title="Hold Shelf"
 				>
-					<Bookmark className="h-6 w-6 text-(--lagoon)" />
+					<Bookmark className="h-[2.125rem] w-[2.125rem] text-(--lagoon)" />
 				</Link>
-				<div className="mx-1 h-6 w-px bg-border" />
+				<div className="mx-2 h-7 w-px bg-border" />
 				{navItems.map((item) => {
 					const isActive = currentPath === item.href;
 					const Icon = item.icon;
@@ -35,12 +38,14 @@ export function MobileBottomBar() {
 							variant="ghost"
 							size="icon-lg"
 							asChild
-							className={isActive ? "bg-accent text-foreground" : ""}
+							className={
+								isActive ? "rounded-xl bg-accent text-foreground" : "rounded-xl"
+							}
 							title={item.label}
 							aria-label={item.label}
 						>
 							<Link to={item.href} className="no-underline">
-								<Icon className="h-6 w-6" />
+								<Icon className="h-8 w-8" />
 							</Link>
 						</Button>
 					);

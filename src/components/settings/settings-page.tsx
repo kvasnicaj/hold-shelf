@@ -1,4 +1,5 @@
 import { AccountSummaryCard } from "#/components/settings/account-summary-card";
+import { DeleteAccountCard } from "#/components/settings/delete-account-card";
 import ThemeToggle from "#/components/theme-toggle";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 
@@ -18,6 +19,7 @@ export function SettingsPage() {
 				</Card>
 
 				<AccountSummaryCard />
+				<DeleteAccountCard />
 			</div>
 		</div>
 	);
