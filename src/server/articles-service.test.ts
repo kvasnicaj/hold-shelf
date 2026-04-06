@@ -78,11 +78,26 @@ function createArticlesRepoFixture() {
 
 	const repo: ArticlesRepository = {
 		listArticles: vi.fn(
-			async ({ userId, isRead, tagId, search, sort, limit, offset }) => {
+			async ({
+				userId,
+				isRead,
+				isFavorite,
+				tagId,
+				search,
+				sort,
+				limit,
+				offset,
+			}) => {
 				let filtered = articles.filter((article) => article.userId === userId);
 
 				if (isRead !== undefined) {
 					filtered = filtered.filter((article) => article.isRead === isRead);
+				}
+
+				if (isFavorite !== undefined) {
+					filtered = filtered.filter(
+						(article) => article.isFavorite === isFavorite,
+					);
 				}
 
 				if (tagId) {
@@ -274,13 +289,19 @@ describe("articles service", () => {
 	});
 
 	it("applies filters, sorting, pagination, and tag hydration when listing", async () => {
-		const { repo } = createArticlesRepoFixture();
+		const { repo, articles } = createArticlesRepoFixture();
+		const favoriteArticle = articles.find((article) => article.id === "a1");
+		if (!favoriteArticle) {
+			throw new Error("Expected fixture article");
+		}
+		favoriteArticle.isFavorite = true;
 
 		const result = await getArticlesForUser({
 			repo,
 			userId: "user-1",
 			data: {
 				isRead: false,
+				isFavorite: true,
 				tagId: "t1",
 				search: "pattern",
 				sort: "title",

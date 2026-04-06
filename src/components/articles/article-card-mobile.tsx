@@ -9,6 +9,7 @@ export function ArticleCardMobile({
 	selected,
 	onSelect,
 	onToggleRead,
+	onToggleFavorite,
 	onDelete,
 	availableTags,
 	onAddTag,
@@ -44,10 +45,12 @@ export function ArticleCardMobile({
 						<ArticleCardActions
 							articleId={article.id}
 							isRead={article.isRead}
+							isFavorite={article.isFavorite}
 							tagIds={article.tags.map((tag) => tag.id)}
 							availableTags={availableTags}
 							persistent
 							onToggleRead={onToggleRead}
+							onToggleFavorite={onToggleFavorite}
 							onDelete={onDelete}
 							onAddTag={onAddTag}
 							onRemoveTag={onRemoveTag}

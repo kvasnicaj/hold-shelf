@@ -20,6 +20,7 @@ const httpUrlSchema = z
 export const getArticlesInputSchema = z
 	.object({
 		isRead: z.boolean().optional(),
+		isFavorite: z.boolean().optional(),
 		tagId: idSchema.optional(),
 		search: z.string().trim().max(200).optional(),
 		sort: z.enum(["newest", "oldest", "title"]).optional(),

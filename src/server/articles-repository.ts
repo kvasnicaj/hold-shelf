@@ -10,6 +10,7 @@ export function createArticlesRepository(): ArticlesRepository {
 		listArticles: async ({
 			userId,
 			isRead,
+			isFavorite,
 			tagId,
 			search,
 			sort,
@@ -20,6 +21,10 @@ export function createArticlesRepository(): ArticlesRepository {
 
 			if (isRead !== undefined) {
 				conditions.push(eq(articles.isRead, isRead));
+			}
+
+			if (isFavorite !== undefined) {
+				conditions.push(eq(articles.isFavorite, isFavorite));
 			}
 
 			if (tagId) {

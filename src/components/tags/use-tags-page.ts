@@ -82,6 +82,11 @@ export function useTagsPage() {
 		invalidateAll();
 	}
 
+	async function handleToggleFavorite(id: string, isFavorite: boolean) {
+		await updateArticle({ data: { id, isFavorite } });
+		invalidateAll();
+	}
+
 	function handleSelect(id: string, isSelected: boolean) {
 		setSelected((prev) => {
 			const next = new Set(prev);
@@ -155,6 +160,7 @@ export function useTagsPage() {
 		handleRename,
 		handleDeleteTag,
 		handleToggleRead,
+		handleToggleFavorite,
 		handleSelect,
 		handleDeleteArticles,
 		handleAddTag,

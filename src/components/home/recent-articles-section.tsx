@@ -1,4 +1,4 @@
-import { BookOpen, Clock } from "lucide-react";
+import { BookOpen, Clock, Star } from "lucide-react";
 import { ArticleLink } from "#/components/home/article-link";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 
@@ -12,45 +12,73 @@ type RecentArticle = {
 
 type RecentArticlesSectionProps = {
 	recentlySaved: RecentArticle[];
+	recentlyFavorite: RecentArticle[];
 	oldestUnread: RecentArticle[];
 };
 
 export function RecentArticlesSection({
 	recentlySaved,
+	recentlyFavorite,
 	oldestUnread,
 }: RecentArticlesSectionProps) {
+	const hasSecondaryCards = recentlySaved.length > 0 || oldestUnread.length > 0;
+
 	return (
-		<div className="grid min-w-0 gap-6 lg:grid-cols-2">
-			{recentlySaved.length > 0 && (
+		<div className="space-y-6">
+			{recentlyFavorite.length > 0 && (
 				<Card className="min-w-0 gap-4 overflow-hidden">
 					<CardHeader>
 						<CardTitle className="flex min-w-0 items-center gap-2 text-base">
-							<Clock className="h-4 w-4" />
-							Recently saved
+							<Star className="h-4 w-4 fill-current text-amber-500" />
+							Favorites
 						</CardTitle>
 					</CardHeader>
 					<CardContent className="min-w-0 space-y-2">
-						{recentlySaved.map((article) => (
-							<ArticleLink key={article.id} article={article} />
+						{recentlyFavorite.map((article) => (
+							<ArticleLink
+								key={article.id}
+								article={article}
+								variant="with-site-column"
+							/>
 						))}
 					</CardContent>
 				</Card>
 			)}
 
-			{oldestUnread.length > 0 && (
-				<Card className="min-w-0 gap-4 overflow-hidden">
-					<CardHeader>
-						<CardTitle className="flex min-w-0 items-center gap-2 text-base">
-							<BookOpen className="h-4 w-4" />
-							Oldest unread
-						</CardTitle>
-					</CardHeader>
-					<CardContent className="min-w-0 space-y-2">
-						{oldestUnread.map((article) => (
-							<ArticleLink key={article.id} article={article} />
-						))}
-					</CardContent>
-				</Card>
+			{hasSecondaryCards && (
+				<div className="grid min-w-0 gap-6 lg:grid-cols-2">
+					{recentlySaved.length > 0 && (
+						<Card className="min-w-0 gap-4 overflow-hidden">
+							<CardHeader>
+								<CardTitle className="flex min-w-0 items-center gap-2 text-base">
+									<Clock className="h-4 w-4" />
+									Recently saved
+								</CardTitle>
+							</CardHeader>
+							<CardContent className="min-w-0 space-y-2">
+								{recentlySaved.map((article) => (
+									<ArticleLink key={article.id} article={article} />
+								))}
+							</CardContent>
+						</Card>
+					)}
+
+					{oldestUnread.length > 0 && (
+						<Card className="min-w-0 gap-4 overflow-hidden">
+							<CardHeader>
+								<CardTitle className="flex min-w-0 items-center gap-2 text-base">
+									<BookOpen className="h-4 w-4" />
+									Oldest unread
+								</CardTitle>
+							</CardHeader>
+							<CardContent className="min-w-0 space-y-2">
+								{oldestUnread.map((article) => (
+									<ArticleLink key={article.id} article={article} />
+								))}
+							</CardContent>
+						</Card>
+					)}
+				</div>
 			)}
 		</div>
 	);

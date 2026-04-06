@@ -55,7 +55,21 @@ function createDashboardRepository(): DashboardRepository {
 				.orderBy(asc(articles.createdAt))
 				.limit(5);
 
-			return { recentlySaved, oldestUnread };
+			const recentlyFavorite = await db
+				.select({
+					id: articles.id,
+					title: articles.title,
+					hostname: articles.hostname,
+					url: articles.url,
+					faviconUrl: articles.faviconUrl,
+					createdAt: articles.createdAt,
+				})
+				.from(articles)
+				.where(and(eq(articles.userId, userId), eq(articles.isFavorite, true)))
+				.orderBy(desc(articles.updatedAt))
+				.limit(5);
+
+			return { recentlySaved, recentlyFavorite, oldestUnread };
 		},
 	};
 }

@@ -13,11 +13,26 @@ export type ArticleWithTags = {
 	tags: Tag[];
 };
 
+export type ArticleCollectionLoaderData = {
+	articles: {
+		items: ArticleWithTags[];
+		total: number;
+	};
+	tags: Tag[];
+};
+
+export type ArticleCollectionSearch = {
+	q?: string;
+	sort?: "newest" | "oldest" | "title";
+	page?: number;
+};
+
 export type ArticleCardProps = {
 	article: ArticleWithTags;
 	selected: boolean;
 	onSelect: (id: string, selected: boolean) => void;
 	onToggleRead: (id: string, isRead: boolean) => void;
+	onToggleFavorite: (id: string, isFavorite: boolean) => void;
 	onDelete: (id: string) => void;
 	availableTags?: Tag[];
 	onAddTag?: (tagId: string, articleIds: string[]) => void;

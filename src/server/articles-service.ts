@@ -20,6 +20,7 @@ export type ArticleSort = "newest" | "oldest" | "title";
 
 export type GetArticlesInput = {
 	isRead?: boolean;
+	isFavorite?: boolean;
 	tagId?: string;
 	search?: string;
 	sort?: ArticleSort;
@@ -49,6 +50,7 @@ export type ArticlesRepository = {
 	listArticles: (args: {
 		userId: string;
 		isRead?: boolean;
+		isFavorite?: boolean;
 		tagId?: string;
 		search?: string;
 		sort: ArticleSort;
@@ -93,6 +95,7 @@ export async function getArticlesForUser({
 	const { rows, total } = await repo.listArticles({
 		userId,
 		isRead: data.isRead,
+		isFavorite: data.isFavorite,
 		tagId: data.tagId,
 		search: data.search,
 		sort,

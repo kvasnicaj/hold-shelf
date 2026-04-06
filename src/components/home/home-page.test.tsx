@@ -18,6 +18,13 @@ type HomeLoaderData = {
 			hostname: string | null;
 			faviconUrl: string | null;
 		}>;
+		recentlyFavorite: Array<{
+			id: string;
+			url: string;
+			title: string | null;
+			hostname: string | null;
+			faviconUrl: string | null;
+		}>;
 		oldestUnread: Array<{
 			id: string;
 			url: string;
@@ -39,6 +46,7 @@ const { routeState } = vi.hoisted(() => ({
 			},
 			recent: {
 				recentlySaved: [],
+				recentlyFavorite: [],
 				oldestUnread: [],
 			},
 		} as HomeLoaderData,
@@ -96,6 +104,15 @@ describe("HomePage", () => {
 						faviconUrl: null,
 					},
 				],
+				recentlyFavorite: [
+					{
+						id: "favorite-1",
+						url: "https://example.com/favorite",
+						title: "Favorite article",
+						hostname: "example.com",
+						faviconUrl: null,
+					},
+				],
 				oldestUnread: [
 					{
 						id: "unread-1",
@@ -116,8 +133,10 @@ describe("HomePage", () => {
 		expect(screen.getAllByText("Unread")).not.toHaveLength(0);
 		expect(screen.getAllByText("Total")).not.toHaveLength(0);
 		expect(screen.getByText("Recently saved")).toBeInTheDocument();
+		expect(screen.getByText("Favorites")).toBeInTheDocument();
 		expect(screen.getByText("Oldest unread")).toBeInTheDocument();
 		expect(screen.getByText("Saved article")).toBeInTheDocument();
+		expect(screen.getByText("Favorite article")).toBeInTheDocument();
 		expect(screen.getByText("Unread article")).toBeInTheDocument();
 	});
 
@@ -131,6 +150,7 @@ describe("HomePage", () => {
 			},
 			recent: {
 				recentlySaved: [],
+				recentlyFavorite: [],
 				oldestUnread: [],
 			},
 		};
