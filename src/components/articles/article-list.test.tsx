@@ -22,6 +22,7 @@ vi.mock("#/components/articles/article-card", () => ({
 	ArticleCard: (props: {
 		article: ArticleWithTags;
 		selected: boolean;
+		onOpenArticle: (id: string, isRead: boolean) => void | Promise<void>;
 		onDelete: (id: string) => void;
 		availableTags?: Tag[];
 	}) => {
@@ -38,6 +39,7 @@ vi.mock("#/components/articles/article-card-mobile", () => ({
 	ArticleCardMobile: (props: {
 		article: ArticleWithTags;
 		selected: boolean;
+		onOpenArticle: (id: string, isRead: boolean) => void | Promise<void>;
 		onDelete: (id: string) => void;
 		availableTags?: Tag[];
 	}) => {
@@ -84,6 +86,7 @@ describe("ArticleList", () => {
 				articles={[]}
 				selected={new Set()}
 				onSelect={vi.fn()}
+				onOpenArticle={vi.fn()}
 				onToggleRead={vi.fn()}
 				onToggleFavorite={vi.fn()}
 				onDelete={vi.fn()}
@@ -104,6 +107,7 @@ describe("ArticleList", () => {
 				articles={[buildArticle("a1"), buildArticle("a2")]}
 				selected={new Set(["a2"])}
 				onSelect={vi.fn()}
+				onOpenArticle={vi.fn()}
 				onToggleRead={vi.fn()}
 				onToggleFavorite={vi.fn()}
 				onDelete={onDelete}
@@ -142,6 +146,7 @@ describe("ArticleList", () => {
 				articles={[buildArticle("a1")]}
 				selected={new Set(["a1"])}
 				onSelect={vi.fn()}
+				onOpenArticle={vi.fn()}
 				onToggleRead={vi.fn()}
 				onToggleFavorite={vi.fn()}
 				onDelete={vi.fn()}

@@ -35,6 +35,7 @@ function createDashboardRepository(): DashboardRepository {
 					url: articles.url,
 					faviconUrl: articles.faviconUrl,
 					createdAt: articles.createdAt,
+					isRead: articles.isRead,
 				})
 				.from(articles)
 				.where(eq(articles.userId, userId))
@@ -49,6 +50,7 @@ function createDashboardRepository(): DashboardRepository {
 					url: articles.url,
 					faviconUrl: articles.faviconUrl,
 					createdAt: articles.createdAt,
+					isRead: articles.isRead,
 				})
 				.from(articles)
 				.where(and(eq(articles.userId, userId), eq(articles.isRead, false)))
@@ -63,6 +65,7 @@ function createDashboardRepository(): DashboardRepository {
 					url: articles.url,
 					faviconUrl: articles.faviconUrl,
 					createdAt: articles.createdAt,
+					isRead: articles.isRead,
 				})
 				.from(articles)
 				.where(and(eq(articles.userId, userId), eq(articles.isFavorite, true)))

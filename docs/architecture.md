@@ -245,6 +245,8 @@ Purpose:
 - dashboard and entry point after login
 - quick archive search shortcut that deep-links into full archive results
 - surfaces reading volume and quick links into saved content
+- dashboard article links use the shared open handler, so unread items can auto-mark
+  as read when the user preference is enabled
 
 ### Unread articles
 
@@ -418,6 +420,7 @@ Component tree:
 SettingsPage
 |- Appearance card
 |  |- ThemeToggle
+|- ReadingSettingsCard
 |- AccountSummaryCard
 |- DeleteAccountCard
 ```
@@ -426,6 +429,7 @@ Core functionality:
 
 - cycles theme between light, dark, and auto
 - persists theme to `localStorage`
+- stores the auto-mark-read-on-open preference in the database per user
 - shows the signed-in GitHub account details and provider summary
 - provides a guarded account-deletion flow that removes the auth user and cascades app data
 
@@ -533,7 +537,9 @@ File: `src/server/dashboard.ts`
 Responsibilities:
 
 - aggregate counts for total, unread, saved this week, and read this week
-- fetch recently saved and oldest unread article slices for the home screen
+- fetch recently saved, favorite, and oldest unread article slices for the home screen
+- include article read state in home link payloads so shared open behavior stays
+  consistent across app surfaces
 
 ### Rate limiting
 

@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getRouteApi, useNavigate, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
+import { useAutoMarkReadOnOpen } from "#/components/articles/use-auto-mark-read-on-open";
 import { useSaveArticle } from "#/components/articles/use-save-article";
 import { deleteArticles, getArticles, updateArticle } from "#/server/articles";
 import {
@@ -21,6 +22,7 @@ export function useArchivePage() {
 	const navigate = useNavigate({ from: "/app/archive" });
 	const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
 	const { handleAdd } = useSaveArticle();
+	const { handleOpenArticle } = useAutoMarkReadOnOpen();
 
 	const isRead =
 		filter === "read" ? true : filter === "unread" ? false : undefined;
@@ -142,6 +144,7 @@ export function useArchivePage() {
 		selectedIds,
 		setRowSelection,
 		handleAdd,
+		handleOpenArticle,
 		handleToggleRead,
 		handleToggleFavorite,
 		handleDelete,

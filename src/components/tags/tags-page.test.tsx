@@ -77,6 +77,13 @@ vi.mock("#/server/tags", () => ({
 	updateTag: updateTagMock,
 }));
 
+vi.mock("#/components/articles/use-auto-mark-read-on-open", () => ({
+	useAutoMarkReadOnOpen: () => ({
+		markReadOnOpen: true,
+		handleOpenArticle: vi.fn().mockResolvedValue(undefined),
+	}),
+}));
+
 vi.mock("#/components/layout/toolbar-actions", () => ({
 	ToolbarSlot: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 	ToolbarSearch: ({ onSearch }: { onSearch: (value: string) => void }) => (

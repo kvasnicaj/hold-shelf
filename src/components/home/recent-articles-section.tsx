@@ -8,18 +8,21 @@ type RecentArticle = {
 	title: string | null;
 	hostname: string | null;
 	faviconUrl: string | null;
+	isRead: boolean;
 };
 
 type RecentArticlesSectionProps = {
 	recentlySaved: RecentArticle[];
 	recentlyFavorite: RecentArticle[];
 	oldestUnread: RecentArticle[];
+	onOpenArticle: (id: string, isRead: boolean) => void | Promise<void>;
 };
 
 export function RecentArticlesSection({
 	recentlySaved,
 	recentlyFavorite,
 	oldestUnread,
+	onOpenArticle,
 }: RecentArticlesSectionProps) {
 	const hasSecondaryCards = recentlySaved.length > 0 || oldestUnread.length > 0;
 
@@ -38,6 +41,7 @@ export function RecentArticlesSection({
 							<ArticleLink
 								key={article.id}
 								article={article}
+								onOpenArticle={onOpenArticle}
 								variant="with-site-column"
 							/>
 						))}
@@ -57,7 +61,11 @@ export function RecentArticlesSection({
 							</CardHeader>
 							<CardContent className="min-w-0 space-y-2">
 								{recentlySaved.map((article) => (
-									<ArticleLink key={article.id} article={article} />
+									<ArticleLink
+										key={article.id}
+										article={article}
+										onOpenArticle={onOpenArticle}
+									/>
 								))}
 							</CardContent>
 						</Card>
@@ -73,7 +81,11 @@ export function RecentArticlesSection({
 							</CardHeader>
 							<CardContent className="min-w-0 space-y-2">
 								{oldestUnread.map((article) => (
-									<ArticleLink key={article.id} article={article} />
+									<ArticleLink
+										key={article.id}
+										article={article}
+										onOpenArticle={onOpenArticle}
+									/>
 								))}
 							</CardContent>
 						</Card>

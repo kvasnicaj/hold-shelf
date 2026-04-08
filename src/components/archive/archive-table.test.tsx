@@ -13,7 +13,10 @@ const { archiveTableMobileMock, useIsMobileMock } = vi.hoisted(() => ({
 }));
 
 vi.mock("#/components/archive/archive-table-mobile", () => ({
-	ArchiveTableMobile: (props: { articles: ArticleWithTags[] }) => {
+	ArchiveTableMobile: (props: {
+		articles: ArticleWithTags[];
+		onOpenArticle: (id: string, isRead: boolean) => Promise<void>;
+	}) => {
 		archiveTableMobileMock(props);
 		return (
 			<div data-testid="archive-table-mobile">
@@ -65,6 +68,7 @@ function renderArchiveTable(
 			onAddTag={vi.fn().mockResolvedValue(undefined)}
 			onRemoveTag={vi.fn().mockResolvedValue(undefined)}
 			onCreateTag={vi.fn().mockResolvedValue(availableTags[0])}
+			onOpenArticle={vi.fn().mockResolvedValue(undefined)}
 			onToggleRead={vi.fn().mockResolvedValue(undefined)}
 			onToggleFavorite={vi.fn().mockResolvedValue(undefined)}
 			onDelete={vi.fn().mockResolvedValue(undefined)}

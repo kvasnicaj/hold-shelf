@@ -7,6 +7,7 @@ import {
 	useToolbarActions,
 } from "#/components/layout/toolbar-actions";
 import { getSession } from "#/server/auth";
+import { getUserSettings } from "#/server/user-settings";
 
 export const Route = createFileRoute("/app")({
 	beforeLoad: async () => {
@@ -15,6 +16,10 @@ export const Route = createFileRoute("/app")({
 			throw redirect({ to: "/login" });
 		}
 		return { session };
+	},
+	loader: async () => {
+		const settings = await getUserSettings();
+		return { settings };
 	},
 	component: AppLayout,
 });

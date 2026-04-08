@@ -17,6 +17,7 @@ type HomeLoaderData = {
 			title: string | null;
 			hostname: string | null;
 			faviconUrl: string | null;
+			isRead: boolean;
 		}>;
 		recentlyFavorite: Array<{
 			id: string;
@@ -24,6 +25,7 @@ type HomeLoaderData = {
 			title: string | null;
 			hostname: string | null;
 			faviconUrl: string | null;
+			isRead: boolean;
 		}>;
 		oldestUnread: Array<{
 			id: string;
@@ -31,6 +33,7 @@ type HomeLoaderData = {
 			title: string | null;
 			hostname: string | null;
 			faviconUrl: string | null;
+			isRead: boolean;
 		}>;
 	};
 };
@@ -90,6 +93,13 @@ vi.mock("#/components/articles/use-save-article", () => ({
 	}),
 }));
 
+vi.mock("#/components/articles/use-auto-mark-read-on-open", () => ({
+	useAutoMarkReadOnOpen: () => ({
+		markReadOnOpen: true,
+		handleOpenArticle: vi.fn().mockResolvedValue(undefined),
+	}),
+}));
+
 describe("HomePage", () => {
 	beforeEach(() => {
 		navigateMock.mockReset();
@@ -108,6 +118,7 @@ describe("HomePage", () => {
 						title: "Saved article",
 						hostname: "example.com",
 						faviconUrl: null,
+						isRead: false,
 					},
 				],
 				recentlyFavorite: [
@@ -117,6 +128,7 @@ describe("HomePage", () => {
 						title: "Favorite article",
 						hostname: "example.com",
 						faviconUrl: null,
+						isRead: true,
 					},
 				],
 				oldestUnread: [
@@ -126,6 +138,7 @@ describe("HomePage", () => {
 						title: "Unread article",
 						hostname: "example.com",
 						faviconUrl: null,
+						isRead: false,
 					},
 				],
 			},

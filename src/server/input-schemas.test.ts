@@ -3,6 +3,7 @@ import {
 	createArticleInputSchema,
 	tagMutationInputSchema,
 	updateArticleInputSchema,
+	updateUserSettingsInputSchema,
 	validateInput,
 } from "#/server/input-schemas";
 
@@ -43,5 +44,18 @@ describe("input schemas", () => {
 			articleIds: ["a1", "a2"],
 		});
 		expect(valid.articleIds).toHaveLength(2);
+	});
+
+	it("requires a boolean for user settings updates", () => {
+		expect(() =>
+			validateInput(updateUserSettingsInputSchema, {
+				markReadOnOpen: "yes",
+			}),
+		).toThrow("Invalid request data.");
+
+		const valid = validateInput(updateUserSettingsInputSchema, {
+			markReadOnOpen: false,
+		});
+		expect(valid.markReadOnOpen).toBe(false);
 	});
 });

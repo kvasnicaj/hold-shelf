@@ -5,6 +5,7 @@ import type {
 	ArticleCollectionLoaderData,
 	ArticleCollectionSearch,
 } from "#/components/articles/types";
+import { useAutoMarkReadOnOpen } from "#/components/articles/use-auto-mark-read-on-open";
 import { useSaveArticle } from "#/components/articles/use-save-article";
 import { deleteArticles, getArticles, updateArticle } from "#/server/articles";
 import {
@@ -45,6 +46,7 @@ export function useArticleCollectionPage({
 	const router = useRouter();
 	const [selected, setSelected] = useState<Set<string>>(new Set());
 	const { handleAdd } = useSaveArticle();
+	const { handleOpenArticle } = useAutoMarkReadOnOpen();
 
 	const { data: result } = useQuery({
 		queryKey: ["articles", queryKey, q, sort, page],
@@ -173,6 +175,7 @@ export function useArticleCollectionPage({
 		selectedIds,
 		handleSelect,
 		handleAdd,
+		handleOpenArticle,
 		handleToggleRead,
 		handleToggleFavorite,
 		handleDelete,

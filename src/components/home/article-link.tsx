@@ -1,4 +1,5 @@
 import { ExternalLink } from "lucide-react";
+import { ArticleExternalLink } from "#/components/articles/article-external-link";
 
 type ArticleLinkProps = {
 	article: {
@@ -7,21 +8,25 @@ type ArticleLinkProps = {
 		title: string | null;
 		hostname: string | null;
 		faviconUrl: string | null;
+		isRead: boolean;
 	};
+	onOpenArticle: (id: string, isRead: boolean) => void | Promise<void>;
 	variant?: "compact" | "with-site-column";
 };
 
 export function ArticleLink({
 	article,
+	onOpenArticle,
 	variant = "compact",
 }: ArticleLinkProps) {
 	const isDetailed = variant === "with-site-column";
 
 	return (
-		<a
+		<ArticleExternalLink
+			articleId={article.id}
 			href={article.url}
-			target="_blank"
-			rel="noopener noreferrer"
+			isRead={article.isRead}
+			onOpenArticle={onOpenArticle}
 			className={
 				isDetailed
 					? "grid w-full min-w-0 grid-cols-[minmax(0,1fr)_minmax(7rem,auto)_auto] items-center gap-3 overflow-hidden rounded-md px-2 py-2 text-sm no-underline transition-colors hover:bg-accent"
@@ -49,6 +54,6 @@ export function ArticleLink({
 				</span>
 			)}
 			<ExternalLink className="h-3 w-3 shrink-0 text-muted-foreground" />
-		</a>
+		</ArticleExternalLink>
 	);
 }

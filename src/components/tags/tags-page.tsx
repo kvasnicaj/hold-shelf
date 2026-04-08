@@ -23,6 +23,7 @@ export function TagsPage() {
 		handleDeleteTag,
 		handleToggleRead,
 		handleToggleFavorite,
+		handleOpenArticle,
 		handleSelect,
 		handleDeleteArticles,
 		handleAddTag,
@@ -66,6 +67,7 @@ export function TagsPage() {
 							availableTags={tagList}
 							onBack={goBackToTags}
 							onSelect={handleSelect}
+							onOpenArticle={handleOpenArticle}
 							onToggleRead={handleToggleRead}
 							onToggleFavorite={handleToggleFavorite}
 							onDeleteArticles={handleDeleteArticles}
@@ -105,6 +107,7 @@ export function TagsPage() {
 								availableTags={tagList}
 								onBack={goBackToTags}
 								onSelect={handleSelect}
+								onOpenArticle={handleOpenArticle}
 								onToggleRead={handleToggleRead}
 								onToggleFavorite={handleToggleFavorite}
 								onDeleteArticles={handleDeleteArticles}

@@ -1,14 +1,17 @@
 import { ExternalLink } from "lucide-react";
+import { ArticleExternalLink } from "#/components/articles/article-external-link";
 import type { ArticleWithTags } from "#/components/articles/types";
 import { Badge } from "#/components/ui/badge";
 
 type ArticleCardContentProps = {
 	article: ArticleWithTags;
+	onOpenArticle: (id: string, isRead: boolean) => void | Promise<void>;
 	timeAgo: string;
 };
 
 export function ArticleCardContent({
 	article,
+	onOpenArticle,
 	timeAgo,
 }: ArticleCardContentProps) {
 	return (
@@ -24,14 +27,15 @@ export function ArticleCardContent({
 						}}
 					/>
 				)}
-				<a
+				<ArticleExternalLink
+					articleId={article.id}
 					href={article.url}
-					target="_blank"
-					rel="noopener noreferrer"
+					isRead={article.isRead}
+					onOpenArticle={onOpenArticle}
 					className="truncate font-medium no-underline hover:underline"
 				>
 					{article.title ?? article.hostname ?? article.url}
-				</a>
+				</ArticleExternalLink>
 				<ExternalLink className="h-3 w-3 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
 			</div>
 

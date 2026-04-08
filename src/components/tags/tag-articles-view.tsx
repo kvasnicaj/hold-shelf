@@ -15,6 +15,7 @@ type TagArticlesViewProps = {
 	availableTags: Tag[];
 	onBack: () => void;
 	onSelect: (id: string, selected: boolean) => void;
+	onOpenArticle: (id: string, isRead: boolean) => void | Promise<void>;
 	onToggleRead: (id: string, isRead: boolean) => Promise<void>;
 	onToggleFavorite: (id: string, isFavorite: boolean) => Promise<void>;
 	onDeleteArticles: (ids: string[]) => Promise<void>;
@@ -36,6 +37,7 @@ export function TagArticlesView({
 	availableTags,
 	onBack,
 	onSelect,
+	onOpenArticle,
 	onToggleRead,
 	onToggleFavorite,
 	onDeleteArticles,
@@ -118,6 +120,7 @@ export function TagArticlesView({
 				articles={articles}
 				selected={selected}
 				onSelect={onSelect}
+				onOpenArticle={onOpenArticle}
 				onToggleRead={onToggleRead}
 				onToggleFavorite={onToggleFavorite}
 				onDelete={onDeleteArticles}

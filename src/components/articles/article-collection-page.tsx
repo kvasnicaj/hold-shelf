@@ -22,6 +22,7 @@ type ArticleCollectionPageProps = {
 	selectedIds: string[];
 	handleSelect: (id: string, selected: boolean) => void;
 	handleAdd: (url: string) => Promise<void>;
+	handleOpenArticle: (id: string, isRead: boolean) => Promise<void>;
 	handleToggleRead: (id: string, isRead: boolean) => Promise<void>;
 	handleToggleFavorite: (id: string, isFavorite: boolean) => Promise<void>;
 	handleDelete: (ids: string[]) => Promise<void>;
@@ -51,6 +52,7 @@ export function ArticleCollectionPage({
 	selectedIds,
 	handleSelect,
 	handleAdd,
+	handleOpenArticle,
 	handleToggleRead,
 	handleToggleFavorite,
 	handleDelete,
@@ -97,6 +99,7 @@ export function ArticleCollectionPage({
 						articles={articles}
 						selected={selected}
 						onSelect={handleSelect}
+						onOpenArticle={handleOpenArticle}
 						onToggleRead={handleToggleRead}
 						onToggleFavorite={handleToggleFavorite}
 						onDelete={handleDelete}

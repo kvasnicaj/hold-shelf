@@ -50,6 +50,10 @@ export const deleteArticlesInputSchema = z.object({
 	ids: articleIdsSchema,
 });
 
+export const updateUserSettingsInputSchema = z.object({
+	markReadOnOpen: z.boolean(),
+});
+
 export const createTagInputSchema = z.object({
 	name: z.string().trim().min(1).max(64),
 	color: z.string().trim().max(32).optional(),

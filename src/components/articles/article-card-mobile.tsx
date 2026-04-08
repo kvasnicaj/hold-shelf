@@ -1,4 +1,5 @@
 import { ArticleCardActions } from "#/components/articles/article-card-actions";
+import { ArticleExternalLink } from "#/components/articles/article-external-link";
 import type { ArticleCardProps } from "#/components/articles/types";
 import { Badge } from "#/components/ui/badge";
 import { Checkbox } from "#/components/ui/checkbox";
@@ -8,6 +9,7 @@ export function ArticleCardMobile({
 	article,
 	selected,
 	onSelect,
+	onOpenArticle,
 	onToggleRead,
 	onToggleFavorite,
 	onDelete,
@@ -21,14 +23,15 @@ export function ArticleCardMobile({
 	return (
 		<div className="rounded-lg border p-4">
 			<div className="space-y-3">
-				<a
+				<ArticleExternalLink
+					articleId={article.id}
 					href={article.url}
-					target="_blank"
-					rel="noopener noreferrer"
+					isRead={article.isRead}
+					onOpenArticle={onOpenArticle}
 					className="block break-words font-medium leading-snug no-underline hover:underline"
 				>
 					{article.title ?? article.hostname ?? article.url}
-				</a>
+				</ArticleExternalLink>
 
 				<div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
 					{article.hostname && <span>{article.hostname}</span>}

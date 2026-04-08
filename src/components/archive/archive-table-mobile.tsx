@@ -6,6 +6,7 @@ import {
 	Star,
 	Trash2,
 } from "lucide-react";
+import { ArticleExternalLink } from "#/components/articles/article-external-link";
 import type { ArticleWithTags } from "#/components/articles/types";
 import type { Tag } from "#/components/tags/types";
 import { Badge } from "#/components/ui/badge";
@@ -28,6 +29,7 @@ type ArchiveTableMobileProps = {
 	onAddTag: (tagId: string, articleIds: string[]) => Promise<void>;
 	onRemoveTag: (tagId: string, articleIds: string[]) => Promise<void>;
 	onCreateTag: (name: string) => Promise<Tag>;
+	onOpenArticle: (id: string, isRead: boolean) => Promise<void>;
 	onToggleRead: (id: string, isRead: boolean) => Promise<void>;
 	onToggleFavorite: (id: string, isFavorite: boolean) => Promise<void>;
 	onDelete: (ids: string[]) => Promise<void>;
@@ -37,6 +39,7 @@ export function ArchiveTableMobile({
 	articles,
 	rowSelection,
 	onRowSelectionChange,
+	onOpenArticle,
 	onToggleRead,
 	onToggleFavorite,
 	onDelete,
@@ -77,16 +80,17 @@ export function ArchiveTableMobile({
 											className="mt-0.5"
 										/>
 									) : null}
-									<a
+									<ArticleExternalLink
+										articleId={article.id}
 										href={article.url}
-										target="_blank"
-										rel="noopener noreferrer"
+										isRead={article.isRead}
+										onOpenArticle={onOpenArticle}
 										className="min-w-0 flex-1 text-sm font-medium leading-snug no-underline hover:underline"
 									>
 										<span className="line-clamp-1 break-words">
 											{article.title ?? article.url}
 										</span>
-									</a>
+									</ArticleExternalLink>
 									<ExternalLink className="mt-0.5 h-3 w-3 shrink-0 text-muted-foreground" />
 								</div>
 
