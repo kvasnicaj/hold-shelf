@@ -36,10 +36,15 @@ vi.mock("@tanstack/react-router", async () => {
 });
 
 describe("MobileBottomBar", () => {
-	it("renders a favorites shortcut", () => {
+	it("renders all primary navigation shortcuts", () => {
 		renderWithProviders(<MobileBottomBar />);
 
+		expect(screen.getByRole("link", { name: /home/i })).toHaveAttribute(
+			"href",
+			"/app/home",
+		);
 		const favoritesLink = screen.getByRole("link", { name: /favorites/i });
 		expect(favoritesLink).toHaveAttribute("href", "/app/favorites");
+		expect(screen.getAllByRole("link")).toHaveLength(5);
 	});
 });

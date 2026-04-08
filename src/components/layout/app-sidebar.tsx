@@ -1,24 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useRouterState } from "@tanstack/react-router";
-import {
-	Archive,
-	BookMarked,
-	Bookmark,
-	BookOpen,
-	Home,
-	Tag,
-	Tags,
-} from "lucide-react";
+import { Bookmark, Tag } from "lucide-react";
+import { homeNavItem, libraryNavItems } from "#/components/layout/nav-items";
 import { NavLink } from "#/components/layout/nav-link";
 import { getArticles } from "#/server/articles";
 import { getTags } from "#/server/tags";
-
-const libraryItems = [
-	{ label: "Unread", href: "/app/articles", icon: BookOpen },
-	{ label: "Favorites", href: "/app/favorites", icon: BookMarked },
-	{ label: "Archive", href: "/app/archive", icon: Archive },
-	{ label: "Tags", href: "/app/tags", icon: Tags },
-];
 
 export function AppSidebar() {
 	const routerState = useRouterState();
@@ -58,10 +44,10 @@ export function AppSidebar() {
 			<div className="pt-1.5">
 				<nav className="space-y-0.5">
 					<NavLink
-						href="/app/home"
-						icon={Home}
-						label="Home"
-						isActive={currentPath === "/app/home"}
+						href={homeNavItem.href}
+						icon={homeNavItem.icon}
+						label={homeNavItem.label}
+						isActive={currentPath === homeNavItem.href}
 					/>
 				</nav>
 
@@ -69,7 +55,7 @@ export function AppSidebar() {
 					Library
 				</p>
 				<nav className="space-y-0.5">
-					{libraryItems.map((item) => (
+					{libraryNavItems.map((item) => (
 						<NavLink
 							key={item.href}
 							href={item.href}
