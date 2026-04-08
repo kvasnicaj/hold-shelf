@@ -81,6 +81,8 @@ Responsibilities:
 
 - blocks unauthenticated access with `getSession()`
 - provides shared desktop/mobile navigation
+- keeps the brand mark in the mobile top bar while the bottom bar stays navigation-only
+- renders a full-width mobile bottom bar styled from the sidebar primitives
 - provides a dynamic toolbar channel via `ToolbarActionsProvider`
 
 ### Toolbar action system
