@@ -39,6 +39,7 @@ describe("ArticleCard", () => {
 				article={buildArticle()}
 				selected={false}
 				onSelect={vi.fn()}
+				onOpenArticle={vi.fn()}
 				onToggleRead={vi.fn()}
 				onToggleFavorite={vi.fn()}
 				onDelete={vi.fn()}
@@ -71,6 +72,7 @@ describe("ArticleCard", () => {
 				})}
 				selected={true}
 				onSelect={onSelect}
+				onOpenArticle={vi.fn()}
 				onToggleRead={onToggleRead}
 				onToggleFavorite={onToggleFavorite}
 				onDelete={onDelete}

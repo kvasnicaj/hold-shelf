@@ -9,7 +9,7 @@ export type DashboardStatsRow = {
 
 export type DashboardRecentArticle = Pick<
 	typeof articles.$inferSelect,
-	"id" | "title" | "hostname" | "url" | "faviconUrl" | "createdAt"
+	"id" | "title" | "hostname" | "url" | "faviconUrl" | "createdAt" | "isRead"
 >;
 
 export type DashboardRepository = {

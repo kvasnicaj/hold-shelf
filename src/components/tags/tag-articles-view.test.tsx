@@ -15,6 +15,7 @@ vi.mock("#/components/articles/article-list", () => ({
 	ArticleList: (props: {
 		articles: ArticleWithTags[];
 		selected: Set<string>;
+		onOpenArticle: (id: string, isRead: boolean) => void | Promise<void>;
 		onDelete: (ids: string[]) => Promise<void>;
 	}) => {
 		articleListMock(props);
@@ -83,6 +84,7 @@ describe("TagArticlesView", () => {
 				availableTags={availableTags}
 				onBack={onBack}
 				onSelect={vi.fn()}
+				onOpenArticle={vi.fn()}
 				onToggleRead={vi.fn().mockResolvedValue(undefined)}
 				onToggleFavorite={vi.fn().mockResolvedValue(undefined)}
 				onDeleteArticles={vi.fn().mockResolvedValue(undefined)}
@@ -118,6 +120,7 @@ describe("TagArticlesView", () => {
 				availableTags={availableTags}
 				onBack={vi.fn()}
 				onSelect={vi.fn()}
+				onOpenArticle={vi.fn()}
 				onToggleRead={vi.fn().mockResolvedValue(undefined)}
 				onToggleFavorite={vi.fn().mockResolvedValue(undefined)}
 				onDeleteArticles={onDeleteArticles}
@@ -158,6 +161,7 @@ describe("TagArticlesView", () => {
 				availableTags={availableTags}
 				onBack={vi.fn()}
 				onSelect={vi.fn()}
+				onOpenArticle={vi.fn()}
 				onToggleRead={vi.fn().mockResolvedValue(undefined)}
 				onToggleFavorite={vi.fn().mockResolvedValue(undefined)}
 				onDeleteArticles={vi.fn().mockResolvedValue(undefined)}

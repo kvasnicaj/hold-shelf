@@ -69,6 +69,13 @@ vi.mock("#/server/tags", () => ({
 	removeTagFromArticles: removeTagFromArticlesMock,
 }));
 
+vi.mock("#/components/articles/use-auto-mark-read-on-open", () => ({
+	useAutoMarkReadOnOpen: () => ({
+		markReadOnOpen: true,
+		handleOpenArticle: vi.fn().mockResolvedValue(undefined),
+	}),
+}));
+
 vi.mock("#/components/archive/archive-toolbar-actions", () => ({
 	ArchiveToolbarActions: ({
 		onAdd,

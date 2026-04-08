@@ -1,0 +1,1 @@
+ALTER TABLE `user` ADD `mark_read_on_open` integer DEFAULT true NOT NULL;

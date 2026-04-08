@@ -8,6 +8,7 @@ export function ArticleCard({
 	article,
 	selected,
 	onSelect,
+	onOpenArticle,
 	onToggleRead,
 	onToggleFavorite,
 	onDelete,
@@ -26,7 +27,11 @@ export function ArticleCard({
 				className="mt-1"
 			/>
 
-			<ArticleCardContent article={article} timeAgo={timeAgo} />
+			<ArticleCardContent
+				article={article}
+				onOpenArticle={onOpenArticle}
+				timeAgo={timeAgo}
+			/>
 			<ArticleCardActions
 				articleId={article.id}
 				isRead={article.isRead}

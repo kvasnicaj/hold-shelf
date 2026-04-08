@@ -31,6 +31,7 @@ export type ArticleCardProps = {
 	article: ArticleWithTags;
 	selected: boolean;
 	onSelect: (id: string, selected: boolean) => void;
+	onOpenArticle: (id: string, isRead: boolean) => void | Promise<void>;
 	onToggleRead: (id: string, isRead: boolean) => void;
 	onToggleFavorite: (id: string, isFavorite: boolean) => void;
 	onDelete: (id: string) => void;

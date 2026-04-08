@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getRouteApi, useNavigate, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
+import { useAutoMarkReadOnOpen } from "#/components/articles/use-auto-mark-read-on-open";
 import { deleteArticles, getArticles, updateArticle } from "#/server/articles";
 import {
 	addTagToArticles,
@@ -23,6 +24,7 @@ export function useTagsPage() {
 	const navigate = useNavigate({ from: "/app/tags" });
 	const [filter, setFilter] = useState("");
 	const [selected, setSelected] = useState<Set<string>>(new Set());
+	const { handleOpenArticle } = useAutoMarkReadOnOpen();
 
 	const { data: tagList = [] } = useQuery({
 		queryKey: ["tags"],
@@ -161,6 +163,7 @@ export function useTagsPage() {
 		handleDeleteTag,
 		handleToggleRead,
 		handleToggleFavorite,
+		handleOpenArticle,
 		handleSelect,
 		handleDeleteArticles,
 		handleAddTag,

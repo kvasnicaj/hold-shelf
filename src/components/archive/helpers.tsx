@@ -7,6 +7,7 @@ import {
 	Star,
 	Trash2,
 } from "lucide-react";
+import { ArticleExternalLink } from "#/components/articles/article-external-link";
 import type { ArticleWithTags } from "#/components/articles/types";
 import { TagPicker } from "#/components/tags/tag-picker";
 import type { Tag } from "#/components/tags/types";
@@ -28,6 +29,7 @@ type CreateArchiveColumnsOptions = {
 	onAddTag: (tagId: string, articleIds: string[]) => Promise<void>;
 	onRemoveTag: (tagId: string, articleIds: string[]) => Promise<void>;
 	onCreateTag: (name: string) => Promise<Tag>;
+	onOpenArticle: (id: string, isRead: boolean) => Promise<void>;
 	onToggleRead: (id: string, isRead: boolean) => Promise<void>;
 	onToggleFavorite: (id: string, isFavorite: boolean) => Promise<void>;
 	onDelete: (ids: string[]) => Promise<void>;
@@ -38,6 +40,7 @@ export function createArchiveColumns({
 	onAddTag,
 	onRemoveTag,
 	onCreateTag,
+	onOpenArticle,
 	onToggleRead,
 	onToggleFavorite,
 	onDelete,
@@ -89,14 +92,15 @@ export function createArchiveColumns({
 									}}
 								/>
 							)}
-							<a
+							<ArticleExternalLink
+								articleId={article.id}
 								href={article.url}
-								target="_blank"
-								rel="noopener noreferrer"
+								isRead={article.isRead}
+								onOpenArticle={onOpenArticle}
 								className="truncate text-sm font-medium no-underline hover:underline"
 							>
 								{article.title ?? article.url}
-							</a>
+							</ArticleExternalLink>
 							{article.isFavorite && (
 								<Star className="h-3.5 w-3.5 shrink-0 fill-current text-amber-500" />
 							)}

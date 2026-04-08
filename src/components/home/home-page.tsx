@@ -1,5 +1,6 @@
 import { getRouteApi } from "@tanstack/react-router";
 import { SaveArticleToolbarAction } from "#/components/articles/save-article-toolbar-action";
+import { useAutoMarkReadOnOpen } from "#/components/articles/use-auto-mark-read-on-open";
 import { useSaveArticle } from "#/components/articles/use-save-article";
 import { EmptyLibraryCta } from "#/components/home/empty-library-cta";
 import { HomeArchiveSearch } from "#/components/home/home-archive-search";
@@ -11,6 +12,7 @@ const route = getRouteApi("/app/home");
 export function HomePage() {
 	const { stats, recent } = route.useLoaderData();
 	const { handleAdd } = useSaveArticle();
+	const { handleOpenArticle } = useAutoMarkReadOnOpen();
 
 	return (
 		<div className="mx-auto max-w-5xl space-y-6">
@@ -29,6 +31,7 @@ export function HomePage() {
 				recentlySaved={recent.recentlySaved}
 				recentlyFavorite={recent.recentlyFavorite}
 				oldestUnread={recent.oldestUnread}
+				onOpenArticle={handleOpenArticle}
 			/>
 
 			{stats.total === 0 && <EmptyLibraryCta />}
