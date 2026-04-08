@@ -1,4 +1,4 @@
-import { fireEvent, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ArticleCollectionLoaderData } from "#/components/articles/types";
@@ -126,12 +126,6 @@ vi.mock("#/components/layout/toolbar-actions", () => ({
 	),
 }));
 
-vi.mock("#/components/ui/native-select", () => ({
-	NativeSelect: ({ children, ...props }: React.ComponentProps<"select">) => (
-		<select {...props}>{children}</select>
-	),
-}));
-
 const tagFixtures = [{ id: "t1", name: "Design", color: null }];
 const favoriteFixtures = [
 	{
@@ -191,9 +185,8 @@ describe("FavoritesPage", () => {
 
 		expect(screen.getByText("Favorite article")).toBeInTheDocument();
 
-		fireEvent.change(screen.getByRole("combobox"), {
-			target: { value: "title" },
-		});
+		await user.click(screen.getByRole("combobox", { name: "Sort articles" }));
+		await user.click(screen.getByRole("option", { name: "Title A-Z" }));
 		expect(navigateMock).toHaveBeenCalled();
 
 		await user.click(screen.getByRole("button", { name: "favorite-a1" }));

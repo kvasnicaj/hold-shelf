@@ -1,7 +1,15 @@
 import { X } from "lucide-react";
 import type { Tag } from "#/components/tags/types";
 import { Badge } from "#/components/ui/badge";
-import { NativeSelect } from "#/components/ui/native-select";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "#/components/ui/select";
+
+const ALL_TAGS_VALUE = "__all_tags__";
 
 type ArchiveFiltersProps = {
 	activeTag: Tag | null;
@@ -42,41 +50,61 @@ export function ArchiveFilters({
 				</Badge>
 			)}
 			<div className="flex w-full flex-wrap gap-2 md:ml-auto md:w-auto">
-				<NativeSelect
-					value={tag ?? ""}
-					onChange={(event) => onTagChange(event.target.value || undefined)}
+				<Select
+					value={tag ?? ALL_TAGS_VALUE}
+					onValueChange={(value) =>
+						onTagChange(value === ALL_TAGS_VALUE ? undefined : value)
+					}
 				>
-					<option value="">All tags</option>
-					{tagList.map((currentTag) => (
-						<option key={currentTag.id} value={currentTag.id}>
-							{currentTag.name}
-						</option>
-					))}
-				</NativeSelect>
-				<NativeSelect
+					<SelectTrigger aria-label="Tag filter" className="min-w-36">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value={ALL_TAGS_VALUE}>All tags</SelectItem>
+						{tagList.map((currentTag) => (
+							<SelectItem key={currentTag.id} value={currentTag.id}>
+								{currentTag.name}
+							</SelectItem>
+						))}
+					</SelectContent>
+				</Select>
+				<Select
 					value={filter ?? "all"}
-					onChange={(event) =>
+					onValueChange={(value) =>
 						onFilterChange(
-							event.target.value === "all"
+							value === "all"
 								? undefined
-								: (event.target.value as "all" | "read" | "unread"),
+								: (value as "all" | "read" | "unread"),
 						)
 					}
 				>
-					<option value="all">All</option>
-					<option value="unread">Unread</option>
-					<option value="read">Read</option>
-				</NativeSelect>
-				<NativeSelect
+					<SelectTrigger aria-label="Read status filter" className="min-w-32">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="all">All</SelectItem>
+						<SelectItem value="unread">Unread</SelectItem>
+						<SelectItem value="read">Read</SelectItem>
+					</SelectContent>
+				</Select>
+				<Select
 					value={sort ?? "newest"}
-					onChange={(event) =>
-						onSortChange(event.target.value as "newest" | "oldest" | "title")
+					onValueChange={(value) =>
+						onSortChange(value as "newest" | "oldest" | "title")
 					}
 				>
-					<option value="newest">Newest first</option>
-					<option value="oldest">Oldest first</option>
-					<option value="title">Title A-Z</option>
-				</NativeSelect>
+					<SelectTrigger
+						aria-label="Sort archive articles"
+						className="min-w-40"
+					>
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="newest">Newest first</SelectItem>
+						<SelectItem value="oldest">Oldest first</SelectItem>
+						<SelectItem value="title">Title A-Z</SelectItem>
+					</SelectContent>
+				</Select>
 			</div>
 		</div>
 	);
