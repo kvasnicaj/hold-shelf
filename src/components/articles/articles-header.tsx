@@ -1,4 +1,10 @@
-import { NativeSelect } from "#/components/ui/native-select";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "#/components/ui/select";
 
 type ArticlesHeaderProps = {
 	title: string;
@@ -26,16 +32,21 @@ export function ArticlesHeader({
 					{total} article{total !== 1 ? "s" : ""}
 				</p>
 				<div className="ml-auto">
-					<NativeSelect
+					<Select
 						value={sort ?? "newest"}
-						onChange={(event) =>
-							onSortChange(event.target.value as "newest" | "oldest" | "title")
+						onValueChange={(value) =>
+							onSortChange(value as "newest" | "oldest" | "title")
 						}
 					>
-						<option value="newest">Newest first</option>
-						<option value="oldest">Oldest first</option>
-						<option value="title">Title A-Z</option>
-					</NativeSelect>
+						<SelectTrigger aria-label="Sort articles" className="min-w-40">
+							<SelectValue />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="newest">Newest first</SelectItem>
+							<SelectItem value="oldest">Oldest first</SelectItem>
+							<SelectItem value="title">Title A-Z</SelectItem>
+						</SelectContent>
+					</Select>
 				</div>
 			</div>
 

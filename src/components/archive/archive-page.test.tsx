@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ArchivePage } from "#/components/archive/archive-page";
@@ -144,12 +144,6 @@ vi.mock("#/components/articles/bulk-actions-panel", () => ({
 	),
 }));
 
-vi.mock("#/components/ui/native-select", () => ({
-	NativeSelect: ({ children, ...props }: React.ComponentProps<"select">) => (
-		<select {...props}>{children}</select>
-	),
-}));
-
 const articleFixtures = [
 	{
 		id: "a1",
@@ -194,15 +188,18 @@ describe("ArchivePage", () => {
 		const user = userEvent.setup();
 		renderWithProviders(<ArchivePage />);
 
-		const selects = screen.getAllByRole("combobox");
-		const [tagSelect, filterSelect, sortSelect] = selects;
-		if (!tagSelect || !filterSelect || !sortSelect) {
-			throw new Error("Expected archive filter selects");
-		}
+		await user.click(screen.getByRole("combobox", { name: "Tag filter" }));
+		await user.click(screen.getByRole("option", { name: "All tags" }));
 
-		fireEvent.change(tagSelect, { target: { value: "" } });
-		fireEvent.change(filterSelect, { target: { value: "unread" } });
-		fireEvent.change(sortSelect, { target: { value: "title" } });
+		await user.click(
+			screen.getByRole("combobox", { name: "Read status filter" }),
+		);
+		await user.click(screen.getByRole("option", { name: "Unread" }));
+
+		await user.click(
+			screen.getByRole("combobox", { name: "Sort archive articles" }),
+		);
+		await user.click(screen.getByRole("option", { name: "Title A-Z" }));
 		await user.click(screen.getByRole("button", { name: /clear tag filter/i }));
 
 		expect(navigateMock).toHaveBeenCalledTimes(4);

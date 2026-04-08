@@ -21,6 +21,21 @@ beforeEach(() => {
 		writable: true,
 		value: vi.fn(),
 	});
+
+	Object.defineProperty(window.HTMLElement.prototype, "hasPointerCapture", {
+		writable: true,
+		value: vi.fn().mockReturnValue(false),
+	});
+
+	Object.defineProperty(window.HTMLElement.prototype, "setPointerCapture", {
+		writable: true,
+		value: vi.fn(),
+	});
+
+	Object.defineProperty(window.HTMLElement.prototype, "releasePointerCapture", {
+		writable: true,
+		value: vi.fn(),
+	});
 });
 
 afterEach(() => {

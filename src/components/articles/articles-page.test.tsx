@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ArticlesPage } from "#/components/articles/articles-page";
@@ -138,12 +138,6 @@ vi.mock("#/components/layout/toolbar-actions", () => ({
 	),
 }));
 
-vi.mock("#/components/ui/native-select", () => ({
-	NativeSelect: ({ children, ...props }: React.ComponentProps<"select">) => (
-		<select {...props}>{children}</select>
-	),
-}));
-
 const tagFixtures = [{ id: "t1", name: "Design", color: null }];
 const articleFixtures = [
 	{
@@ -204,6 +198,7 @@ describe("ArticlesPage", () => {
 	});
 
 	it("renders article titles from initial data and updates search params for sorting", async () => {
+		const user = userEvent.setup();
 		routeState.loaderData = {
 			articles: { items: articleFixtures, total: 2 },
 			tags: tagFixtures,
@@ -215,9 +210,8 @@ describe("ArticlesPage", () => {
 		expect(screen.getByText("Article one")).toBeInTheDocument();
 		expect(screen.getByText("Article two")).toBeInTheDocument();
 
-		fireEvent.change(screen.getByRole("combobox"), {
-			target: { value: "title" },
-		});
+		await user.click(screen.getByRole("combobox", { name: "Sort articles" }));
+		await user.click(screen.getByRole("option", { name: "Title A-Z" }));
 
 		expect(navigateMock).toHaveBeenCalled();
 		const latestNavigateCall = navigateMock.mock.calls.at(-1);
