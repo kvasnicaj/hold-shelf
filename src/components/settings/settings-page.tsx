@@ -1,5 +1,7 @@
 import { getRouteApi, useRouter } from "@tanstack/react-router";
+import { Chrome } from "lucide-react";
 import { useState } from "react";
+import { AddToChromeButton } from "#/components/extension/add-to-chrome-button";
 import { AccountSummaryCard } from "#/components/settings/account-summary-card";
 import { DeleteAccountCard } from "#/components/settings/delete-account-card";
 import { ReadingSettingsCard } from "#/components/settings/reading-settings-card";
@@ -46,6 +48,29 @@ export function SettingsPage() {
 					disabled={isPending}
 					onCheckedChange={handleMarkReadOnOpenChange}
 				/>
+
+				<Card>
+					<CardHeader>
+						<CardTitle>Browser extension</CardTitle>
+					</CardHeader>
+					<CardContent className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+						<div className="flex items-start gap-3">
+							<div className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl bg-(--lagoon)/10 ring-1 ring-(--lagoon)/20">
+								<Chrome className="size-5 text-(--lagoon)" />
+							</div>
+							<div className="space-y-1">
+								<p className="text-sm font-medium">
+									Save pages from Chrome in one click
+								</p>
+								<p className="text-sm text-muted-foreground">
+									Install the Hold Shelf extension to save the current tab or
+									right-clicked links without leaving your browser.
+								</p>
+							</div>
+						</div>
+						<AddToChromeButton />
+					</CardContent>
+				</Card>
 
 				<AccountSummaryCard />
 				<DeleteAccountCard />

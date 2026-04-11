@@ -110,12 +110,14 @@ LandingPage
 |- hero icon
 |- app title / tagline
 |- CTA button -> /login
+|- secondary extension link -> Chrome Web Store
 |- footer links -> /about, /privacy
 ```
 
 Purpose:
 
 - marketing-style entry screen for signed-out users
+- highlights that the Chrome extension is available from the Chrome Web Store
 - provides public about and privacy links for the website and extension listing
 
 ### About page
@@ -423,6 +425,8 @@ SettingsPage
 |- Appearance card
 |  |- ThemeToggle
 |- ReadingSettingsCard
+|- Browser extension card
+|  |- CTA button -> Chrome Web Store
 |- AccountSummaryCard
 |- DeleteAccountCard
 ```
@@ -432,6 +436,7 @@ Core functionality:
 - cycles theme between light, dark, and auto
 - persists theme to `localStorage`
 - stores the auto-mark-read-on-open preference in the database per user
+- links signed-in users to the Chrome Web Store extension install
 - shows the signed-in GitHub account details and provider summary
 - provides a guarded account-deletion flow that removes the auth user and cascades app data
 
