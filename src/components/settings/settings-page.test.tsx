@@ -1,6 +1,7 @@
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { CHROME_EXTENSION_URL } from "#/components/home/helpers";
 import { SettingsPage } from "#/components/settings/settings-page";
 import { renderWithProviders } from "#/test/render";
 
@@ -71,6 +72,10 @@ describe("SettingsPage", () => {
 		expect(
 			screen.getByText(/opening an article from hold shelf marks it as read/i),
 		).toBeInTheDocument();
+		expect(screen.getByText("Browser extension")).toBeInTheDocument();
+		expect(
+			screen.getByRole("link", { name: /add to chrome/i }),
+		).toHaveAttribute("href", CHROME_EXTENSION_URL);
 	});
 
 	it("persists the reading preference toggle", async () => {
