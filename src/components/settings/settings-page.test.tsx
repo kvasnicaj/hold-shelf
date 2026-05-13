@@ -43,6 +43,10 @@ vi.mock("#/components/settings/account-summary-card", () => ({
 	AccountSummaryCard: () => <div>Account summary</div>,
 }));
 
+vi.mock("#/components/settings/api-token-card", () => ({
+	ApiTokenCard: () => <div>API access</div>,
+}));
+
 vi.mock("#/components/settings/delete-account-card", () => ({
 	DeleteAccountCard: () => <div>Delete account</div>,
 }));
@@ -76,6 +80,7 @@ describe("SettingsPage", () => {
 		expect(
 			screen.getByRole("link", { name: /add to chrome/i }),
 		).toHaveAttribute("href", CHROME_EXTENSION_URL);
+		expect(screen.getByText("API access")).toBeInTheDocument();
 	});
 
 	it("persists the reading preference toggle", async () => {

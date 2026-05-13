@@ -36,6 +36,7 @@ High-level flow:
 |- /privacy                   -> PrivacyPage
 |- /extension/save            -> ExtensionSavePage
 |- /api/extension/articles    -> Chrome extension save endpoint
+|- /api/v1/articles           -> Personal-token REST articles API
 |- /app                       -> AppLayout (auth-gated)
    |- /app/home               -> HomePage
    |- /app/articles           -> ArticlesPage
@@ -213,6 +214,19 @@ Responsibilities:
 - saves the article with the same metadata extraction flow as the web app
 - returns `409` for duplicates so the extension can treat repeat saves as
   success
+
+### REST articles API
+
+Route: `/api/v1/articles`
+
+Responsibilities:
+
+- authenticates with `Authorization: Bearer <personal-token>`
+- `GET` lists articles with the same filters used by the app article domain
+- `POST` saves an article from `{ url }` using the shared metadata extraction
+  flow
+- rate limits auth attempts by client IP and authenticated API requests by user
+- returns an idempotent `status: "exists"` response for duplicate saves
 
 ## Authenticated routes
 
@@ -428,6 +442,7 @@ SettingsPage
 |- Browser extension card
 |  |- CTA button -> Chrome Web Store
 |- AccountSummaryCard
+|- ApiTokenCard
 |- DeleteAccountCard
 ```
 
@@ -438,6 +453,7 @@ Core functionality:
 - stores the auto-mark-read-on-open preference in the database per user
 - links signed-in users to the Chrome Web Store extension install
 - shows the signed-in GitHub account details and provider summary
+- lets users generate, replace, and revoke one personal API token
 - provides a guarded account-deletion flow that removes the auth user and cascades app data
 
 ## Shared components
@@ -497,6 +513,17 @@ Responsibilities:
 - enforce create-article rate limiting
 - update read/favorite state
 - delete articles in bulk
+
+### API tokens domain
+
+File: `src/server/api-tokens.ts`
+
+Responsibilities:
+
+- expose one personal API token per authenticated user
+- show the raw token only immediately after generation
+- store only the token hash and display prefix in D1
+- revoke or replace the token from settings
 
 ### Metadata extraction
 
@@ -565,6 +592,7 @@ Core tables in `src/db/schema.ts`:
 - `articles`: saved URLs and extracted metadata
 - `tags`: user-defined labels
 - `article_tags`: many-to-many join between articles and tags
+- `api_tokens`: one hashed personal API token per user
 - `rate_limits`: persistent rate-limit counters
 
 Important relationships:
@@ -572,6 +600,7 @@ Important relationships:
 - one user has many articles
 - one user has many tags
 - one article can have many tags through `article_tags`
+- one user can have one API token
 - article URLs are unique per user
 - tag names are unique per user
 
