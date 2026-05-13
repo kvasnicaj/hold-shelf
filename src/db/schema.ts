@@ -132,6 +132,22 @@ export const articleTags = sqliteTable(
 	],
 );
 
+export const apiTokens = sqliteTable(
+	"api_tokens",
+	{
+		userId: text("user_id")
+			.primaryKey()
+			.references(() => user.id, { onDelete: "cascade" }),
+		tokenHash: text("token_hash").notNull(),
+		tokenPrefix: text("token_prefix").notNull(),
+		createdAt: integer("created_at", { mode: "timestamp" })
+			.notNull()
+			.default(sql`(unixepoch())`),
+		lastUsedAt: integer("last_used_at", { mode: "timestamp" }),
+	},
+	(table) => [uniqueIndex("api_tokens_token_hash_idx").on(table.tokenHash)],
+);
+
 export const rateLimits = sqliteTable(
 	"rate_limits",
 	{

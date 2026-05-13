@@ -21,6 +21,7 @@ import { Route as AppHomeRouteImport } from './routes/app/home'
 import { Route as AppFavoritesRouteImport } from './routes/app/favorites'
 import { Route as AppArticlesRouteImport } from './routes/app/articles'
 import { Route as AppArchiveRouteImport } from './routes/app/archive'
+import { Route as ApiV1ArticlesRouteImport } from './routes/api/v1/articles'
 import { Route as ApiExtensionArticlesRouteImport } from './routes/api/extension/articles'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
@@ -84,6 +85,11 @@ const AppArchiveRoute = AppArchiveRouteImport.update({
   path: '/archive',
   getParentRoute: () => AppRoute,
 } as any)
+const ApiV1ArticlesRoute = ApiV1ArticlesRouteImport.update({
+  id: '/api/v1/articles',
+  path: '/api/v1/articles',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiExtensionArticlesRoute = ApiExtensionArticlesRouteImport.update({
   id: '/api/extension/articles',
   path: '/api/extension/articles',
@@ -110,6 +116,7 @@ export interface FileRoutesByFullPath {
   '/extension/save': typeof ExtensionSaveRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/extension/articles': typeof ApiExtensionArticlesRoute
+  '/api/v1/articles': typeof ApiV1ArticlesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -126,6 +133,7 @@ export interface FileRoutesByTo {
   '/extension/save': typeof ExtensionSaveRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/extension/articles': typeof ApiExtensionArticlesRoute
+  '/api/v1/articles': typeof ApiV1ArticlesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -143,6 +151,7 @@ export interface FileRoutesById {
   '/extension/save': typeof ExtensionSaveRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/extension/articles': typeof ApiExtensionArticlesRoute
+  '/api/v1/articles': typeof ApiV1ArticlesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -161,6 +170,7 @@ export interface FileRouteTypes {
     | '/extension/save'
     | '/api/auth/$'
     | '/api/extension/articles'
+    | '/api/v1/articles'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -177,6 +187,7 @@ export interface FileRouteTypes {
     | '/extension/save'
     | '/api/auth/$'
     | '/api/extension/articles'
+    | '/api/v1/articles'
   id:
     | '__root__'
     | '/'
@@ -193,6 +204,7 @@ export interface FileRouteTypes {
     | '/extension/save'
     | '/api/auth/$'
     | '/api/extension/articles'
+    | '/api/v1/articles'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -204,6 +216,7 @@ export interface RootRouteChildren {
   ExtensionSaveRoute: typeof ExtensionSaveRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiExtensionArticlesRoute: typeof ApiExtensionArticlesRoute
+  ApiV1ArticlesRoute: typeof ApiV1ArticlesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -292,6 +305,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppArchiveRouteImport
       parentRoute: typeof AppRoute
     }
+    '/api/v1/articles': {
+      id: '/api/v1/articles'
+      path: '/api/v1/articles'
+      fullPath: '/api/v1/articles'
+      preLoaderRoute: typeof ApiV1ArticlesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/extension/articles': {
       id: '/api/extension/articles'
       path: '/api/extension/articles'
@@ -338,6 +358,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExtensionSaveRoute: ExtensionSaveRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiExtensionArticlesRoute: ApiExtensionArticlesRoute,
+  ApiV1ArticlesRoute: ApiV1ArticlesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
