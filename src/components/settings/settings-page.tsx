@@ -3,6 +3,7 @@ import { Chrome } from "lucide-react";
 import { useState } from "react";
 import { AddToChromeButton } from "#/components/extension/add-to-chrome-button";
 import { AccountSummaryCard } from "#/components/settings/account-summary-card";
+import { ApiTokenCard } from "#/components/settings/api-token-card";
 import { DeleteAccountCard } from "#/components/settings/delete-account-card";
 import { ReadingSettingsCard } from "#/components/settings/reading-settings-card";
 import ThemeToggle from "#/components/theme-toggle";
@@ -73,6 +74,7 @@ export function SettingsPage() {
 				</Card>
 
 				<AccountSummaryCard />
+				<ApiTokenCard />
 				<DeleteAccountCard />
 			</div>
 		</div>
