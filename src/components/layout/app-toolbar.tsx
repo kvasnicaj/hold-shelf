@@ -77,7 +77,7 @@ export function AppToolbar({
 				</Button>
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
-						<Button variant="ghost" size="icon-sm">
+						<Button variant="ghost" size="icon-sm" className="md:hidden">
 							<User className="h-[1.125rem] w-[1.125rem]" />
 						</Button>
 					</DropdownMenuTrigger>

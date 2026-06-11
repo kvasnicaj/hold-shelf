@@ -61,6 +61,6 @@ describe("AppSidebar", () => {
 			name: /favorites/i,
 		});
 		expect(favoritesLink).toHaveAttribute("href", "/app/favorites");
-		expect(favoritesLink.className).toContain("bg-accent");
+		expect(favoritesLink.className).toContain("bg-sidebar-accent");
 	});
 });
