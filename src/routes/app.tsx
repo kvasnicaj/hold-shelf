@@ -29,10 +29,10 @@ function AppLayout() {
 	return (
 		<ToolbarActionsProvider>
 			<div className="flex min-h-screen bg-background">
-				<div className="sticky top-0 hidden h-screen shrink-0 p-2 md:flex">
+				<div className="sticky top-0 hidden h-screen shrink-0 md:flex">
 					<AppSidebar />
 				</div>
-				<main className="min-w-0 flex-1 p-4 pb-28 md:pb-4 lg:p-6">
+				<main className="min-w-0 flex-1 p-4 pb-32 md:pb-4 lg:p-6">
 					<TopBar />
 					<Outlet />
 				</main>

@@ -28,8 +28,8 @@ export function NavLink({
 			{...props}
 			className={`flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-sm no-underline transition-colors ${
 				isActive
-					? "bg-accent font-medium text-foreground"
-					: "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+					? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
+					: "text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
 			}`}
 		>
 			<Icon className={iconClassName ?? "h-4 w-4 shrink-0"} />
@@ -40,7 +40,7 @@ export function NavLink({
 				</span>
 			)}
 			{count !== undefined && (
-				<span className="text-xs text-muted-foreground">{count}</span>
+				<span className="text-xs text-sidebar-foreground/60">{count}</span>
 			)}
 		</Link>
 	);
