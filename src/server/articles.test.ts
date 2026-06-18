@@ -19,19 +19,24 @@ import {
 import { requireUserId } from "#/server/helpers";
 
 vi.mock("@tanstack/react-start", () => ({
-	createServerFn: (options: { method: string }) => ({
-		inputValidator: (validator: unknown) => ({
+	createServerFn: (options: { method: string }) => {
+		const withValidator = (validator: unknown) => ({
 			handler: (handler: unknown) => ({
 				options,
 				validator,
 				handler,
 			}),
-		}),
-		handler: (handler: unknown) => ({
-			options,
-			handler,
-		}),
-	}),
+		});
+
+		return {
+			validator: withValidator,
+			inputValidator: withValidator,
+			handler: (handler: unknown) => ({
+				options,
+				handler,
+			}),
+		};
+	},
 }));
 
 vi.mock("#/server/articles-repository", () => ({

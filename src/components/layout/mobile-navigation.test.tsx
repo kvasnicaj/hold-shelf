@@ -1,6 +1,6 @@
 import { screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { MobileBottomBar } from "#/components/layout/mobile-bottom-bar";
+import { MobileNavigation } from "#/components/layout/mobile-navigation";
 import { renderWithProviders } from "#/test/render";
 
 const { routerState } = vi.hoisted(() => ({
@@ -35,10 +35,11 @@ vi.mock("@tanstack/react-router", async () => {
 	};
 });
 
-describe("MobileBottomBar", () => {
+describe("MobileNavigation", () => {
 	it("renders all primary navigation shortcuts", () => {
-		renderWithProviders(<MobileBottomBar />);
+		renderWithProviders(<MobileNavigation />);
 
+		expect(screen.getByRole("navigation", { name: /primary/i })).toBeVisible();
 		expect(screen.getByRole("link", { name: /home/i })).toHaveAttribute(
 			"href",
 			"/app/home",

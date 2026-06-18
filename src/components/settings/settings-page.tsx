@@ -1,5 +1,5 @@
 import { getRouteApi, useRouter } from "@tanstack/react-router";
-import { Chrome } from "lucide-react";
+import { Globe } from "lucide-react";
 import { useState } from "react";
 import { AddToChromeButton } from "#/components/extension/add-to-chrome-button";
 import { AccountSummaryCard } from "#/components/settings/account-summary-card";
@@ -57,7 +57,7 @@ export function SettingsPage() {
 					<CardContent className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 						<div className="flex items-start gap-3">
 							<div className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl bg-(--lagoon)/10 ring-1 ring-(--lagoon)/20">
-								<Chrome className="size-5 text-(--lagoon)" />
+								<Globe className="size-5 text-(--lagoon)" />
 							</div>
 							<div className="space-y-1">
 								<p className="text-sm font-medium">

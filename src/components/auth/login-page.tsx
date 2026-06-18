@@ -1,4 +1,4 @@
-import { Bookmark, Github } from "lucide-react";
+import { Bookmark, GitBranch } from "lucide-react";
 import { useLoginPage } from "#/components/auth/use-login-page";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
@@ -41,7 +41,7 @@ export function LoginPage({
 							disabled={socialLoading}
 							onClick={() => void handleGitHubSignIn()}
 						>
-							<Github className="mr-2 h-4 w-4" />
+							<GitBranch className="mr-2 h-4 w-4" />
 							{socialLoading ? "Redirecting..." : "Continue with GitHub"}
 						</Button>
 						<p className="text-center text-xs leading-relaxed text-muted-foreground">

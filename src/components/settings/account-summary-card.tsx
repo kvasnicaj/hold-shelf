@@ -1,4 +1,4 @@
-import { Github } from "lucide-react";
+import { GitBranch } from "lucide-react";
 import { getAccountInitials } from "#/components/settings/helpers";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 import { authClient } from "#/lib/auth-client";
@@ -41,7 +41,7 @@ export function AccountSummaryCard() {
 						</p>
 					</div>
 					<div className="flex items-center gap-2 rounded-full border px-2 py-1 text-sm font-medium sm:px-3">
-						<Github className="h-4 w-4" />
+						<GitBranch className="h-4 w-4" />
 						<span className="sr-only sm:not-sr-only">GitHub</span>
 					</div>
 				</div>
