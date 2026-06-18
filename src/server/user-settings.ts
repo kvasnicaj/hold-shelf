@@ -53,7 +53,7 @@ export const getUserSettings = createServerFn({ method: "GET" }).handler(
 );
 
 export const updateUserSettings = createServerFn({ method: "POST" })
-	.inputValidator((input) =>
+	.validator((input) =>
 		validateInput(
 			updateUserSettingsInputSchema,
 			input,

@@ -13,7 +13,7 @@ import {
 import { requireUserId } from "#/server/helpers";
 
 export const getArticles = createServerFn({ method: "GET" })
-	.inputValidator(validateGetArticlesInput)
+	.validator(validateGetArticlesInput)
 	.handler(async ({ data }) =>
 		handleGetArticles(data, {
 			createRepository: createArticlesRepository,
@@ -22,7 +22,7 @@ export const getArticles = createServerFn({ method: "GET" })
 	);
 
 export const createArticle = createServerFn({ method: "POST" })
-	.inputValidator(validateCreateArticleInput)
+	.validator(validateCreateArticleInput)
 	.handler(async ({ data }) =>
 		handleCreateArticle(data, {
 			createRepository: createArticlesRepository,
@@ -31,7 +31,7 @@ export const createArticle = createServerFn({ method: "POST" })
 	);
 
 export const updateArticle = createServerFn({ method: "POST" })
-	.inputValidator(validateUpdateArticleInput)
+	.validator(validateUpdateArticleInput)
 	.handler(async ({ data }) =>
 		handleUpdateArticle(data, {
 			createRepository: createArticlesRepository,
@@ -40,7 +40,7 @@ export const updateArticle = createServerFn({ method: "POST" })
 	);
 
 export const deleteArticles = createServerFn({ method: "POST" })
-	.inputValidator(validateDeleteArticlesInput)
+	.validator(validateDeleteArticlesInput)
 	.handler(async ({ data }) =>
 		handleDeleteArticles(data, {
 			createRepository: createArticlesRepository,

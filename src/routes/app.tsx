@@ -2,7 +2,7 @@ import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { AppBrandMark } from "#/components/layout/app-brand-mark";
 import { AppSidebar } from "#/components/layout/app-sidebar";
 import { AppToolbar } from "#/components/layout/app-toolbar";
-import { MobileBottomBar } from "#/components/layout/mobile-bottom-bar";
+import { MobileNavigation } from "#/components/layout/mobile-navigation";
 import {
 	ToolbarActionsProvider,
 	useToolbarActions,
@@ -37,7 +37,7 @@ function AppLayout() {
 					<Outlet />
 				</main>
 			</div>
-			<MobileBottomBar />
+			<MobileNavigation />
 		</ToolbarActionsProvider>
 	);
 }

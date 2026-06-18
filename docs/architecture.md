@@ -75,15 +75,15 @@ AppLayout
 |  |  |
 |  |  |- Outlet
 |  |
-|  |- MobileBottomBar
+|  |- MobileNavigation
 ```
 
 Responsibilities:
 
 - blocks unauthenticated access with `getSession()`
 - provides shared desktop/mobile navigation
-- keeps the brand mark in the mobile top bar while the bottom bar stays navigation-only
-- renders a full-width mobile bottom bar styled from the sidebar primitives
+- keeps the brand mark in the mobile top bar while the mobile navigation stays route-focused
+- renders a full-width mobile bottom navigation strip styled from the sidebar primitives
 - provides a dynamic toolbar channel via `ToolbarActionsProvider`
 
 ### Toolbar action system
@@ -461,7 +461,7 @@ Core functionality:
 ### Layout
 
 - `AppSidebar`: desktop navigation, unread counter, favorites link, dynamic tag links
-- `MobileBottomBar`: mobile navigation
+- `MobileNavigation`: mobile navigation
 - `AppToolbar`: search, page actions, theme toggle, user menu, sign out
 - `ToolBox`: shared chrome for toolbar controls
 
