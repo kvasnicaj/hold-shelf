@@ -1,17 +1,16 @@
-import viteReact from "@vitejs/plugin-react";
+import babel from "@rolldown/plugin-babel";
+import viteReact, { reactCompilerPreset } from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
-import tsconfigPaths from "vite-tsconfig-paths";
 
 const plugins = [
-	tsconfigPaths({ projects: ["./tsconfig.json"] }),
-	viteReact({
-		babel: {
-			plugins: ["babel-plugin-react-compiler"],
-		},
-	}),
+	viteReact(),
+	babel({ presets: [reactCompilerPreset()] }),
 ];
 
 export default defineConfig({
+	resolve: {
+		tsconfigPaths: true,
+	},
 	test: {
 		coverage: {
 			provider: "v8",

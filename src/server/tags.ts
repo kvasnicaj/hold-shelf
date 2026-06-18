@@ -119,7 +119,7 @@ export const getTags = createServerFn({ method: "GET" }).handler(async () =>
 );
 
 export const createTag = createServerFn({ method: "POST" })
-	.inputValidator(validateCreateTagInput)
+	.validator(validateCreateTagInput)
 	.handler(async ({ data }) =>
 		handleCreateTag(data, {
 			createRepository: createTagsRepository,
@@ -128,7 +128,7 @@ export const createTag = createServerFn({ method: "POST" })
 	);
 
 export const updateTag = createServerFn({ method: "POST" })
-	.inputValidator(validateUpdateTagInput)
+	.validator(validateUpdateTagInput)
 	.handler(async ({ data }) =>
 		handleUpdateTag(data, {
 			createRepository: createTagsRepository,
@@ -137,7 +137,7 @@ export const updateTag = createServerFn({ method: "POST" })
 	);
 
 export const deleteTag = createServerFn({ method: "POST" })
-	.inputValidator(validateDeleteTagInput)
+	.validator(validateDeleteTagInput)
 	.handler(async ({ data }) =>
 		handleDeleteTag(data, {
 			createRepository: createTagsRepository,
@@ -146,7 +146,7 @@ export const deleteTag = createServerFn({ method: "POST" })
 	);
 
 export const addTagToArticles = createServerFn({ method: "POST" })
-	.inputValidator(validateTagMutationInput)
+	.validator(validateTagMutationInput)
 	.handler(async ({ data }) =>
 		handleAddTagToArticles(data, {
 			createRepository: createTagsRepository,
@@ -155,9 +155,7 @@ export const addTagToArticles = createServerFn({ method: "POST" })
 	);
 
 export const removeTagFromArticles = createServerFn({ method: "POST" })
-	.inputValidator((input) =>
-		validateTagMutationInput(input, "Invalid tag removal."),
-	)
+	.validator((input) => validateTagMutationInput(input, "Invalid tag removal."))
 	.handler(async ({ data }) =>
 		handleRemoveTagFromArticles(data, {
 			createRepository: createTagsRepository,
