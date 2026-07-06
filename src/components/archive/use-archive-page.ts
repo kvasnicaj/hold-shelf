@@ -1,14 +1,11 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getRouteApi, useNavigate, useRouter } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { getRouteApi, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import type { ArticleSort } from "#/components/articles/types";
+import { useArticleMutations } from "#/components/articles/use-article-mutations";
 import { useAutoMarkReadOnOpen } from "#/components/articles/use-auto-mark-read-on-open";
-import { deleteArticles, getArticles, updateArticle } from "#/server/articles";
-import {
-	addTagToArticles,
-	createTag,
-	getTags,
-	removeTagFromArticles,
-} from "#/server/tags";
+import { getArticles } from "#/server/articles";
+import { getTags } from "#/server/tags";
 
 const route = getRouteApi("/app/archive");
 
@@ -17,11 +14,20 @@ export function useArchivePage() {
 	const { q, filter, sort, tag, tags, page: searchPage } = route.useSearch();
 	const page = searchPage ?? 1;
 	const selectedTagIds = tags?.length ? tags : tag ? [tag] : [];
-	const queryClient = useQueryClient();
-	const router = useRouter();
 	const navigate = useNavigate({ from: "/app/archive" });
 	const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
 	const { handleOpenArticle } = useAutoMarkReadOnOpen();
+	const {
+		handleToggleRead,
+		handleToggleFavorite,
+		handleDelete,
+		handleBulkToggleRead,
+		handleAddTag,
+		handleRemoveTag,
+		handleCreateTag,
+	} = useArticleMutations({
+		onSelectionClear: () => setRowSelection({}),
+	});
 
 	const isRead =
 		filter === "read" ? true : filter === "unread" ? false : undefined;
@@ -54,58 +60,12 @@ export function useArchivePage() {
 		(id) => rowSelection[id],
 	);
 
-	function invalidateAll() {
-		queryClient.invalidateQueries({ queryKey: ["articles"] });
-		queryClient.invalidateQueries({ queryKey: ["tags"] });
-		router.invalidate();
-	}
-
-	async function handleToggleRead(id: string, readState: boolean) {
-		await updateArticle({ data: { id, isRead: readState } });
-		invalidateAll();
-	}
-
-	async function handleToggleFavorite(id: string, favoriteState: boolean) {
-		await updateArticle({ data: { id, isFavorite: favoriteState } });
-		invalidateAll();
-	}
-
-	async function handleDelete(ids: string[]) {
-		await deleteArticles({ data: { ids } });
-		setRowSelection({});
-		invalidateAll();
-	}
-
-	async function handleBulkToggleRead(ids: string[], readState: boolean) {
-		await Promise.all(
-			ids.map((id) => updateArticle({ data: { id, isRead: readState } })),
-		);
-		setRowSelection({});
-		invalidateAll();
-	}
-
-	async function handleAddTag(tagId: string, articleIds: string[]) {
-		await addTagToArticles({ data: { tagId, articleIds } });
-		invalidateAll();
-	}
-
-	async function handleRemoveTag(tagId: string, articleIds: string[]) {
-		await removeTagFromArticles({ data: { tagId, articleIds } });
-		invalidateAll();
-	}
-
-	async function handleCreateTag(name: string) {
-		const newTag = await createTag({ data: { name } });
-		invalidateAll();
-		return { id: newTag.id, name: newTag.name, color: newTag.color };
-	}
-
 	function updateSearch(partial: {
 		q?: string;
 		tag?: string;
 		tags?: string[];
 		filter?: "all" | "read" | "unread";
-		sort?: "newest" | "oldest" | "title";
+		sort?: ArticleSort;
 		page?: number;
 	}) {
 		navigate({
@@ -161,7 +121,7 @@ export function useArchivePage() {
 			}),
 		updateFilter: (nextFilter?: "all" | "read" | "unread") =>
 			updateSearch({ filter: nextFilter, page: undefined }),
-		updateSort: (nextSort: "newest" | "oldest" | "title") =>
+		updateSort: (nextSort: ArticleSort) =>
 			updateSearch({
 				sort: nextSort === "newest" ? undefined : nextSort,
 				page: undefined,

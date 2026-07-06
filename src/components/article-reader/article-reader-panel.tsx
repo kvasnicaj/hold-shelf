@@ -1,27 +1,21 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { BookOpen, Check, ExternalLink, Star, X } from "lucide-react";
 import { ArticleReaderContent } from "#/components/article-reader/article-reader-content";
 import { ArticleReaderFallback } from "#/components/article-reader/article-reader-fallback";
 import { ArticleReaderMetadata } from "#/components/article-reader/article-reader-metadata";
 import { useArticleReader } from "#/components/article-reader/use-article-reader";
+import { useArticleMutations } from "#/components/articles/use-article-mutations";
 import { ColumnNavbar } from "#/components/layout/column-navbar";
 import { TagPicker } from "#/components/tags/tag-picker";
-import type { Tag } from "#/components/tags/types";
 import { Badge } from "#/components/ui/badge";
 import { Button } from "#/components/ui/button";
 import { Skeleton } from "#/components/ui/skeleton";
 import { cn } from "#/lib/utils";
-import { getArticleReader, updateArticle } from "#/server/articles";
-import {
-	addTagToArticles,
-	createTag,
-	getTags,
-	removeTagFromArticles,
-} from "#/server/tags";
+import { getArticleReader } from "#/server/articles";
+import { getTags } from "#/server/tags";
 
 export function ArticleReaderPanel() {
 	const { articleId, isOpen, closeArticle } = useArticleReader();
-	const queryClient = useQueryClient();
 	const { data: tagList = [] } = useQuery({
 		queryKey: ["tags"],
 		queryFn: () => getTags(),
@@ -31,42 +25,16 @@ export function ArticleReaderPanel() {
 		queryFn: () => getArticleReader({ data: { id: articleId ?? "" } }),
 		enabled: Boolean(articleId),
 	});
-
-	async function invalidateAll() {
-		await Promise.all([
-			queryClient.invalidateQueries({ queryKey: ["articles"] }),
-			queryClient.invalidateQueries({
-				queryKey: ["article-reader", articleId],
-			}),
-			queryClient.invalidateQueries({ queryKey: ["tags"] }),
-		]);
-	}
-
-	async function handleToggleRead(id: string, isRead: boolean) {
-		await updateArticle({ data: { id, isRead } });
-		await invalidateAll();
-	}
-
-	async function handleToggleFavorite(id: string, isFavorite: boolean) {
-		await updateArticle({ data: { id, isFavorite } });
-		await invalidateAll();
-	}
-
-	async function handleAddTag(tagId: string, articleIds: string[]) {
-		await addTagToArticles({ data: { tagId, articleIds } });
-		await invalidateAll();
-	}
-
-	async function handleRemoveTag(tagId: string, articleIds: string[]) {
-		await removeTagFromArticles({ data: { tagId, articleIds } });
-		await invalidateAll();
-	}
-
-	async function handleCreateTag(name: string): Promise<Tag> {
-		const tag = await createTag({ data: { name } });
-		await invalidateAll();
-		return { id: tag.id, name: tag.name, color: tag.color };
-	}
+	const {
+		handleToggleRead,
+		handleToggleFavorite,
+		handleAddTag,
+		handleRemoveTag,
+		handleCreateTag,
+	} = useArticleMutations({
+		extraInvalidationKeys: articleId ? [["article-reader", articleId]] : [],
+		invalidateRouter: false,
+	});
 
 	function renderCloseButton(key: string) {
 		return (

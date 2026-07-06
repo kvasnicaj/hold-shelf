@@ -4,12 +4,6 @@ import { describe, expect, it, vi } from "vitest";
 import { BulkActionsPanel } from "#/components/articles/bulk-actions-panel";
 import { renderWithProviders } from "#/test/render";
 
-vi.mock("#/components/layout/toolbar-actions", () => ({
-	ToolbarCenter: ({ children }: { children: React.ReactNode }) => (
-		<>{children}</>
-	),
-}));
-
 describe("BulkActionsPanel", () => {
 	it("renders expanded inline actions for wider layouts", async () => {
 		const user = userEvent.setup();
