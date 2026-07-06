@@ -80,7 +80,13 @@ describe("SettingsPage", () => {
 		expect(
 			screen.getByRole("link", { name: /add to chrome/i }),
 		).toHaveAttribute("href", CHROME_EXTENSION_URL);
+		expect(screen.getByText("Appearance")).toBeInTheDocument();
+		expect(
+			screen.getByRole("button", { name: "Theme toggle" }),
+		).toBeInTheDocument();
+		expect(screen.getByText("Account summary")).toBeInTheDocument();
 		expect(screen.getByText("API access")).toBeInTheDocument();
+		expect(screen.getByText("Delete account")).toBeInTheDocument();
 	});
 
 	it("persists the reading preference toggle", async () => {

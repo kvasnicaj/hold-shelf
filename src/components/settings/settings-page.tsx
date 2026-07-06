@@ -31,51 +31,60 @@ export function SettingsPage() {
 	}
 
 	return (
-		<div className="mx-auto max-w-5xl space-y-4">
-			<h1 className="display-title text-2xl font-bold">Settings</h1>
-			<div className="max-w-2xl space-y-4">
-				<Card>
-					<CardHeader>
-						<CardTitle>Appearance</CardTitle>
-					</CardHeader>
-					<CardContent className="flex items-center justify-between">
-						<span className="text-sm">Theme</span>
-						<ThemeToggle />
-					</CardContent>
-				</Card>
+		<div className="w-full space-y-4">
+			<div className="space-y-1">
+				<h1 className="display-title text-2xl font-bold">Settings</h1>
+				<p className="text-sm text-muted-foreground">
+					Manage reading behavior, account access, and integrations.
+				</p>
+			</div>
+			<div className="grid gap-4 xl:grid-cols-2">
+				<div className="space-y-4">
+					<Card>
+						<CardHeader>
+							<CardTitle>Appearance</CardTitle>
+						</CardHeader>
+						<CardContent className="flex items-center justify-between">
+							<span className="text-sm">Theme</span>
+							<ThemeToggle />
+						</CardContent>
+					</Card>
 
-				<ReadingSettingsCard
-					checked={markReadOnOpen}
-					disabled={isPending}
-					onCheckedChange={handleMarkReadOnOpenChange}
-				/>
+					<ReadingSettingsCard
+						checked={markReadOnOpen}
+						disabled={isPending}
+						onCheckedChange={handleMarkReadOnOpenChange}
+					/>
 
-				<Card>
-					<CardHeader>
-						<CardTitle>Browser extension</CardTitle>
-					</CardHeader>
-					<CardContent className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-						<div className="flex items-start gap-3">
-							<div className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl bg-(--lagoon)/10 ring-1 ring-(--lagoon)/20">
-								<Globe className="size-5 text-(--lagoon)" />
+					<Card>
+						<CardHeader>
+							<CardTitle>Browser extension</CardTitle>
+						</CardHeader>
+						<CardContent className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+							<div className="flex items-start gap-3">
+								<div className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl bg-(--lagoon)/10 ring-1 ring-(--lagoon)/20">
+									<Globe className="size-5 text-(--lagoon)" />
+								</div>
+								<div className="space-y-1">
+									<p className="text-sm font-medium">
+										Save pages from Chrome in one click
+									</p>
+									<p className="text-sm text-muted-foreground">
+										Install the Hold Shelf extension to save the current tab or
+										right-clicked links without leaving your browser.
+									</p>
+								</div>
 							</div>
-							<div className="space-y-1">
-								<p className="text-sm font-medium">
-									Save pages from Chrome in one click
-								</p>
-								<p className="text-sm text-muted-foreground">
-									Install the Hold Shelf extension to save the current tab or
-									right-clicked links without leaving your browser.
-								</p>
-							</div>
-						</div>
-						<AddToChromeButton />
-					</CardContent>
-				</Card>
+							<AddToChromeButton />
+						</CardContent>
+					</Card>
+				</div>
 
-				<AccountSummaryCard />
-				<ApiTokenCard />
-				<DeleteAccountCard />
+				<div className="space-y-4">
+					<AccountSummaryCard />
+					<ApiTokenCard />
+					<DeleteAccountCard />
+				</div>
 			</div>
 		</div>
 	);

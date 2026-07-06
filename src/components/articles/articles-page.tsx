@@ -1,6 +1,6 @@
 import { getRouteApi, useNavigate } from "@tanstack/react-router";
-import { ArticleCollectionPage } from "#/components/articles/article-collection-page";
-import { useArticleCollectionPage } from "#/components/articles/use-article-collection-page";
+import { BookOpen } from "lucide-react";
+import { ArticleCollectionRoutePage } from "#/components/articles/article-collection-route-page";
 
 const route = getRouteApi("/app/articles");
 
@@ -8,27 +8,20 @@ export function ArticlesPage() {
 	const initialData = route.useLoaderData();
 	const search = route.useSearch();
 	const navigate = useNavigate({ from: "/app/articles" });
-	const pageState = useArticleCollectionPage({
-		initialData,
-		search,
-		queryKey: "unread",
-		filters: { isRead: false },
-		navigate,
-	});
 
 	return (
-		<ArticleCollectionPage
-			{...pageState}
+		<ArticleCollectionRoutePage
+			initialData={initialData}
+			search={search}
+			navigate={navigate}
+			queryKey="unread"
+			filters={{ isRead: false }}
 			title="Unread"
+			icon={BookOpen}
 			searchPlaceholder="Search articles..."
-			emptyStateMessage={
-				pageState.q
-					? "No articles match your search."
-					: "No unread articles yet."
-			}
-			emptyStateHint={
-				pageState.q ? undefined : "Save an article to get started."
-			}
+			emptyStateMessage="No unread articles yet."
+			filteredEmptyStateMessage="No articles match your search."
+			emptyStateHint="Save an article to get started."
 		/>
 	);
 }

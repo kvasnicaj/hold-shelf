@@ -3,6 +3,7 @@ import { useApiTokenCard } from "#/components/settings/use-api-token-card";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 import { Input } from "#/components/ui/input";
+import { formatFullDate } from "#/lib/formatters";
 
 export function ApiTokenCard() {
 	const {
@@ -93,9 +94,9 @@ export function ApiTokenCard() {
 
 				{apiToken ? (
 					<p className="text-xs text-muted-foreground">
-						Created {apiToken.createdAt.toLocaleDateString()}
+						Created {formatFullDate(apiToken.createdAt)}
 						{apiToken.lastUsedAt
-							? ` · Last used ${apiToken.lastUsedAt.toLocaleDateString()}`
+							? ` · Last used ${formatFullDate(apiToken.lastUsedAt)}`
 							: ""}
 					</p>
 				) : null}

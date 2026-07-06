@@ -1,5 +1,5 @@
 import { screen } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { HomePage } from "#/components/home/home-page";
 import { renderWithProviders } from "#/test/render";
 
@@ -18,6 +18,7 @@ type HomeLoaderData = {
 			hostname: string | null;
 			faviconUrl: string | null;
 			isRead: boolean;
+			createdAt?: Date | null;
 		}>;
 		recentlyFavorite: Array<{
 			id: string;
@@ -26,6 +27,7 @@ type HomeLoaderData = {
 			hostname: string | null;
 			faviconUrl: string | null;
 			isRead: boolean;
+			createdAt?: Date | null;
 		}>;
 		oldestUnread: Array<{
 			id: string;
@@ -34,6 +36,7 @@ type HomeLoaderData = {
 			hostname: string | null;
 			faviconUrl: string | null;
 			isRead: boolean;
+			createdAt?: Date | null;
 		}>;
 	};
 };
@@ -56,10 +59,6 @@ const { routeState } = vi.hoisted(() => ({
 	},
 }));
 
-const { navigateMock } = vi.hoisted(() => ({
-	navigateMock: vi.fn(),
-}));
-
 vi.mock("@tanstack/react-router", async () => {
 	const actual = await vi.importActual<typeof import("@tanstack/react-router")>(
 		"@tanstack/react-router",
@@ -70,7 +69,6 @@ vi.mock("@tanstack/react-router", async () => {
 		getRouteApi: () => ({
 			useLoaderData: () => routeState.loaderData,
 		}),
-		useNavigate: () => navigateMock,
 		Link: ({
 			children,
 			to,
@@ -102,7 +100,8 @@ vi.mock("#/components/articles/use-auto-mark-read-on-open", () => ({
 
 describe("HomePage", () => {
 	beforeEach(() => {
-		navigateMock.mockReset();
+		vi.useFakeTimers();
+		vi.setSystemTime(new Date("2026-07-03T12:00:00.000Z"));
 		routeState.loaderData = {
 			stats: {
 				unread: 3,
@@ -119,6 +118,7 @@ describe("HomePage", () => {
 						hostname: "example.com",
 						faviconUrl: null,
 						isRead: false,
+						createdAt: new Date("2026-07-01T12:00:00.000Z"),
 					},
 				],
 				recentlyFavorite: [
@@ -129,6 +129,7 @@ describe("HomePage", () => {
 						hostname: "example.com",
 						faviconUrl: null,
 						isRead: true,
+						createdAt: new Date("2026-07-02T12:00:00.000Z"),
 					},
 				],
 				oldestUnread: [
@@ -139,19 +140,21 @@ describe("HomePage", () => {
 						hostname: "example.com",
 						faviconUrl: null,
 						isRead: false,
+						createdAt: new Date("2026-04-05T12:00:00.000Z"),
 					},
 				],
 			},
 		};
 	});
 
+	afterEach(() => {
+		vi.useRealTimers();
+	});
+
 	it("renders the stats and recent sections from loader data", () => {
 		renderWithProviders(<HomePage />);
 
 		expect(screen.getByText("Welcome to Hold Shelf")).toBeInTheDocument();
-		expect(
-			screen.getByRole("searchbox", { name: /search all archived articles/i }),
-		).toBeInTheDocument();
 		expect(screen.getAllByText("Unread")).not.toHaveLength(0);
 		expect(screen.getAllByText("Total")).not.toHaveLength(0);
 		expect(screen.getByText("Recently saved")).toBeInTheDocument();
@@ -160,6 +163,7 @@ describe("HomePage", () => {
 		expect(screen.getByText("Saved article")).toBeInTheDocument();
 		expect(screen.getByText("Favorite article")).toBeInTheDocument();
 		expect(screen.getByText("Unread article")).toBeInTheDocument();
+		expect(screen.getByText("Unread for 89 days")).toBeInTheDocument();
 	});
 
 	it("shows the empty library guidance when there are no articles", () => {
@@ -185,23 +189,36 @@ describe("HomePage", () => {
 		).toBeInTheDocument();
 	});
 
-	it("navigates to archive search from the dashboard search bar", async () => {
-		const user = (await import("@testing-library/user-event")).default.setup();
+	it("keeps the oldest unread widget visible when there are no unread articles", () => {
+		routeState.loaderData = {
+			stats: {
+				unread: 0,
+				total: 1,
+				readThisWeek: 1,
+				savedThisWeek: 1,
+			},
+			recent: {
+				recentlySaved: [
+					{
+						id: "saved-1",
+						url: "https://example.com/saved",
+						title: "Saved article",
+						hostname: "example.com",
+						faviconUrl: null,
+						isRead: true,
+						createdAt: new Date("2026-07-02T12:00:00.000Z"),
+					},
+				],
+				recentlyFavorite: [],
+				oldestUnread: [],
+			},
+		};
+
 		renderWithProviders(<HomePage />);
 
-		await user.type(
-			screen.getByRole("searchbox", {
-				name: /search all archived articles/i,
-			}),
-			"design systems",
-		);
-		await user.click(screen.getByRole("button", { name: /^search$/i }));
-
-		expect(navigateMock).toHaveBeenCalledWith({
-			to: "/app/archive",
-			search: {
-				q: "design systems",
-			},
-		});
+		expect(screen.getByText("Oldest unread")).toBeInTheDocument();
+		expect(
+			screen.getByText("No unread articles right now."),
+		).toBeInTheDocument();
 	});
 });

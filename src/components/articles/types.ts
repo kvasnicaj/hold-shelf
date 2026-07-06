@@ -25,7 +25,23 @@ export type ArticleCollectionSearch = {
 	q?: string;
 	sort?: "newest" | "oldest" | "title";
 	page?: number;
+	tag?: string;
 };
+
+export type ArticleCollectionFilters = {
+	isRead?: boolean;
+	isFavorite?: boolean;
+	tagId?: string;
+};
+
+export type ArticleCollectionQueryKey = string;
+
+export type ArticleCollectionNavigate = (options: {
+	search: (
+		prev: ArticleCollectionSearch,
+	) => Partial<ArticleCollectionSearch> | ArticleCollectionSearch;
+	replace: boolean;
+}) => void | Promise<void>;
 
 export type ArticleCardProps = {
 	article: ArticleWithTags;
