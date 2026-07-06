@@ -6,8 +6,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useAutoMarkReadOnOpen } from "#/components/articles/use-auto-mark-read-on-open";
 import { createTestQueryClient } from "#/test/render";
 
-const { routeState, routerInvalidateMock, updateArticleMock } = vi.hoisted(
-	() => ({
+const { openArticleMock, routeState, routerInvalidateMock, updateArticleMock } =
+	vi.hoisted(() => ({
+		openArticleMock: vi.fn(),
 		routeState: {
 			loaderData: {
 				settings: {
@@ -17,8 +18,7 @@ const { routeState, routerInvalidateMock, updateArticleMock } = vi.hoisted(
 		},
 		routerInvalidateMock: vi.fn(),
 		updateArticleMock: vi.fn(),
-	}),
-);
+	}));
 
 vi.mock("@tanstack/react-router", async () => {
 	const actual = await vi.importActual<typeof import("@tanstack/react-router")>(
@@ -40,8 +40,15 @@ vi.mock("#/server/articles", () => ({
 	updateArticle: updateArticleMock,
 }));
 
+vi.mock("#/components/article-reader/use-article-reader", () => ({
+	useArticleReader: () => ({
+		openArticle: openArticleMock,
+	}),
+}));
+
 describe("useAutoMarkReadOnOpen", () => {
 	beforeEach(() => {
+		openArticleMock.mockReset();
 		routeState.loaderData.settings.markReadOnOpen = true;
 		routerInvalidateMock.mockReset().mockResolvedValue(undefined);
 		updateArticleMock.mockReset().mockResolvedValue({ success: true });
@@ -62,6 +69,7 @@ describe("useAutoMarkReadOnOpen", () => {
 		expect(updateArticleMock).toHaveBeenCalledWith({
 			data: { id: "a1", isRead: true },
 		});
+		expect(openArticleMock).toHaveBeenCalledWith("a1");
 		expect(invalidateQueriesMock).toHaveBeenCalledWith({
 			queryKey: ["articles"],
 		});
@@ -81,6 +89,7 @@ describe("useAutoMarkReadOnOpen", () => {
 		});
 
 		expect(updateArticleMock).not.toHaveBeenCalled();
+		expect(openArticleMock).toHaveBeenCalledWith("a1");
 		expect(invalidateQueriesMock).not.toHaveBeenCalled();
 		expect(routerInvalidateMock).not.toHaveBeenCalled();
 	});
@@ -99,6 +108,7 @@ describe("useAutoMarkReadOnOpen", () => {
 		});
 
 		expect(updateArticleMock).not.toHaveBeenCalled();
+		expect(openArticleMock).toHaveBeenCalledWith("a1");
 		expect(invalidateQueriesMock).not.toHaveBeenCalled();
 		expect(routerInvalidateMock).not.toHaveBeenCalled();
 	});

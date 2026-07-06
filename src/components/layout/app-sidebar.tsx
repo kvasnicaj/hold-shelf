@@ -1,12 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { Bookmark, LogOut, Tag, User } from "lucide-react";
-import { homeNavItem, libraryNavItems } from "#/components/layout/nav-items";
+import { Bookmark, LogOut, Settings, User } from "lucide-react";
+import {
+	desktopLibraryNavItems,
+	homeNavItem,
+} from "#/components/layout/nav-items";
 import { NavLink } from "#/components/layout/nav-link";
+import { SidebarTagsSection } from "#/components/layout/sidebar-tags-section";
+import { SidebarUserMenuItem } from "#/components/layout/sidebar-user-menu-item";
+import ThemeToggle from "#/components/theme-toggle";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
-	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "#/components/ui/dropdown-menu";
 import { authClient } from "#/lib/auth-client";
@@ -28,13 +33,6 @@ export function AppSidebar() {
 		queryFn: () => getArticles({ data: { isRead: false, limit: 0 } }),
 	});
 	const unreadCount = unreadResult?.total ?? 0;
-	const sortedTagList = [...tagList].sort((left, right) => {
-		if (right.articleCount !== left.articleCount) {
-			return right.articleCount - left.articleCount;
-		}
-
-		return left.name.localeCompare(right.name);
-	});
 
 	return (
 		<aside className="flex w-56 flex-col border-r border-sidebar-border bg-sidebar pb-3 pl-3 pt-4 lg:pt-6">
@@ -62,7 +60,7 @@ export function AppSidebar() {
 					Library
 				</p>
 				<nav className="space-y-0.5">
-					{libraryNavItems.map((item) => (
+					{desktopLibraryNavItems.map((item) => (
 						<NavLink
 							key={item.href}
 							href={item.href}
@@ -78,30 +76,11 @@ export function AppSidebar() {
 					))}
 				</nav>
 
-				{sortedTagList.length > 0 && (
-					<>
-						<p className="mb-1 mt-4 px-2 text-xs font-semibold uppercase tracking-wider text-sidebar-foreground/60">
-							Tags
-						</p>
-						<nav className="space-y-0.5">
-							{sortedTagList.map((tag) => (
-								<NavLink
-									key={tag.id}
-									href={`/app/archive?tag=${tag.id}`}
-									linkProps={{ to: "/app/archive", search: { tag: tag.id } }}
-									icon={Tag}
-									iconClassName="h-3.5 w-3.5"
-									label={tag.name}
-									isActive={
-										currentPath === "/app/archive" &&
-										searchParams.tag === tag.id
-									}
-									count={tag.articleCount}
-								/>
-							))}
-						</nav>
-					</>
-				)}
+				<SidebarTagsSection
+					tags={tagList}
+					currentPath={currentPath}
+					activeTagId={searchParams.tag}
+				/>
 			</div>
 
 			<SidebarUserMenu />
@@ -133,15 +112,24 @@ function SidebarUserMenu() {
 							{session.user.email}
 						</div>
 					)}
-					<DropdownMenuItem
+					<ThemeToggle variant="menu-item" />
+					<SidebarUserMenuItem
+						icon={Settings}
+						onSelect={() => {
+							void router.navigate({ to: "/app/settings" });
+						}}
+					>
+						Settings
+					</SidebarUserMenuItem>
+					<SidebarUserMenuItem
+						icon={LogOut}
 						onClick={async () => {
 							await authClient.signOut();
 							router.navigate({ to: "/login" });
 						}}
 					>
-						<LogOut className="mr-2 h-4 w-4" />
 						Sign out
-					</DropdownMenuItem>
+					</SidebarUserMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>
 		</div>

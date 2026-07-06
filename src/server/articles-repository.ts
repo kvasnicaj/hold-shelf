@@ -12,6 +12,7 @@ export function createArticlesRepository(): ArticlesRepository {
 			isRead,
 			isFavorite,
 			tagId,
+			tagIds,
 			search,
 			sort,
 			limit,
@@ -27,11 +28,13 @@ export function createArticlesRepository(): ArticlesRepository {
 				conditions.push(eq(articles.isFavorite, isFavorite));
 			}
 
-			if (tagId) {
+			const selectedTagIds = tagIds?.length ? tagIds : tagId ? [tagId] : [];
+
+			if (selectedTagIds.length > 0) {
 				const articleIdsWithTag = db
 					.select({ articleId: articleTags.articleId })
 					.from(articleTags)
-					.where(eq(articleTags.tagId, tagId));
+					.where(inArray(articleTags.tagId, selectedTagIds));
 
 				conditions.push(inArray(articles.id, articleIdsWithTag));
 			}
@@ -39,7 +42,7 @@ export function createArticlesRepository(): ArticlesRepository {
 			if (search?.trim()) {
 				const term = `%${search.trim()}%`;
 				conditions.push(
-					sql`(${articles.title} LIKE ${term} OR ${articles.description} LIKE ${term})`,
+					sql`(${articles.title} LIKE ${term} OR ${articles.description} LIKE ${term} OR ${articles.url} LIKE ${term} OR ${articles.hostname} LIKE ${term})`,
 				);
 			}
 
@@ -82,6 +85,15 @@ export function createArticlesRepository(): ArticlesRepository {
 				.from(articleTags)
 				.innerJoin(tags, eq(articleTags.tagId, tags.id))
 				.where(inArray(articleTags.articleId, articleIds));
+		},
+		getArticleById: async ({ userId, id }) => {
+			const [article] = await db
+				.select()
+				.from(articles)
+				.where(and(eq(articles.userId, userId), eq(articles.id, id)))
+				.limit(1);
+
+			return article ?? null;
 		},
 		findArticleByUrl: async ({ userId, url }) => {
 			const [existing] = await db

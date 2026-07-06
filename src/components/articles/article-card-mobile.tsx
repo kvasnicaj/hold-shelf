@@ -21,7 +21,18 @@ export function ArticleCardMobile({
 	const timeAgo = article.createdAt ? formatTimeAgo(article.createdAt) : "";
 
 	return (
-		<div className="rounded-lg border p-4">
+		// biome-ignore lint/a11y/useSemanticElements: The composite card contains nested controls, so it cannot be a native button.
+		<div
+			className="cursor-pointer rounded-lg border p-4 transition-colors hover:bg-accent/50"
+			onClick={() => void onOpenArticle(article.id, article.isRead)}
+			onKeyDown={(event) => {
+				if (event.key === "Enter") {
+					void onOpenArticle(article.id, article.isRead);
+				}
+			}}
+			role="button"
+			tabIndex={0}
+		>
 			<div className="space-y-3">
 				<ArticleExternalLink
 					articleId={article.id}
@@ -44,6 +55,7 @@ export function ArticleCardMobile({
 						<Checkbox
 							checked={selected}
 							onCheckedChange={(checked) => onSelect(article.id, !!checked)}
+							onClick={(event) => event.stopPropagation()}
 						/>
 						<ArticleCardActions
 							articleId={article.id}

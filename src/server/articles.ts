@@ -3,10 +3,12 @@ import { createArticlesRepository } from "#/server/articles-repository";
 import {
 	handleCreateArticle,
 	handleDeleteArticles,
+	handleGetArticleReader,
 	handleGetArticles,
 	handleUpdateArticle,
 	validateCreateArticleInput,
 	validateDeleteArticlesInput,
+	validateGetArticleReaderInput,
 	validateGetArticlesInput,
 	validateUpdateArticleInput,
 } from "#/server/articles-runtime";
@@ -16,6 +18,15 @@ export const getArticles = createServerFn({ method: "GET" })
 	.validator(validateGetArticlesInput)
 	.handler(async ({ data }) =>
 		handleGetArticles(data, {
+			createRepository: createArticlesRepository,
+			requireUserIdFn: requireUserId,
+		}),
+	);
+
+export const getArticleReader = createServerFn({ method: "GET" })
+	.validator(validateGetArticleReaderInput)
+	.handler(async ({ data }) =>
+		handleGetArticleReader(data, {
 			createRepository: createArticlesRepository,
 			requireUserIdFn: requireUserId,
 		}),

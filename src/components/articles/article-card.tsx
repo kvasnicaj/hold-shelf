@@ -20,10 +20,22 @@ export function ArticleCard({
 	const timeAgo = article.createdAt ? formatTimeAgo(article.createdAt) : "";
 
 	return (
-		<div className="group flex items-start gap-3 rounded-lg border p-4 transition-colors hover:bg-accent/50">
+		// biome-ignore lint/a11y/useSemanticElements: The composite card contains nested controls, so it cannot be a native button.
+		<div
+			className="group flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors hover:bg-accent/50"
+			onClick={() => void onOpenArticle(article.id, article.isRead)}
+			onKeyDown={(event) => {
+				if (event.key === "Enter") {
+					void onOpenArticle(article.id, article.isRead);
+				}
+			}}
+			role="button"
+			tabIndex={0}
+		>
 			<Checkbox
 				checked={selected}
 				onCheckedChange={(checked) => onSelect(article.id, !!checked)}
+				onClick={(event) => event.stopPropagation()}
 				className="mt-1"
 			/>
 
