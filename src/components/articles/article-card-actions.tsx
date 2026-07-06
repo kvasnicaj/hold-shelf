@@ -59,7 +59,10 @@ export function ArticleCardActions({
 			<Button
 				variant="ghost"
 				size="icon-xs"
-				onClick={() => onToggleFavorite(articleId, !isFavorite)}
+				onClick={(event) => {
+					event.stopPropagation();
+					onToggleFavorite(articleId, !isFavorite);
+				}}
 				title={isFavorite ? "Remove from favorites" : "Add to favorites"}
 				className={
 					isFavorite ? "text-amber-500 hover:text-amber-600" : undefined
@@ -70,7 +73,10 @@ export function ArticleCardActions({
 			<Button
 				variant="ghost"
 				size="icon-xs"
-				onClick={() => onToggleRead(articleId, !isRead)}
+				onClick={(event) => {
+					event.stopPropagation();
+					onToggleRead(articleId, !isRead);
+				}}
 				title={isRead ? "Mark as unread" : "Mark as read"}
 			>
 				{isRead ? (
@@ -82,7 +88,10 @@ export function ArticleCardActions({
 			<Button
 				variant="ghost"
 				size="icon-xs"
-				onClick={() => onDelete(articleId)}
+				onClick={(event) => {
+					event.stopPropagation();
+					onDelete(articleId);
+				}}
 				title="Delete"
 			>
 				<Trash2 className={iconClassName} />

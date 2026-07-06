@@ -1,18 +1,10 @@
 import { createContext, useContext, useEffect, useState } from "react";
 
-type SearchConfig = {
-	placeholder: string;
-	value: string;
-	onSearch: (query: string) => void;
-} | null;
-
 type ToolbarActionsContextType = {
 	actions: React.ReactNode;
 	setActions: (actions: React.ReactNode) => void;
 	centerContent: React.ReactNode;
 	setCenterContent: (content: React.ReactNode) => void;
-	searchConfig: SearchConfig;
-	setSearchConfig: (config: SearchConfig) => void;
 };
 
 const ToolbarActionsContext = createContext<ToolbarActionsContextType>({
@@ -20,8 +12,6 @@ const ToolbarActionsContext = createContext<ToolbarActionsContextType>({
 	setActions: () => {},
 	centerContent: null,
 	setCenterContent: () => {},
-	searchConfig: null,
-	setSearchConfig: () => {},
 });
 
 export function ToolbarActionsProvider({
@@ -31,7 +21,6 @@ export function ToolbarActionsProvider({
 }) {
 	const [actions, setActions] = useState<React.ReactNode>(null);
 	const [centerContent, setCenterContent] = useState<React.ReactNode>(null);
-	const [searchConfig, setSearchConfig] = useState<SearchConfig>(null);
 	return (
 		<ToolbarActionsContext.Provider
 			value={{
@@ -39,8 +28,6 @@ export function ToolbarActionsProvider({
 				setActions,
 				centerContent,
 				setCenterContent,
-				searchConfig,
-				setSearchConfig,
 			}}
 		>
 			{children}
@@ -53,7 +40,6 @@ export function useToolbarActions() {
 	return {
 		actions: ctx.actions,
 		centerContent: ctx.centerContent,
-		searchConfig: ctx.searchConfig,
 	};
 }
 
@@ -75,25 +61,6 @@ export function ToolbarCenter({ children }: { children: React.ReactNode }) {
 		setCenterContent(children);
 		return () => setCenterContent(null);
 	}, [children, setCenterContent]);
-
-	return null;
-}
-
-export function ToolbarSearch({
-	placeholder,
-	value,
-	onSearch,
-}: {
-	placeholder: string;
-	value: string;
-	onSearch: (query: string) => void;
-}) {
-	const { setSearchConfig } = useContext(ToolbarActionsContext);
-
-	useEffect(() => {
-		setSearchConfig({ placeholder, value, onSearch });
-		return () => setSearchConfig(null);
-	}, [placeholder, value, onSearch, setSearchConfig]);
 
 	return null;
 }

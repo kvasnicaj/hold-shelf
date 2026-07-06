@@ -1,4 +1,8 @@
 import type { articles } from "#/db/schema";
+import type {
+	ArticleReaderContent,
+	extractArticleContent,
+} from "#/server/article-content";
 
 type ArticleRecord = typeof articles.$inferSelect;
 
@@ -22,6 +26,7 @@ export type GetArticlesInput = {
 	isRead?: boolean;
 	isFavorite?: boolean;
 	tagId?: string;
+	tagIds?: string[];
 	search?: string;
 	sort?: ArticleSort;
 	limit?: number;
@@ -52,12 +57,17 @@ export type ArticlesRepository = {
 		isRead?: boolean;
 		isFavorite?: boolean;
 		tagId?: string;
+		tagIds?: string[];
 		search?: string;
 		sort: ArticleSort;
 		limit: number;
 		offset: number;
 	}) => Promise<{ rows: ArticleRecord[]; total: number }>;
 	listArticleTags: (articleIds: string[]) => Promise<ArticleTagRow[]>;
+	getArticleById: (args: {
+		userId: string;
+		id: string;
+	}) => Promise<ArticleRecord | null>;
 	findArticleByUrl: (args: {
 		userId: string;
 		url: string;
@@ -80,6 +90,11 @@ export type ArticlesRepository = {
 	deleteArticles: (args: { userId: string; ids: string[] }) => Promise<void>;
 };
 
+export type ArticleReaderRecord = {
+	article: ArticleWithTagsRecord;
+	content: ArticleReaderContent;
+};
+
 export async function getArticlesForUser({
 	repo,
 	userId,
@@ -97,6 +112,7 @@ export async function getArticlesForUser({
 		isRead: data.isRead,
 		isFavorite: data.isFavorite,
 		tagId: data.tagId,
+		tagIds: data.tagIds,
 		search: data.search,
 		sort,
 		limit,
@@ -120,6 +136,38 @@ export async function getArticlesForUser({
 			tags: tagsByArticle.get(article.id) ?? [],
 		})),
 		total,
+	};
+}
+
+export async function getArticleReaderForUser({
+	repo,
+	userId,
+	id,
+	extractArticleContentFn,
+}: {
+	repo: ArticlesRepository;
+	userId: string;
+	id: string;
+	extractArticleContentFn: typeof extractArticleContent;
+}): Promise<ArticleReaderRecord> {
+	const article = await repo.getArticleById({ userId, id });
+	if (!article) {
+		throw new Error("Article not found.");
+	}
+
+	const tagRows = await repo.listArticleTags([article.id]);
+	const content = await extractArticleContentFn(article.url);
+
+	return {
+		article: {
+			...article,
+			tags: tagRows.map((tag) => ({
+				id: tag.id,
+				name: tag.name,
+				color: tag.color,
+			})),
+		},
+		content,
 	};
 }
 

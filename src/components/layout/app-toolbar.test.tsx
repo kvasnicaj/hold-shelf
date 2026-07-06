@@ -96,46 +96,10 @@ describe("AppToolbar", () => {
 		routerState.location.pathname = "/app/articles";
 	});
 
-	it("shows search controls, syncs external search state, and highlights settings", async () => {
-		const user = userEvent.setup();
-		const onSearch = vi.fn();
-		routerState.location.pathname = "/app/settings";
+	it("shows the compact account menu", () => {
+		renderWithProviders(<AppToolbar />);
 
-		const { rerender } = renderWithProviders(
-			<AppToolbar
-				actions={<button type="button">Bulk actions</button>}
-				searchValue="design"
-				searchPlaceholder="Search articles"
-				onSearch={onSearch}
-			/>,
-		);
-
-		const input = screen.getByPlaceholderText("Search articles");
-		expect(input).toHaveValue("design");
-		expect(
-			screen.getByRole("button", { name: "Bulk actions" }),
-		).toBeInTheDocument();
 		expect(screen.getByText("Jaroslav")).toBeInTheDocument();
-
-		await user.clear(input);
-		await user.type(input, "zustand");
-		expect(onSearch).toHaveBeenLastCalledWith("zustand");
-
-		rerender(
-			<AppToolbar
-				actions={<button type="button">Bulk actions</button>}
-				searchValue="fresh query"
-				searchPlaceholder="Search articles"
-				onSearch={onSearch}
-			/>,
-		);
-
-		expect(screen.getByPlaceholderText("Search articles")).toHaveValue(
-			"fresh query",
-		);
-
-		const settingsLink = document.querySelector('a[href="/app/settings"]');
-		expect(settingsLink?.className).toContain("bg-accent");
 	});
 
 	it("signs the user out and navigates back to login", async () => {

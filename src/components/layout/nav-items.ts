@@ -26,4 +26,8 @@ export const libraryNavItems: AppNavItem[] = [
 	{ href: "/app/tags", icon: Tags, label: "Tags" },
 ];
 
+export const desktopLibraryNavItems: AppNavItem[] = libraryNavItems.filter(
+	(item) => item.href !== "/app/tags",
+);
+
 export const mobileNavItems: AppNavItem[] = [homeNavItem, ...libraryNavItems];

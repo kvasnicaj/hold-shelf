@@ -13,12 +13,14 @@ import {
 } from "#/components/ui/dialog";
 import { Input } from "#/components/ui/input";
 import { Label } from "#/components/ui/label";
+import { cn } from "#/lib/utils";
 
 type AddArticleDialogProps = {
 	onAdd: (url: string) => Promise<void>;
 	triggerVariant?: VariantProps<typeof buttonVariants>["variant"];
 	triggerSize?: VariantProps<typeof buttonVariants>["size"];
 	triggerClassName?: string;
+	triggerLabelClassName?: string;
 	triggerAriaLabel?: string;
 	collapseLabelOnMobile?: boolean;
 };
@@ -28,6 +30,7 @@ export function AddArticleDialog({
 	triggerVariant = "outline",
 	triggerSize = "sm",
 	triggerClassName,
+	triggerLabelClassName,
 	triggerAriaLabel,
 	collapseLabelOnMobile = false,
 }: AddArticleDialogProps) {
@@ -69,7 +72,12 @@ export function AddArticleDialog({
 					aria-label={triggerAriaLabel}
 				>
 					<BookmarkPlus className="h-[1.125rem] w-[1.125rem]" />
-					<span className={collapseLabelOnMobile ? "hidden sm:inline" : ""}>
+					<span
+						className={cn(
+							collapseLabelOnMobile ? "hidden sm:inline" : "",
+							triggerLabelClassName,
+						)}
+					>
 						Add article
 					</span>
 				</Button>

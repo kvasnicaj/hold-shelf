@@ -32,6 +32,8 @@ export function ArticleExternalLink({
 			return;
 		}
 
+		event.preventDefault();
+		event.stopPropagation();
 		triggerOpen();
 	}
 
@@ -42,6 +44,8 @@ export function ArticleExternalLink({
 			return;
 		}
 
+		event.preventDefault();
+		event.stopPropagation();
 		triggerOpen();
 	}
 

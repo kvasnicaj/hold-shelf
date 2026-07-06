@@ -1,9 +1,11 @@
 import { Monitor, Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
+import { SidebarUserMenuItem } from "#/components/layout/sidebar-user-menu-item";
 import { Button } from "#/components/ui/button";
 
 type ThemeMode = "light" | "dark" | "auto";
 type ThemeToggleSize = "icon-sm" | "icon" | "icon-lg";
+type ThemeToggleVariant = "button" | "menu-item";
 
 function getInitialMode(): ThemeMode {
 	if (typeof window === "undefined") {
@@ -35,8 +37,10 @@ function applyThemeMode(mode: ThemeMode) {
 }
 
 export default function ThemeToggle({
+	variant = "button",
 	size = "icon-sm",
 }: {
+	variant?: ThemeToggleVariant;
 	size?: ThemeToggleSize;
 }) {
 	const [mode, setMode] = useState<ThemeMode>("auto");
@@ -69,19 +73,34 @@ export default function ThemeToggle({
 		window.localStorage.setItem("theme", nextMode);
 	}
 
-	const label = mode === "auto" ? "Theme: system" : `Theme: ${mode}`;
+	const modeLabel =
+		mode === "auto" ? "System" : mode === "light" ? "Light" : "Dark";
+	const buttonLabel = `Theme: ${modeLabel.toLowerCase()}`;
+	const Icon = mode === "light" ? Sun : mode === "dark" ? Moon : Monitor;
+
+	if (variant === "menu-item") {
+		return (
+			<SidebarUserMenuItem
+				icon={Icon}
+				onSelect={(event) => {
+					event.preventDefault();
+					toggleMode();
+				}}
+			>
+				{modeLabel}
+			</SidebarUserMenuItem>
+		);
+	}
 
 	return (
 		<Button
 			variant="ghost"
 			size={size}
 			onClick={toggleMode}
-			aria-label={label}
-			title={label}
+			aria-label={buttonLabel}
+			title={buttonLabel}
 		>
-			{mode === "light" && <Sun className="h-[1.125rem] w-[1.125rem]" />}
-			{mode === "dark" && <Moon className="h-[1.125rem] w-[1.125rem]" />}
-			{mode === "auto" && <Monitor className="h-[1.125rem] w-[1.125rem]" />}
+			<Icon className="h-[1.125rem] w-[1.125rem]" />
 		</Button>
 	);
 }
