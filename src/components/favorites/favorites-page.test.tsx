@@ -91,15 +91,21 @@ vi.mock("#/components/articles/add-article-dialog", () => ({
 vi.mock("#/components/articles/article-list", () => ({
 	ArticleList: ({
 		articles,
+		onSelect,
 		onToggleFavorite,
 	}: {
 		articles: Array<{ id: string; title: string | null; isFavorite: boolean }>;
+		onSelect: (id: string, selected: boolean) => void;
 		onToggleFavorite: (id: string, isFavorite: boolean) => void;
 	}) => (
 		<div>
 			{articles.map((article) => (
 				<div key={article.id}>
 					<span>{article.title}</span>
+					<button
+						type="button"
+						onClick={() => onSelect(article.id, true)}
+					>{`select-${article.id}`}</button>
 					<button
 						type="button"
 						onClick={() => onToggleFavorite(article.id, !article.isFavorite)}
@@ -113,16 +119,6 @@ vi.mock("#/components/articles/article-list", () => ({
 vi.mock("#/components/articles/bulk-actions-panel", () => ({
 	BulkActionsPanel: ({ count }: { count: number }) => (
 		<div>{count} selected</div>
-	),
-}));
-
-vi.mock("#/components/layout/toolbar-actions", () => ({
-	ToolbarSlot: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-	ToolbarSearch: ({ onSearch }: { onSearch: (value: string) => void }) => (
-		<input
-			aria-label="Search favorites..."
-			onChange={(event) => onSearch(event.target.value)}
-		/>
 	),
 }));
 
@@ -184,6 +180,8 @@ describe("FavoritesPage", () => {
 		renderWithProviders(<FavoritesPage />);
 
 		expect(screen.getByText("Favorite article")).toBeInTheDocument();
+		await user.type(screen.getByLabelText("Search favorites..."), "design");
+		expect(navigateMock).toHaveBeenCalled();
 
 		await user.click(screen.getByRole("combobox", { name: "Sort articles" }));
 		await user.click(screen.getByRole("option", { name: "Title A-Z" }));
@@ -193,5 +191,19 @@ describe("FavoritesPage", () => {
 		expect(updateArticleMock).toHaveBeenCalledWith({
 			data: { id: "a1", isFavorite: false },
 		});
+	});
+
+	it("reveals bulk actions after selecting a favorite article", async () => {
+		const user = userEvent.setup();
+		routeState.loaderData = {
+			articles: { items: favoriteFixtures, total: 1 },
+			tags: tagFixtures,
+		};
+		getArticlesMock.mockResolvedValue(routeState.loaderData.articles);
+
+		renderWithProviders(<FavoritesPage />);
+		await user.click(screen.getByRole("button", { name: "select-a1" }));
+
+		expect(screen.getByText("1 selected")).toBeInTheDocument();
 	});
 });

@@ -1,4 +1,5 @@
 import { ExternalLink } from "lucide-react";
+import type * as React from "react";
 import { ArticleExternalLink } from "#/components/articles/article-external-link";
 
 type ArticleLinkProps = {
@@ -11,11 +12,13 @@ type ArticleLinkProps = {
 		isRead: boolean;
 	};
 	onOpenArticle: (id: string, isRead: boolean) => void | Promise<void>;
+	metadata?: React.ReactNode;
 	variant?: "compact" | "with-site-column";
 };
 
 export function ArticleLink({
 	article,
+	metadata,
 	onOpenArticle,
 	variant = "compact",
 }: ArticleLinkProps) {
@@ -30,7 +33,7 @@ export function ArticleLink({
 			className={
 				isDetailed
 					? "grid w-full min-w-0 grid-cols-[minmax(0,1fr)_minmax(7rem,auto)_auto] items-center gap-3 overflow-hidden rounded-md px-2 py-2 text-sm no-underline transition-colors hover:bg-accent"
-					: "flex w-full min-w-0 items-center gap-2 overflow-hidden rounded-md px-2 py-1.5 text-sm no-underline transition-colors hover:bg-accent"
+					: "@container flex w-full min-w-0 items-center gap-2 overflow-hidden rounded-md px-2 py-1.5 text-sm no-underline transition-colors hover:bg-accent"
 			}
 		>
 			<div className="flex min-w-0 items-center gap-2">
@@ -53,6 +56,11 @@ export function ArticleLink({
 					{article.hostname ?? new URL(article.url).hostname}
 				</span>
 			)}
+			{!isDetailed && metadata ? (
+				<span className="hidden shrink-0 @min-[24rem]:inline-flex">
+					{metadata}
+				</span>
+			) : null}
 			<ExternalLink className="h-3 w-3 shrink-0 text-muted-foreground" />
 		</ArticleExternalLink>
 	);

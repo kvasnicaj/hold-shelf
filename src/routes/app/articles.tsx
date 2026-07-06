@@ -1,43 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ArticlesPage } from "#/components/articles/articles-page";
-import { getArticles } from "#/server/articles";
-import { getTags } from "#/server/tags";
-
-const PAGE_SIZE = 20;
-
-type ArticlesSearch = {
-	q?: string;
-	sort?: "newest" | "oldest" | "title";
-	page?: number;
-};
+import {
+	loadArticleCollectionRoute,
+	validateArticleCollectionSearch,
+} from "#/components/articles/helpers";
 
 export const Route = createFileRoute("/app/articles")({
-	validateSearch: (search: Record<string, unknown>): ArticlesSearch => ({
-		q: typeof search.q === "string" ? search.q : undefined,
-		sort: ["newest", "oldest", "title"].includes(search.sort as string)
-			? (search.sort as ArticlesSearch["sort"])
-			: undefined,
-		page:
-			typeof search.page === "number" && search.page > 1
-				? search.page
-				: undefined,
-	}),
+	validateSearch: validateArticleCollectionSearch,
 	loaderDeps: ({ search }) => search,
-	loader: async ({ deps }) => {
-		const page = deps.page ?? 1;
-		const [articles, tags] = await Promise.all([
-			getArticles({
-				data: {
-					isRead: false,
-					search: deps.q,
-					sort: deps.sort,
-					limit: PAGE_SIZE,
-					offset: (page - 1) * PAGE_SIZE,
-				},
-			}),
-			getTags(),
-		]);
-		return { articles, tags };
-	},
+	loader: ({ deps }) =>
+		loadArticleCollectionRoute({
+			filters: { isRead: false },
+			search: deps,
+		}),
 	component: ArticlesPage,
 });

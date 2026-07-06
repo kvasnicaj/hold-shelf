@@ -1,5 +1,7 @@
 import { BookMarked, BookOpen, Clock } from "lucide-react";
+import { getUnreadAgeLabel } from "#/components/article-reader/helpers";
 import { ArticleLink } from "#/components/home/article-link";
+import { Badge } from "#/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 
 type RecentArticle = {
@@ -9,6 +11,7 @@ type RecentArticle = {
 	hostname: string | null;
 	faviconUrl: string | null;
 	isRead: boolean;
+	createdAt?: Date | null;
 };
 
 type RecentArticlesSectionProps = {
@@ -71,25 +74,43 @@ export function RecentArticlesSection({
 						</Card>
 					)}
 
-					{oldestUnread.length > 0 && (
-						<Card className="min-w-0 gap-4 overflow-hidden">
-							<CardHeader>
-								<CardTitle className="flex min-w-0 items-center gap-2 text-base">
-									<BookOpen className="h-4 w-4" />
-									Oldest unread
-								</CardTitle>
-							</CardHeader>
-							<CardContent className="min-w-0 space-y-2">
-								{oldestUnread.map((article) => (
-									<ArticleLink
-										key={article.id}
-										article={article}
-										onOpenArticle={onOpenArticle}
-									/>
-								))}
-							</CardContent>
-						</Card>
-					)}
+					<Card className="min-w-0 gap-4 overflow-hidden">
+						<CardHeader>
+							<CardTitle className="flex min-w-0 items-center gap-2 text-base">
+								<BookOpen className="h-4 w-4" />
+								Oldest unread
+							</CardTitle>
+						</CardHeader>
+						<CardContent className="min-w-0 space-y-2">
+							{oldestUnread.length > 0 ? (
+								oldestUnread.map((article) => {
+									const unreadAge = getUnreadAgeLabel(article);
+
+									return (
+										<ArticleLink
+											key={article.id}
+											article={article}
+											onOpenArticle={onOpenArticle}
+											metadata={
+												unreadAge ? (
+													<Badge
+														variant="secondary"
+														className="shrink-0 text-[0.6875rem]"
+													>
+														{unreadAge}
+													</Badge>
+												) : null
+											}
+										/>
+									);
+								})
+							) : (
+								<p className="px-2 py-1.5 text-sm text-muted-foreground">
+									No unread articles right now.
+								</p>
+							)}
+						</CardContent>
+					</Card>
 				</div>
 			)}
 		</div>

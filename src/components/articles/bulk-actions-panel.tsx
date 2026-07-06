@@ -1,6 +1,5 @@
 import { BookOpen, Check, ListChecks, Trash2, X } from "lucide-react";
 import { ToolBox } from "#/components/layout/tool-box";
-import { ToolbarCenter } from "#/components/layout/toolbar-actions";
 import { Button } from "#/components/ui/button";
 import {
 	DropdownMenu,
@@ -25,9 +24,8 @@ export function BulkActionsPanel({
 	onClear,
 }: BulkActionsPanelProps) {
 	return (
-		<ToolbarCenter>
-			{/* Expanded — shown when container has enough space */}
-			<ToolBox className="hidden @min-[260px]:flex">
+		<div className="flex min-w-0 justify-start sm:justify-center">
+			<ToolBox className="hidden sm:inline-flex">
 				<span className="px-2.5 text-sm text-muted-foreground whitespace-nowrap">
 					{count} selected
 				</span>
@@ -64,14 +62,13 @@ export function BulkActionsPanel({
 					<X className="h-4 w-4" />
 				</Button>
 			</ToolBox>
-			{/* Collapsed dropdown — shown when container is too narrow */}
-			<div className="@min-[260px]:hidden">
+			<div className="sm:hidden">
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<ToolBox asChild>
 							<button
 								type="button"
-								className="flex size-8 items-center justify-center rounded-lg hover:bg-accent hover:text-accent-foreground"
+								className="flex size-8 items-center justify-center rounded-md hover:bg-accent hover:text-accent-foreground"
 								aria-label="Bulk actions"
 							>
 								<ListChecks className="h-4 w-4" />
@@ -101,6 +98,6 @@ export function BulkActionsPanel({
 					</DropdownMenuContent>
 				</DropdownMenu>
 			</div>
-		</ToolbarCenter>
+		</div>
 	);
 }
