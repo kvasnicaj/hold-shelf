@@ -70,10 +70,17 @@ AppLayout
 |  |
 |  |- main content
 |  |  |- TopBar
-|  |  |  |- AppToolbar
-|  |  |  |- route-provided toolbar center/actions
+|  |  |  |- ColumnNavbar
+|  |  |  |  |- mobile brand mark
+|  |  |  |  |- global article search
+|  |  |  |  |- route-provided toolbar center/actions
+|  |  |  |  |- add article and account actions
 |  |  |
 |  |  |- Outlet
+|  |
+|  |- article reader column
+|  |  |- ColumnNavbar
+|  |  |- article content
 |  |
 |  |- MobileNavigation
 ```
@@ -85,6 +92,9 @@ Responsibilities:
 - keeps the brand mark in the mobile top bar while the mobile navigation stays route-focused
 - renders a full-width mobile bottom navigation strip styled from the sidebar primitives
 - provides a dynamic toolbar channel via `ToolbarActionsProvider`
+- renders column-owned navbars through `ColumnNavbar`, which accepts left,
+  center, and right action arrays and collapses side tools into a mobile
+  overflow menu
 
 ### Toolbar action system
 
@@ -93,7 +103,7 @@ into the shared top bar without putting page-specific UI into the layout.
 
 Used by:
 
-- `ArticlesPage` and `ArchivePage` for `AddArticleDialog`
+- `ArticlesPage`, `FavoritesPage`, and `ArchivePage` for page-scoped search
 - `TagsPage` for `CreateTagDialog`
 - `BulkActionsPanel` for centered bulk actions
 - `TagsPage` for tag filtering search
@@ -244,7 +254,6 @@ Component tree:
 ```text
 HomePage
 |- page header
-|- archive search bar -> /app/archive?q=...
 |- mobile stats card
 |- desktop stat card grid
 |  |- StatCard x4
@@ -261,7 +270,6 @@ HomePage
 Purpose:
 
 - dashboard and entry point after login
-- quick archive search shortcut that deep-links into full archive results
 - surfaces reading volume and quick links into saved content
 - dashboard article links use the shared open handler, so unread items can auto-mark
   as read when the user preference is enabled
@@ -462,7 +470,9 @@ Core functionality:
 
 - `AppSidebar`: desktop navigation, unread counter, favorites link, dynamic tag links
 - `MobileNavigation`: mobile navigation
-- `AppToolbar`: search, page actions, theme toggle, user menu, sign out
+- `ColumnNavbar`: shared column header chrome for left, center, and right controls
+- `AppSearch`: global article search with preview results
+- `AppToolbar`: compact account menu and sign out
 - `ToolBox`: shared chrome for toolbar controls
 
 ### Articles
