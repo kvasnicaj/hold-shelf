@@ -1,5 +1,4 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRouter } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { ARTICLE_COLLECTION_PAGE_SIZE } from "#/components/articles/helpers";
 import type {
@@ -8,16 +7,12 @@ import type {
 	ArticleCollectionNavigate,
 	ArticleCollectionQueryKey,
 	ArticleCollectionSearch,
+	ArticleSort,
 } from "#/components/articles/types";
+import { useArticleMutations } from "#/components/articles/use-article-mutations";
 import { useAutoMarkReadOnOpen } from "#/components/articles/use-auto-mark-read-on-open";
-import { useSaveArticle } from "#/components/articles/use-save-article";
-import { deleteArticles, getArticles, updateArticle } from "#/server/articles";
-import {
-	addTagToArticles,
-	createTag,
-	getTags,
-	removeTagFromArticles,
-} from "#/server/tags";
+import { getArticles } from "#/server/articles";
+import { getTags } from "#/server/tags";
 
 type UseArticleCollectionPageOptions = {
 	initialData: ArticleCollectionLoaderData;
@@ -38,11 +33,19 @@ export function useArticleCollectionPage({
 }: UseArticleCollectionPageOptions) {
 	const { q, sort, page: searchPage } = search;
 	const page = searchPage ?? 1;
-	const queryClient = useQueryClient();
-	const router = useRouter();
 	const [selected, setSelected] = useState<Set<string>>(new Set());
-	const { handleAdd } = useSaveArticle();
 	const { handleOpenArticle } = useAutoMarkReadOnOpen();
+	const {
+		handleToggleRead,
+		handleToggleFavorite,
+		handleDelete,
+		handleBulkToggleRead,
+		handleAddTag,
+		handleRemoveTag,
+		handleCreateTag,
+	} = useArticleMutations({
+		onSelectionClear: () => setSelected(new Set()),
+	});
 
 	const { data: result } = useQuery({
 		queryKey: ["articles", queryKey, q, sort, page],
@@ -70,12 +73,6 @@ export function useArticleCollectionPage({
 	const totalPages = Math.ceil(total / ARTICLE_COLLECTION_PAGE_SIZE);
 	const selectedIds = Array.from(selected);
 
-	function invalidateAll() {
-		void queryClient.invalidateQueries({ queryKey: ["articles"] });
-		void queryClient.invalidateQueries({ queryKey: ["tags"] });
-		void router.invalidate();
-	}
-
 	function handleSelect(id: string, isSelected: boolean) {
 		setSelected((prev) => {
 			const next = new Set(prev);
@@ -85,45 +82,7 @@ export function useArticleCollectionPage({
 		});
 	}
 
-	async function handleToggleRead(id: string, isRead: boolean) {
-		await updateArticle({ data: { id, isRead } });
-		invalidateAll();
-	}
-
-	async function handleToggleFavorite(id: string, isFavorite: boolean) {
-		await updateArticle({ data: { id, isFavorite } });
-		invalidateAll();
-	}
-
-	async function handleDelete(ids: string[]) {
-		await deleteArticles({ data: { ids } });
-		setSelected(new Set());
-		invalidateAll();
-	}
-
-	async function handleBulkToggleRead(ids: string[], isRead: boolean) {
-		await Promise.all(ids.map((id) => updateArticle({ data: { id, isRead } })));
-		setSelected(new Set());
-		invalidateAll();
-	}
-
-	async function handleAddTag(tagId: string, articleIds: string[]) {
-		await addTagToArticles({ data: { tagId, articleIds } });
-		invalidateAll();
-	}
-
-	async function handleRemoveTag(tagId: string, articleIds: string[]) {
-		await removeTagFromArticles({ data: { tagId, articleIds } });
-		invalidateAll();
-	}
-
-	async function handleCreateTag(name: string) {
-		const tag = await createTag({ data: { name } });
-		invalidateAll();
-		return { id: tag.id, name: tag.name, color: tag.color };
-	}
-
-	function updateSort(nextSort: "newest" | "oldest" | "title") {
+	function updateSort(nextSort: ArticleSort) {
 		void navigate({
 			search: (prev) => ({
 				...prev,
@@ -171,7 +130,6 @@ export function useArticleCollectionPage({
 		selected,
 		selectedIds,
 		handleSelect,
-		handleAdd,
 		handleOpenArticle,
 		handleToggleRead,
 		handleToggleFavorite,

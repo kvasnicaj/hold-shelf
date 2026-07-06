@@ -81,16 +81,6 @@ vi.mock("@tanstack/react-router", async () => {
 	};
 });
 
-vi.mock("#/components/articles/save-article-toolbar-action", () => ({
-	SaveArticleToolbarAction: () => null,
-}));
-
-vi.mock("#/components/articles/use-save-article", () => ({
-	useSaveArticle: () => ({
-		handleAdd: vi.fn(),
-	}),
-}));
-
 vi.mock("#/components/articles/use-auto-mark-read-on-open", () => ({
 	useAutoMarkReadOnOpen: () => ({
 		markReadOnOpen: true,

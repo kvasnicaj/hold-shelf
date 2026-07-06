@@ -1,5 +1,7 @@
 import type { Tag } from "#/components/tags/types";
 
+export type ArticleSort = "newest" | "oldest" | "title";
+
 export type ArticleWithTags = {
 	id: string;
 	url: string;
@@ -23,7 +25,7 @@ export type ArticleCollectionLoaderData = {
 
 export type ArticleCollectionSearch = {
 	q?: string;
-	sort?: "newest" | "oldest" | "title";
+	sort?: ArticleSort;
 	page?: number;
 	tag?: string;
 };

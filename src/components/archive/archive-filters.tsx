@@ -1,25 +1,20 @@
 import { ArchiveTagsCombobox } from "#/components/archive/archive-tags-combobox";
+import { ArticleSortSelect } from "#/components/articles/article-sort-select";
+import type { ArticleSort } from "#/components/articles/types";
 import { PageSearchField } from "#/components/layout/page-search-field";
 import type { Tag } from "#/components/tags/types";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "#/components/ui/select";
 import { ToggleGroup, ToggleGroupItem } from "#/components/ui/toggle-group";
 
 type ArchiveFiltersProps = {
 	selectedTagIds: string[];
 	q?: string;
 	filter?: "all" | "read" | "unread";
-	sort?: "newest" | "oldest" | "title";
+	sort?: ArticleSort;
 	tagList: Tag[];
 	onSearch: (query: string) => void;
 	onTagsChange: (tagIds: string[]) => void;
 	onFilterChange: (filter?: "all" | "read" | "unread") => void;
-	onSortChange: (sort: "newest" | "oldest" | "title") => void;
+	onSortChange: (sort: ArticleSort) => void;
 };
 
 export function ArchiveFilters({
@@ -83,24 +78,12 @@ export function ArchiveFilters({
 					selectedTagIds={selectedTagIds}
 					onChange={onTagsChange}
 				/>
-				<Select
-					value={sort ?? "newest"}
-					onValueChange={(value) =>
-						onSortChange(value as "newest" | "oldest" | "title")
-					}
-				>
-					<SelectTrigger
-						aria-label="Sort archive articles"
-						className="w-full md:w-40"
-					>
-						<SelectValue />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectItem value="newest">Newest first</SelectItem>
-						<SelectItem value="oldest">Oldest first</SelectItem>
-						<SelectItem value="title">Title A-Z</SelectItem>
-					</SelectContent>
-				</Select>
+				<ArticleSortSelect
+					value={sort}
+					onChange={onSortChange}
+					ariaLabel="Sort archive articles"
+					className="w-full md:w-40"
+				/>
 			</div>
 		</div>
 	);

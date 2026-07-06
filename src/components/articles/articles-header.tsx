@@ -1,20 +1,15 @@
 import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
+import { ArticleSortSelect } from "#/components/articles/article-sort-select";
+import type { ArticleSort } from "#/components/articles/types";
 import { PageSearchField } from "#/components/layout/page-search-field";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "#/components/ui/select";
 
 type ArticlesHeaderProps = {
 	title: string;
 	icon?: LucideIcon;
 	total: number;
-	sort?: "newest" | "oldest" | "title";
-	onSortChange: (sort: "newest" | "oldest" | "title") => void;
+	sort?: ArticleSort;
+	onSortChange: (sort: ArticleSort) => void;
 	searchValue: string;
 	searchPlaceholder: string;
 	onSearch: (query: string) => void;
@@ -74,24 +69,11 @@ export function ArticlesHeader({
 							onSearch={onSearch}
 							className="w-full @min-[34rem]:w-64"
 						/>
-						<Select
-							value={sort ?? "newest"}
-							onValueChange={(value) =>
-								onSortChange(value as "newest" | "oldest" | "title")
-							}
-						>
-							<SelectTrigger
-								aria-label="Sort articles"
-								className="w-full @min-[34rem]:w-40"
-							>
-								<SelectValue />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="newest">Newest first</SelectItem>
-								<SelectItem value="oldest">Oldest first</SelectItem>
-								<SelectItem value="title">Title A-Z</SelectItem>
-							</SelectContent>
-						</Select>
+						<ArticleSortSelect
+							value={sort}
+							onChange={onSortChange}
+							className="w-full @min-[34rem]:w-40"
+						/>
 					</div>
 				</div>
 			</div>
