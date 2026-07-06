@@ -1,5 +1,6 @@
 import { ArrowLeft } from "lucide-react";
 import { ArticleList } from "#/components/articles/article-list";
+import { BulkActionsPanel } from "#/components/articles/bulk-actions-panel";
 import type { ArticleWithTags } from "#/components/articles/types";
 import { AppPagination } from "#/components/pagination/app-pagination";
 import type { Tag } from "#/components/tags/types";
@@ -18,7 +19,9 @@ type TagArticlesViewProps = {
 	onOpenArticle: (id: string, isRead: boolean) => void | Promise<void>;
 	onToggleRead: (id: string, isRead: boolean) => Promise<void>;
 	onToggleFavorite: (id: string, isFavorite: boolean) => Promise<void>;
+	onBulkToggleRead: (ids: string[], isRead: boolean) => Promise<void>;
 	onDeleteArticles: (ids: string[]) => Promise<void>;
+	onClearSelection: () => void;
 	onAddTag: (tagId: string, articleIds: string[]) => Promise<void>;
 	onRemoveTag: (tagId: string, articleIds: string[]) => Promise<void>;
 	onCreateTag: (name: string) => Promise<Tag>;
@@ -40,7 +43,9 @@ export function TagArticlesView({
 	onOpenArticle,
 	onToggleRead,
 	onToggleFavorite,
+	onBulkToggleRead,
 	onDeleteArticles,
+	onClearSelection,
 	onAddTag,
 	onRemoveTag,
 	onCreateTag,
@@ -98,6 +103,18 @@ export function TagArticlesView({
 
 	return (
 		<div className="space-y-4">
+			{selected.size > 0 && (
+				<BulkActionsPanel
+					count={selected.size}
+					onMarkRead={() => void onBulkToggleRead(Array.from(selected), true)}
+					onMarkUnread={() =>
+						void onBulkToggleRead(Array.from(selected), false)
+					}
+					onDelete={() => void onDeleteArticles(Array.from(selected))}
+					onClear={onClearSelection}
+				/>
+			)}
+
 			<div className="flex items-center gap-2">
 				{showBackButton && (
 					<Button

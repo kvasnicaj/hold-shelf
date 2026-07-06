@@ -87,7 +87,9 @@ describe("TagArticlesView", () => {
 				onOpenArticle={vi.fn()}
 				onToggleRead={vi.fn().mockResolvedValue(undefined)}
 				onToggleFavorite={vi.fn().mockResolvedValue(undefined)}
+				onBulkToggleRead={vi.fn().mockResolvedValue(undefined)}
 				onDeleteArticles={vi.fn().mockResolvedValue(undefined)}
+				onClearSelection={vi.fn()}
 				onAddTag={vi.fn().mockResolvedValue(undefined)}
 				onRemoveTag={vi.fn().mockResolvedValue(undefined)}
 				onCreateTag={vi.fn().mockResolvedValue(availableTags[0])}
@@ -108,6 +110,8 @@ describe("TagArticlesView", () => {
 		const user = userEvent.setup();
 		const onPageChange = vi.fn();
 		const onDeleteArticles = vi.fn().mockResolvedValue(undefined);
+		const onBulkToggleRead = vi.fn().mockResolvedValue(undefined);
+		const onClearSelection = vi.fn();
 
 		renderWithProviders(
 			<TagArticlesView
@@ -123,7 +127,9 @@ describe("TagArticlesView", () => {
 				onOpenArticle={vi.fn()}
 				onToggleRead={vi.fn().mockResolvedValue(undefined)}
 				onToggleFavorite={vi.fn().mockResolvedValue(undefined)}
+				onBulkToggleRead={onBulkToggleRead}
 				onDeleteArticles={onDeleteArticles}
+				onClearSelection={onClearSelection}
 				onAddTag={vi.fn().mockResolvedValue(undefined)}
 				onRemoveTag={vi.fn().mockResolvedValue(undefined)}
 				onCreateTag={vi.fn().mockResolvedValue(availableTags[0])}
@@ -144,6 +150,7 @@ describe("TagArticlesView", () => {
 				availableTags,
 			}),
 		);
+		expect(screen.getByText("1 selected")).toBeInTheDocument();
 
 		await user.click(screen.getByRole("button", { name: "pagination:2/4" }));
 		expect(onPageChange).toHaveBeenCalledWith(3);
@@ -164,7 +171,9 @@ describe("TagArticlesView", () => {
 				onOpenArticle={vi.fn()}
 				onToggleRead={vi.fn().mockResolvedValue(undefined)}
 				onToggleFavorite={vi.fn().mockResolvedValue(undefined)}
+				onBulkToggleRead={vi.fn().mockResolvedValue(undefined)}
 				onDeleteArticles={vi.fn().mockResolvedValue(undefined)}
+				onClearSelection={vi.fn()}
 				onAddTag={vi.fn().mockResolvedValue(undefined)}
 				onRemoveTag={vi.fn().mockResolvedValue(undefined)}
 				onCreateTag={vi.fn().mockResolvedValue(availableTags[0])}

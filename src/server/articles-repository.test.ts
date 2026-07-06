@@ -303,13 +303,13 @@ class FakeD1Database {
 
 		if (
 			sql.includes(
-				'"articles"."title" LIKE ? OR "articles"."description" LIKE ?',
+				'"articles"."title" LIKE ? OR "articles"."description" LIKE ? OR "articles"."url" LIKE ? OR "articles"."hostname" LIKE ?',
 			)
 		) {
 			const search = String(params[index++]).replaceAll("%", "").toLowerCase();
-			index += 1;
+			index += 3;
 			articles = articles.filter((article) =>
-				`${article.title ?? ""} ${article.description ?? ""}`
+				`${article.title ?? ""} ${article.description ?? ""} ${article.url} ${article.hostname ?? ""}`
 					.toLowerCase()
 					.includes(search),
 			);
@@ -441,6 +441,33 @@ describe("createArticlesRepository", () => {
 			isRead: false,
 			isFavorite: false,
 		});
+	});
+
+	it("matches article search against URL and source hostname", async () => {
+		const { repo } = createFixture();
+
+		const urlResult = await repo.listArticles({
+			userId: "user-1",
+			search: "design-systems",
+			sort: "newest",
+			limit: 10,
+			offset: 0,
+		});
+		const hostResult = await repo.listArticles({
+			userId: "user-1",
+			search: "example.com",
+			sort: "newest",
+			limit: 10,
+			offset: 0,
+		});
+
+		expect(urlResult.rows.map((article) => article.id)).toEqual(["a1"]);
+		expect(hostResult.total).toBe(3);
+		expect(hostResult.rows.map((article) => article.id)).toEqual([
+			"a3",
+			"a2",
+			"a1",
+		]);
 	});
 
 	it("returns joined tag rows and skips the database entirely for empty article ids", async () => {
