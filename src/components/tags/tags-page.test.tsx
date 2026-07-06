@@ -86,12 +86,6 @@ vi.mock("#/components/articles/use-auto-mark-read-on-open", () => ({
 
 vi.mock("#/components/layout/toolbar-actions", () => ({
 	ToolbarSlot: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-	ToolbarSearch: ({ onSearch }: { onSearch: (value: string) => void }) => (
-		<input
-			aria-label="Filter tags"
-			onChange={(event) => onSearch(event.target.value)}
-		/>
-	),
 }));
 
 vi.mock("#/components/articles/article-list", () => ({
@@ -179,12 +173,13 @@ describe("TagsPage", () => {
 
 	it("renders the list view, filters tags, and supports rename and delete actions", async () => {
 		const user = userEvent.setup();
+		mobileState.value = true;
 		renderWithProviders(<TagsPage />);
 
 		expect(screen.getByText("Design")).toBeInTheDocument();
 		expect(screen.getByText("Research")).toBeInTheDocument();
 
-		await user.type(screen.getByLabelText("Filter tags"), "res");
+		await user.type(screen.getByLabelText("Search tags"), "res");
 		expect(screen.queryByText("Design")).not.toBeInTheDocument();
 		expect(screen.getByText("Research")).toBeInTheDocument();
 
@@ -207,13 +202,13 @@ describe("TagsPage", () => {
 		);
 	});
 
-	it("restores the desktop split view placeholder and keeps desktop search visible", () => {
+	it("shows a desktop handoff state because tags live in the sidebar", () => {
 		renderWithProviders(<TagsPage />);
 
 		expect(
-			screen.getByText("Select a tag to view its articles"),
+			screen.getByText("Select a tag from the sidebar"),
 		).toBeInTheDocument();
-		expect(screen.getByLabelText("Filter tags")).toBeInTheDocument();
+		expect(screen.queryByLabelText("Search tags")).not.toBeInTheDocument();
 	});
 
 	it("renders the selected tag article view and article actions", async () => {
@@ -233,8 +228,16 @@ describe("TagsPage", () => {
 		expect(
 			screen.getByRole("link", { name: /go to page 2/i }),
 		).toBeInTheDocument();
-		expect(screen.getAllByText("Design")).toHaveLength(2);
-		expect(screen.getByLabelText("Filter tags")).toBeInTheDocument();
+		expect(screen.getByText("Design")).toBeInTheDocument();
+		expect(
+			screen.getByLabelText("Search tagged articles..."),
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole("button", { name: /rename design/i }),
+		).toBeInTheDocument();
+		expect(
+			screen.getByRole("button", { name: /delete design/i }),
+		).toBeInTheDocument();
 		expect(
 			screen.queryByRole("button", { name: /back to tags/i }),
 		).not.toBeInTheDocument();
@@ -297,6 +300,10 @@ describe("TagsPage", () => {
 
 		renderWithProviders(<TagsPage />);
 
+		expect(
+			screen.queryByRole("heading", { name: "Tags" }),
+		).not.toBeInTheDocument();
+		expect(screen.getByRole("heading", { name: "Design" })).toBeInTheDocument();
 		expect(
 			screen.getByRole("button", { name: /back to tags/i }),
 		).toBeInTheDocument();

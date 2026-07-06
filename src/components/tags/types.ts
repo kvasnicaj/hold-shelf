@@ -1,1 +1,6 @@
-export type Tag = { id: string; name: string; color: string | null };
+export type Tag = {
+	id: string;
+	name: string;
+	color: string | null;
+	articleCount?: number;
+};

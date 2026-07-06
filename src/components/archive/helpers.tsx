@@ -52,12 +52,14 @@ export function createArchiveColumns({
 				<Checkbox
 					checked={table.getIsAllRowsSelected()}
 					onCheckedChange={(value) => table.toggleAllRowsSelected(!!value)}
+					onClick={(event) => event.stopPropagation()}
 				/>
 			),
 			cell: ({ row }) => (
 				<Checkbox
 					checked={row.getIsSelected()}
 					onCheckedChange={(value) => row.toggleSelected(!!value)}
+					onClick={(event) => event.stopPropagation()}
 				/>
 			),
 			size: 32,
@@ -77,6 +79,7 @@ export function createArchiveColumns({
 		}),
 		columnHelper.accessor("title", {
 			header: "Title",
+			size: 520,
 			cell: ({ row }) => {
 				const article = row.original;
 				return (
@@ -118,19 +121,19 @@ export function createArchiveColumns({
 		columnHelper.accessor("tags", {
 			header: "Tags",
 			cell: ({ row }) => (
-				<div className="flex flex-wrap items-center gap-1">
+				<div className="flex min-w-0 items-center gap-1 overflow-hidden">
 					{row.original.tags.map((tag) => (
 						<Badge
 							key={tag.id}
 							variant="secondary"
-							className="px-1.5 py-0 text-[10px]"
+							className="max-w-24 shrink-0 truncate px-1.5 py-0 text-[10px]"
 						>
 							{tag.name}
 						</Badge>
 					))}
 				</div>
 			),
-			size: 168,
+			size: 240,
 		}),
 		columnHelper.accessor("createdAt", {
 			header: "Saved",
@@ -163,6 +166,7 @@ export function createArchiveColumns({
 									size="icon-xs"
 									aria-label={`Article actions for ${article.title ?? article.url}`}
 									title="More actions"
+									onClick={(event) => event.stopPropagation()}
 								>
 									<EllipsisVertical className="h-3.5 w-3.5" />
 								</Button>

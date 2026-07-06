@@ -17,6 +17,7 @@ type TagPickerProps = {
 	onRemoveTag: (tagId: string, articleIds: string[]) => void;
 	onCreateTag: (name: string) => Promise<Tag>;
 	articleIds: string[];
+	triggerClassName?: string;
 };
 
 export function TagPicker({
@@ -26,6 +27,7 @@ export function TagPicker({
 	onRemoveTag,
 	onCreateTag,
 	articleIds,
+	triggerClassName,
 }: TagPickerProps) {
 	const [open, setOpen] = useState(false);
 	const [search, setSearch] = useState("");
@@ -44,7 +46,13 @@ export function TagPicker({
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
-				<Button variant="ghost" size="icon-xs" title="Manage tags">
+				<Button
+					variant="ghost"
+					size="icon-xs"
+					title="Manage tags"
+					className={triggerClassName}
+					onClick={(event) => event.stopPropagation()}
+				>
 					<Tags className="h-[1.125rem] w-[1.125rem]" />
 				</Button>
 			</PopoverTrigger>

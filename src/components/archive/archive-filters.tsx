@@ -1,6 +1,6 @@
-import { X } from "lucide-react";
+import { ArchiveTagsCombobox } from "#/components/archive/archive-tags-combobox";
+import { PageSearchField } from "#/components/layout/page-search-field";
 import type { Tag } from "#/components/tags/types";
-import { Badge } from "#/components/ui/badge";
 import {
 	Select,
 	SelectContent,
@@ -8,85 +8,81 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "#/components/ui/select";
-
-const ALL_TAGS_VALUE = "__all_tags__";
+import { ToggleGroup, ToggleGroupItem } from "#/components/ui/toggle-group";
 
 type ArchiveFiltersProps = {
-	activeTag: Tag | null;
-	tag?: string;
+	selectedTagIds: string[];
+	q?: string;
 	filter?: "all" | "read" | "unread";
 	sort?: "newest" | "oldest" | "title";
 	tagList: Tag[];
-	onClearTag: () => void;
-	onTagChange: (tagId?: string) => void;
+	onSearch: (query: string) => void;
+	onTagsChange: (tagIds: string[]) => void;
 	onFilterChange: (filter?: "all" | "read" | "unread") => void;
 	onSortChange: (sort: "newest" | "oldest" | "title") => void;
 };
 
 export function ArchiveFilters({
-	activeTag,
-	tag,
+	selectedTagIds,
+	q,
 	filter,
 	sort,
 	tagList,
-	onClearTag,
-	onTagChange,
+	onSearch,
+	onTagsChange,
 	onFilterChange,
 	onSortChange,
 }: ArchiveFiltersProps) {
 	return (
-		<div className="flex flex-wrap items-center gap-2">
-			{activeTag && (
-				<Badge variant="secondary" className="gap-1">
-					{activeTag.name}
-					<button
-						type="button"
-						className="ml-0.5 inline-flex size-5 cursor-pointer items-center justify-center rounded-full hover:bg-foreground/10"
-						onClick={onClearTag}
-					>
-						<span className="sr-only">Clear tag filter</span>
-						<X className="h-3.5 w-3.5" />
-					</button>
-				</Badge>
-			)}
-			<div className="flex w-full flex-wrap gap-2 md:ml-auto md:w-auto">
-				<Select
-					value={tag ?? ALL_TAGS_VALUE}
-					onValueChange={(value) =>
-						onTagChange(value === ALL_TAGS_VALUE ? undefined : value)
-					}
+		<div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+			<ToggleGroup
+				type="single"
+				value={filter ?? "all"}
+				className="grid w-full grid-cols-3 lg:inline-flex lg:w-auto"
+				onValueChange={(value) => {
+					if (!value) return;
+					onFilterChange(
+						value === "all" ? undefined : (value as "read" | "unread"),
+					);
+				}}
+				aria-label="Read status filter"
+			>
+				<ToggleGroupItem
+					value="all"
+					aria-label="Show all articles"
+					className="min-w-0"
 				>
-					<SelectTrigger aria-label="Tag filter" className="min-w-36">
-						<SelectValue />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectItem value={ALL_TAGS_VALUE}>All tags</SelectItem>
-						{tagList.map((currentTag) => (
-							<SelectItem key={currentTag.id} value={currentTag.id}>
-								{currentTag.name}
-							</SelectItem>
-						))}
-					</SelectContent>
-				</Select>
-				<Select
-					value={filter ?? "all"}
-					onValueChange={(value) =>
-						onFilterChange(
-							value === "all"
-								? undefined
-								: (value as "all" | "read" | "unread"),
-						)
-					}
+					All
+				</ToggleGroupItem>
+				<ToggleGroupItem
+					value="unread"
+					aria-label="Show unread articles"
+					className="min-w-0"
 				>
-					<SelectTrigger aria-label="Read status filter" className="min-w-32">
-						<SelectValue />
-					</SelectTrigger>
-					<SelectContent>
-						<SelectItem value="all">All</SelectItem>
-						<SelectItem value="unread">Unread</SelectItem>
-						<SelectItem value="read">Read</SelectItem>
-					</SelectContent>
-				</Select>
+					Unread
+				</ToggleGroupItem>
+				<ToggleGroupItem
+					value="read"
+					aria-label="Show read articles"
+					className="min-w-0"
+				>
+					Read
+				</ToggleGroupItem>
+			</ToggleGroup>
+
+			<div className="flex w-full flex-wrap gap-2 lg:w-auto lg:justify-end">
+				<PageSearchField
+					value={q ?? ""}
+					placeholder="Search archive..."
+					ariaLabel="Search archive"
+					onSearch={onSearch}
+					className="w-full md:w-64"
+				/>
+				<ArchiveTagsCombobox
+					tags={tagList}
+					selectedTagIds={selectedTagIds}
+					onChange={onTagsChange}
+				/>
 				<Select
 					value={sort ?? "newest"}
 					onValueChange={(value) =>
@@ -95,7 +91,7 @@ export function ArchiveFilters({
 				>
 					<SelectTrigger
 						aria-label="Sort archive articles"
-						className="min-w-40"
+						className="w-full md:w-40"
 					>
 						<SelectValue />
 					</SelectTrigger>

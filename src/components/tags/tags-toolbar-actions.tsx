@@ -1,44 +1,24 @@
 import { ToolBox } from "#/components/layout/tool-box";
-import {
-	ToolbarSearch,
-	ToolbarSlot,
-} from "#/components/layout/toolbar-actions";
+import { ToolbarSlot } from "#/components/layout/toolbar-actions";
 import { CreateTagDialog } from "#/components/tags/create-tag-dialog";
 
 type TagsToolbarActionsProps = {
-	showSearch: boolean;
-	searchValue: string;
 	onCreate: (name: string) => Promise<void>;
-	onSearch: (query: string) => void;
 };
 
-export function TagsToolbarActions({
-	showSearch,
-	searchValue,
-	onCreate,
-	onSearch,
-}: TagsToolbarActionsProps) {
+export function TagsToolbarActions({ onCreate }: TagsToolbarActionsProps) {
 	return (
-		<>
-			<ToolbarSlot>
-				<ToolBox>
-					<CreateTagDialog
-						onCreate={onCreate}
-						triggerVariant="ghost"
-						triggerSize="sm"
-						triggerClassName="h-9 rounded-lg border-0 px-2.5 shadow-none sm:px-3.5"
-						triggerAriaLabel="Create tag"
-						collapseLabelOnMobile
-					/>
-				</ToolBox>
-			</ToolbarSlot>
-			{showSearch && (
-				<ToolbarSearch
-					placeholder="Search tags..."
-					value={searchValue}
-					onSearch={onSearch}
+		<ToolbarSlot>
+			<ToolBox>
+				<CreateTagDialog
+					onCreate={onCreate}
+					triggerVariant="ghost"
+					triggerSize="sm"
+					triggerClassName="h-9 border-0 px-2.5 shadow-none sm:px-3.5"
+					triggerAriaLabel="Create tag"
+					collapseLabelOnMobile
 				/>
-			)}
-		</>
+			</ToolBox>
+		</ToolbarSlot>
 	);
 }
