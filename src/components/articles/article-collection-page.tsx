@@ -1,6 +1,7 @@
+import type { LucideIcon } from "lucide-react";
+import type { ReactNode } from "react";
 import { ArticleList } from "#/components/articles/article-list";
 import { ArticlesHeader } from "#/components/articles/articles-header";
-import { ArticlesToolbarActions } from "#/components/articles/articles-toolbar-actions";
 import { BulkActionsPanel } from "#/components/articles/bulk-actions-panel";
 import type { ArticleWithTags } from "#/components/articles/types";
 import { AppPagination } from "#/components/pagination/app-pagination";
@@ -8,6 +9,8 @@ import type { Tag } from "#/components/tags/types";
 
 type ArticleCollectionPageProps = {
 	title: string;
+	icon?: LucideIcon;
+	headingActions?: ReactNode;
 	searchPlaceholder: string;
 	emptyStateMessage: string;
 	emptyStateHint?: string;
@@ -38,6 +41,8 @@ type ArticleCollectionPageProps = {
 
 export function ArticleCollectionPage({
 	title,
+	icon,
+	headingActions,
 	searchPlaceholder,
 	emptyStateMessage,
 	emptyStateHint,
@@ -51,7 +56,6 @@ export function ArticleCollectionPage({
 	selected,
 	selectedIds,
 	handleSelect,
-	handleAdd,
 	handleOpenArticle,
 	handleToggleRead,
 	handleToggleFavorite,
@@ -65,30 +69,30 @@ export function ArticleCollectionPage({
 	goToPage,
 	clearSelection,
 }: ArticleCollectionPageProps) {
-	return (
-		<div className="mx-auto max-w-5xl space-y-4">
-			<ArticlesToolbarActions
-				onAdd={handleAdd}
-				searchValue={q ?? ""}
-				onSearch={updateQuery}
-				searchPlaceholder={searchPlaceholder}
+	const selectionActions =
+		selected.size > 0 ? (
+			<BulkActionsPanel
+				count={selected.size}
+				onMarkRead={() => void handleBulkToggleRead(selectedIds, true)}
+				onMarkUnread={() => void handleBulkToggleRead(selectedIds, false)}
+				onDelete={() => void handleDelete(selectedIds)}
+				onClear={clearSelection}
 			/>
+		) : undefined;
 
-			{selected.size > 0 && (
-				<BulkActionsPanel
-					count={selected.size}
-					onMarkRead={() => void handleBulkToggleRead(selectedIds, true)}
-					onMarkUnread={() => void handleBulkToggleRead(selectedIds, false)}
-					onDelete={() => void handleDelete(selectedIds)}
-					onClear={clearSelection}
-				/>
-			)}
-
+	return (
+		<div className="w-full space-y-4">
 			<ArticlesHeader
 				title={title}
+				icon={icon}
+				headingActions={headingActions}
 				total={total}
 				sort={sort}
 				onSortChange={updateSort}
+				searchValue={q ?? ""}
+				searchPlaceholder={searchPlaceholder}
+				onSearch={updateQuery}
+				selectionActions={selectionActions}
 				emptyStateMessage={emptyStateMessage}
 				emptyStateHint={emptyStateHint}
 			/>

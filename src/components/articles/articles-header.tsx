@@ -1,3 +1,6 @@
+import type { LucideIcon } from "lucide-react";
+import type { ReactNode } from "react";
+import { PageSearchField } from "#/components/layout/page-search-field";
 import {
 	Select,
 	SelectContent,
@@ -8,45 +11,88 @@ import {
 
 type ArticlesHeaderProps = {
 	title: string;
+	icon?: LucideIcon;
 	total: number;
 	sort?: "newest" | "oldest" | "title";
 	onSortChange: (sort: "newest" | "oldest" | "title") => void;
+	searchValue: string;
+	searchPlaceholder: string;
+	onSearch: (query: string) => void;
+	selectionActions?: ReactNode;
+	headingActions?: ReactNode;
 	emptyStateMessage: string;
 	emptyStateHint?: string;
 };
 
 export function ArticlesHeader({
 	title,
+	icon: Icon,
 	total,
 	sort,
 	onSortChange,
+	searchValue,
+	searchPlaceholder,
+	onSearch,
+	selectionActions,
+	headingActions,
 	emptyStateMessage,
 	emptyStateHint,
 }: ArticlesHeaderProps) {
 	return (
 		<>
-			<h1 className="display-title text-2xl font-bold">{title}</h1>
+			<div className="flex min-w-0 flex-wrap items-center justify-between gap-2">
+				<h1 className="display-title flex min-w-0 items-center gap-2 text-2xl font-bold">
+					{Icon ? (
+						<Icon className="h-6 w-6 shrink-0 text-muted-foreground" />
+					) : null}
+					<span className="truncate">{title}</span>
+				</h1>
+				{headingActions ? (
+					<div className="flex shrink-0 items-center gap-1">
+						{headingActions}
+					</div>
+				) : null}
+			</div>
 
-			<div className="flex items-center gap-2">
-				<p className="text-sm text-muted-foreground">
-					{total} article{total !== 1 ? "s" : ""}
-				</p>
-				<div className="ml-auto">
-					<Select
-						value={sort ?? "newest"}
-						onValueChange={(value) =>
-							onSortChange(value as "newest" | "oldest" | "title")
-						}
-					>
-						<SelectTrigger aria-label="Sort articles" className="min-w-40">
-							<SelectValue />
-						</SelectTrigger>
-						<SelectContent>
-							<SelectItem value="newest">Newest first</SelectItem>
-							<SelectItem value="oldest">Oldest first</SelectItem>
-							<SelectItem value="title">Title A-Z</SelectItem>
-						</SelectContent>
-					</Select>
+			<div className="@container">
+				<div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 @min-[48rem]:grid-cols-[minmax(max-content,1fr)_auto_minmax(max-content,1fr)]">
+					<p className="min-w-0 text-sm text-muted-foreground @min-[48rem]:col-start-1 @min-[48rem]:row-start-1">
+						{total} article{total !== 1 ? "s" : ""}
+					</p>
+
+					{selectionActions && (
+						<div className="min-w-0 justify-self-end @min-[48rem]:col-start-2 @min-[48rem]:row-start-1 @min-[48rem]:justify-self-center">
+							{selectionActions}
+						</div>
+					)}
+
+					<div className="col-span-full flex flex-col gap-2 @min-[34rem]:flex-row @min-[34rem]:items-center @min-[48rem]:col-span-1 @min-[48rem]:col-start-3 @min-[48rem]:row-start-1 @min-[48rem]:justify-self-end">
+						<PageSearchField
+							value={searchValue}
+							placeholder={searchPlaceholder}
+							ariaLabel={searchPlaceholder}
+							onSearch={onSearch}
+							className="w-full @min-[34rem]:w-64"
+						/>
+						<Select
+							value={sort ?? "newest"}
+							onValueChange={(value) =>
+								onSortChange(value as "newest" | "oldest" | "title")
+							}
+						>
+							<SelectTrigger
+								aria-label="Sort articles"
+								className="w-full @min-[34rem]:w-40"
+							>
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="newest">Newest first</SelectItem>
+								<SelectItem value="oldest">Oldest first</SelectItem>
+								<SelectItem value="title">Title A-Z</SelectItem>
+							</SelectContent>
+						</Select>
+					</div>
 				</div>
 			</div>
 

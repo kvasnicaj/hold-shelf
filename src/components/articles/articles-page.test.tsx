@@ -128,16 +128,6 @@ vi.mock("#/components/articles/bulk-actions-panel", () => ({
 	),
 }));
 
-vi.mock("#/components/layout/toolbar-actions", () => ({
-	ToolbarSlot: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-	ToolbarSearch: ({ onSearch }: { onSearch: (value: string) => void }) => (
-		<input
-			aria-label="Search articles..."
-			onChange={(event) => onSearch(event.target.value)}
-		/>
-	),
-}));
-
 const tagFixtures = [{ id: "t1", name: "Design", color: null }];
 const articleFixtures = [
 	{
@@ -210,6 +200,9 @@ describe("ArticlesPage", () => {
 		expect(screen.getByText("Article one")).toBeInTheDocument();
 		expect(screen.getByText("Article two")).toBeInTheDocument();
 
+		await user.type(screen.getByLabelText("Search articles..."), "design");
+		expect(navigateMock).toHaveBeenCalled();
+
 		await user.click(screen.getByRole("combobox", { name: "Sort articles" }));
 		await user.click(screen.getByRole("option", { name: "Title A-Z" }));
 
@@ -270,7 +263,7 @@ describe("ArticlesPage", () => {
 		});
 	});
 
-	it("runs add, toggle, and delete mutations and invalidates cached state", async () => {
+	it("runs toggle and delete mutations and invalidates cached state", async () => {
 		const user = userEvent.setup();
 		routeState.loaderData = {
 			articles: { items: articleFixtures, total: 2 },
@@ -279,13 +272,6 @@ describe("ArticlesPage", () => {
 		getArticlesMock.mockResolvedValue(routeState.loaderData.articles);
 		const { queryClient } = renderWithProviders(<ArticlesPage />);
 		const invalidateQueriesSpy = vi.spyOn(queryClient, "invalidateQueries");
-
-		await user.click(screen.getByRole("button", { name: /mock add article/i }));
-		await waitFor(() =>
-			expect(createArticleMock).toHaveBeenCalledWith({
-				data: { url: "https://example.com/added" },
-			}),
-		);
 
 		await user.click(screen.getByRole("button", { name: "toggle-a1" }));
 		await waitFor(() =>

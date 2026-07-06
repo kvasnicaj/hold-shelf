@@ -11,6 +11,27 @@ vi.mock("#/components/layout/toolbar-actions", () => ({
 }));
 
 describe("BulkActionsPanel", () => {
+	it("renders expanded inline actions for wider layouts", async () => {
+		const user = userEvent.setup();
+		const onMarkRead = vi.fn();
+
+		renderWithProviders(
+			<BulkActionsPanel
+				count={2}
+				onMarkRead={onMarkRead}
+				onMarkUnread={vi.fn()}
+				onDelete={vi.fn()}
+				onClear={vi.fn()}
+			/>,
+		);
+
+		expect(screen.getByText("2 selected")).toBeInTheDocument();
+
+		await user.click(screen.getByTitle("Mark read"));
+
+		expect(onMarkRead).toHaveBeenCalledTimes(1);
+	});
+
 	it("opens the collapsed bulk actions menu from the icon trigger", async () => {
 		const user = userEvent.setup();
 		const onMarkRead = vi.fn();

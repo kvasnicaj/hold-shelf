@@ -9,13 +9,24 @@ export function formatTimeAgo(date: Date): string {
 	if (diffMins < 60) return `${diffMins}m ago`;
 	if (diffHours < 24) return `${diffHours}h ago`;
 	if (diffDays < 30) return `${diffDays}d ago`;
-	return date.toLocaleDateString();
+	return formatFullDate(date);
 }
 
 export function formatDate(date: Date | null): string {
 	if (!date) return "";
-	return new Intl.DateTimeFormat("en", {
+	return new Intl.DateTimeFormat("en-US", {
 		month: "short",
 		day: "numeric",
+		timeZone: "UTC",
+	}).format(date);
+}
+
+export function formatFullDate(date: Date | null): string {
+	if (!date) return "";
+	return new Intl.DateTimeFormat("en-US", {
+		year: "numeric",
+		month: "numeric",
+		day: "numeric",
+		timeZone: "UTC",
 	}).format(date);
 }

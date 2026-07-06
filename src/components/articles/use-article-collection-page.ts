@@ -1,8 +1,12 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useState } from "react";
+import { ARTICLE_COLLECTION_PAGE_SIZE } from "#/components/articles/helpers";
 import type {
+	ArticleCollectionFilters,
 	ArticleCollectionLoaderData,
+	ArticleCollectionNavigate,
+	ArticleCollectionQueryKey,
 	ArticleCollectionSearch,
 } from "#/components/articles/types";
 import { useAutoMarkReadOnOpen } from "#/components/articles/use-auto-mark-read-on-open";
@@ -18,20 +22,11 @@ import {
 type UseArticleCollectionPageOptions = {
 	initialData: ArticleCollectionLoaderData;
 	search: ArticleCollectionSearch;
-	queryKey: "unread" | "favorites";
-	filters: {
-		isRead?: boolean;
-		isFavorite?: boolean;
-	};
-	navigate: (options: {
-		search: (
-			prev: ArticleCollectionSearch,
-		) => Partial<ArticleCollectionSearch> | ArticleCollectionSearch;
-		replace: boolean;
-	}) => void | Promise<void>;
+	queryKey: ArticleCollectionQueryKey;
+	filters: ArticleCollectionFilters;
+	navigate: ArticleCollectionNavigate;
+	enabled?: boolean;
 };
-
-const PAGE_SIZE = 20;
 
 export function useArticleCollectionPage({
 	initialData,
@@ -39,6 +34,7 @@ export function useArticleCollectionPage({
 	queryKey,
 	filters,
 	navigate,
+	enabled = true,
 }: UseArticleCollectionPageOptions) {
 	const { q, sort, page: searchPage } = search;
 	const page = searchPage ?? 1;
@@ -56,11 +52,12 @@ export function useArticleCollectionPage({
 					...filters,
 					search: q,
 					sort,
-					limit: PAGE_SIZE,
-					offset: (page - 1) * PAGE_SIZE,
+					limit: ARTICLE_COLLECTION_PAGE_SIZE,
+					offset: (page - 1) * ARTICLE_COLLECTION_PAGE_SIZE,
 				},
 			}),
 		initialData: initialData.articles,
+		enabled,
 	});
 	const { data: tagList = [] } = useQuery({
 		queryKey: ["tags"],
@@ -70,7 +67,7 @@ export function useArticleCollectionPage({
 
 	const articles = result?.items ?? [];
 	const total = result?.total ?? 0;
-	const totalPages = Math.ceil(total / PAGE_SIZE);
+	const totalPages = Math.ceil(total / ARTICLE_COLLECTION_PAGE_SIZE);
 	const selectedIds = Array.from(selected);
 
 	function invalidateAll() {
