@@ -2,7 +2,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getRouteApi, useNavigate, useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { useAutoMarkReadOnOpen } from "#/components/articles/use-auto-mark-read-on-open";
-import { useSaveArticle } from "#/components/articles/use-save-article";
 import { deleteArticles, getArticles, updateArticle } from "#/server/articles";
 import {
 	addTagToArticles,
@@ -15,27 +14,27 @@ const route = getRouteApi("/app/archive");
 
 export function useArchivePage() {
 	const initialData = route.useLoaderData();
-	const { q, filter, sort, tag, page: searchPage } = route.useSearch();
+	const { q, filter, sort, tag, tags, page: searchPage } = route.useSearch();
 	const page = searchPage ?? 1;
+	const selectedTagIds = tags?.length ? tags : tag ? [tag] : [];
 	const queryClient = useQueryClient();
 	const router = useRouter();
 	const navigate = useNavigate({ from: "/app/archive" });
 	const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
-	const { handleAdd } = useSaveArticle();
 	const { handleOpenArticle } = useAutoMarkReadOnOpen();
 
 	const isRead =
 		filter === "read" ? true : filter === "unread" ? false : undefined;
 
 	const { data: result } = useQuery({
-		queryKey: ["articles", "archive", q, filter, sort, tag, page],
+		queryKey: ["articles", "archive", q, filter, sort, selectedTagIds, page],
 		queryFn: () =>
 			getArticles({
 				data: {
 					isRead,
 					search: q,
 					sort,
-					tagId: tag,
+					tagIds: selectedTagIds,
 					limit: 20,
 					offset: (page - 1) * 20,
 				},
@@ -51,9 +50,6 @@ export function useArchivePage() {
 	const articles = result?.items ?? [];
 	const total = result?.total ?? 0;
 	const totalPages = Math.ceil(total / 20);
-	const activeTag = tag
-		? tagList.find((currentTag) => currentTag.id === tag)
-		: null;
 	const selectedIds = Object.keys(rowSelection).filter(
 		(id) => rowSelection[id],
 	);
@@ -107,6 +103,7 @@ export function useArchivePage() {
 	function updateSearch(partial: {
 		q?: string;
 		tag?: string;
+		tags?: string[];
 		filter?: "all" | "read" | "unread";
 		sort?: "newest" | "oldest" | "title";
 		page?: number;
@@ -134,16 +131,15 @@ export function useArchivePage() {
 		filter,
 		sort,
 		tag,
+		selectedTagIds,
 		page,
 		articles,
 		total,
 		totalPages,
 		tagList,
-		activeTag,
 		rowSelection,
 		selectedIds,
 		setRowSelection,
-		handleAdd,
 		handleOpenArticle,
 		handleToggleRead,
 		handleToggleFavorite,
@@ -157,9 +153,12 @@ export function useArchivePage() {
 				q: nextQuery.trim() ? nextQuery : undefined,
 				page: undefined,
 			}),
-		clearTag: () => updateSearch({ tag: undefined, page: undefined }),
-		updateTag: (nextTag?: string) =>
-			updateSearch({ tag: nextTag, page: undefined }),
+		updateTags: (nextTags: string[]) =>
+			updateSearch({
+				tag: undefined,
+				tags: nextTags.length > 0 ? nextTags : undefined,
+				page: undefined,
+			}),
 		updateFilter: (nextFilter?: "all" | "read" | "unread") =>
 			updateSearch({ filter: nextFilter, page: undefined }),
 		updateSort: (nextSort: "newest" | "oldest" | "title") =>

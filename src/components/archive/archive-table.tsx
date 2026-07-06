@@ -124,7 +124,10 @@ export function ArchiveTable({
 					{table.getRowModel().rows.map((row) => (
 						<tr
 							key={row.id}
-							className="group/row border-b transition-colors last:border-b-0 hover:bg-accent/50"
+							className="group/row cursor-pointer border-b transition-colors last:border-b-0 hover:bg-accent/50"
+							onClick={() =>
+								void onOpenArticle(row.original.id, row.original.isRead)
+							}
 						>
 							{row.getVisibleCells().map((cell) =>
 								cell.column.id === "createdAt" ? (

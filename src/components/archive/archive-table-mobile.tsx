@@ -65,9 +65,18 @@ export function ArchiveTableMobile({
 					const isSelected = Boolean(rowSelection[article.id]);
 
 					return (
+						// biome-ignore lint/a11y/useSemanticElements: The composite row contains nested controls, so it cannot be a native button.
 						<div
 							key={article.id}
-							className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-2 py-2"
+							className="grid cursor-pointer grid-cols-[minmax(0,1fr)_auto] gap-x-2 py-2"
+							onClick={() => void onOpenArticle(article.id, article.isRead)}
+							onKeyDown={(event) => {
+								if (event.key === "Enter") {
+									void onOpenArticle(article.id, article.isRead);
+								}
+							}}
+							role="button"
+							tabIndex={0}
 						>
 							<div className="min-w-0 space-y-2">
 								<div className="flex min-w-0 items-start gap-1.5">
@@ -78,6 +87,7 @@ export function ArchiveTableMobile({
 												toggleRow(article.id, !!value)
 											}
 											className="mt-0.5"
+											onClick={(event) => event.stopPropagation()}
 										/>
 									) : null}
 									<ArticleExternalLink
@@ -123,6 +133,7 @@ export function ArchiveTableMobile({
 											variant="ghost"
 											size="icon-xs"
 											aria-label={`Article actions for ${article.title ?? article.url}`}
+											onClick={(event) => event.stopPropagation()}
 										>
 											<EllipsisVertical className="h-[1.125rem] w-[1.125rem]" />
 										</Button>
