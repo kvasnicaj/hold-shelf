@@ -29,7 +29,6 @@ export function TagsPage() {
 		handleToggleRead,
 		handleToggleFavorite,
 		handleBulkToggleRead,
-		handleAdd,
 		handleOpenArticle,
 		handleSelect,
 		handleDelete,
@@ -52,6 +51,38 @@ export function TagsPage() {
 			onBack={goBackToTags}
 			onRename={(name) => handleRename(activeTag.id, name)}
 			onDelete={() => handleDeleteTag(activeTag.id)}
+		/>
+	) : null;
+	const selectedTagArticles = selectedTagId ? (
+		<ArticleCollectionPage
+			articles={articles}
+			total={total}
+			page={page}
+			totalPages={totalPages}
+			selected={selected}
+			selectedIds={selectedIds}
+			tagList={tagList}
+			title={selectedTagTitle}
+			icon={Tag}
+			headingActions={selectedTagActions}
+			searchPlaceholder="Search tagged articles..."
+			emptyStateMessage="No articles with this tag."
+			emptyStateHint="Add this tag to an article to see it here."
+			q={q}
+			sort={sort}
+			handleSelect={handleSelect}
+			handleOpenArticle={handleOpenArticle}
+			handleToggleRead={handleToggleRead}
+			handleToggleFavorite={handleToggleFavorite}
+			handleDelete={handleDelete}
+			handleBulkToggleRead={handleBulkToggleRead}
+			handleAddTag={handleAddTag}
+			handleRemoveTag={handleRemoveTag}
+			handleCreateTag={handleCreateTagFromPicker}
+			updateQuery={updateQuery}
+			updateSort={updateSort}
+			goToPage={goToPage}
+			clearSelection={clearSelection}
 		/>
 	) : null;
 
@@ -80,73 +111,13 @@ export function TagsPage() {
 							/>
 						</>
 					) : (
-						<ArticleCollectionPage
-							articles={articles}
-							total={total}
-							page={page}
-							totalPages={totalPages}
-							selected={selected}
-							selectedIds={selectedIds}
-							tagList={tagList}
-							title={selectedTagTitle}
-							icon={Tag}
-							headingActions={selectedTagActions}
-							searchPlaceholder="Search tagged articles..."
-							emptyStateMessage="No articles with this tag."
-							emptyStateHint="Add this tag to an article to see it here."
-							q={q}
-							sort={sort}
-							handleSelect={handleSelect}
-							handleOpenArticle={handleOpenArticle}
-							handleToggleRead={handleToggleRead}
-							handleToggleFavorite={handleToggleFavorite}
-							handleAdd={handleAdd}
-							handleDelete={handleDelete}
-							handleBulkToggleRead={handleBulkToggleRead}
-							handleAddTag={handleAddTag}
-							handleRemoveTag={handleRemoveTag}
-							handleCreateTag={handleCreateTagFromPicker}
-							updateQuery={updateQuery}
-							updateSort={updateSort}
-							goToPage={goToPage}
-							clearSelection={clearSelection}
-						/>
+						selectedTagArticles
 					)}
 				</div>
 			) : (
 				<div className="w-full">
 					{selectedTagId && activeTag ? (
-						<ArticleCollectionPage
-							articles={articles}
-							total={total}
-							page={page}
-							totalPages={totalPages}
-							selected={selected}
-							selectedIds={selectedIds}
-							tagList={tagList}
-							title={selectedTagTitle}
-							icon={Tag}
-							headingActions={selectedTagActions}
-							searchPlaceholder="Search tagged articles..."
-							emptyStateMessage="No articles with this tag."
-							emptyStateHint="Add this tag to an article to see it here."
-							q={q}
-							sort={sort}
-							handleSelect={handleSelect}
-							handleOpenArticle={handleOpenArticle}
-							handleToggleRead={handleToggleRead}
-							handleToggleFavorite={handleToggleFavorite}
-							handleAdd={handleAdd}
-							handleDelete={handleDelete}
-							handleBulkToggleRead={handleBulkToggleRead}
-							handleAddTag={handleAddTag}
-							handleRemoveTag={handleRemoveTag}
-							handleCreateTag={handleCreateTagFromPicker}
-							updateQuery={updateQuery}
-							updateSort={updateSort}
-							goToPage={goToPage}
-							clearSelection={clearSelection}
-						/>
+						selectedTagArticles
 					) : (
 						<div className="flex flex-col items-center justify-center py-20 text-center">
 							<Tag className="mb-3 h-10 w-10 text-muted-foreground/40" />

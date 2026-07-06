@@ -1,7 +1,5 @@
 import { getRouteApi } from "@tanstack/react-router";
-import { SaveArticleToolbarAction } from "#/components/articles/save-article-toolbar-action";
 import { useAutoMarkReadOnOpen } from "#/components/articles/use-auto-mark-read-on-open";
-import { useSaveArticle } from "#/components/articles/use-save-article";
 import { EmptyLibraryCta } from "#/components/home/empty-library-cta";
 import { HomeStatsSection } from "#/components/home/home-stats-section";
 import { RecentArticlesSection } from "#/components/home/recent-articles-section";
@@ -10,13 +8,10 @@ const route = getRouteApi("/app/home");
 
 export function HomePage() {
 	const { stats, recent } = route.useLoaderData();
-	const { handleAdd } = useSaveArticle();
 	const { handleOpenArticle } = useAutoMarkReadOnOpen();
 
 	return (
 		<div className="w-full space-y-6">
-			<SaveArticleToolbarAction onAdd={handleAdd} />
-
 			<div className="rise-in space-y-1">
 				<h1 className="display-title text-3xl font-bold">
 					Welcome to Hold Shelf

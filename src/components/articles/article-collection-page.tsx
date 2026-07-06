@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { ArticleList } from "#/components/articles/article-list";
 import { ArticlesHeader } from "#/components/articles/articles-header";
 import { BulkActionsPanel } from "#/components/articles/bulk-actions-panel";
-import type { ArticleWithTags } from "#/components/articles/types";
+import type { ArticleSort, ArticleWithTags } from "#/components/articles/types";
 import { AppPagination } from "#/components/pagination/app-pagination";
 import type { Tag } from "#/components/tags/types";
 
@@ -15,7 +15,7 @@ type ArticleCollectionPageProps = {
 	emptyStateMessage: string;
 	emptyStateHint?: string;
 	q?: string;
-	sort?: "newest" | "oldest" | "title";
+	sort?: ArticleSort;
 	page: number;
 	articles: ArticleWithTags[];
 	total: number;
@@ -24,7 +24,6 @@ type ArticleCollectionPageProps = {
 	selected: Set<string>;
 	selectedIds: string[];
 	handleSelect: (id: string, selected: boolean) => void;
-	handleAdd: (url: string) => Promise<void>;
 	handleOpenArticle: (id: string, isRead: boolean) => Promise<void>;
 	handleToggleRead: (id: string, isRead: boolean) => Promise<void>;
 	handleToggleFavorite: (id: string, isFavorite: boolean) => Promise<void>;
@@ -34,7 +33,7 @@ type ArticleCollectionPageProps = {
 	handleRemoveTag: (tagId: string, articleIds: string[]) => Promise<void>;
 	handleCreateTag: (name: string) => Promise<Tag>;
 	updateQuery: (query: string) => void;
-	updateSort: (sort: "newest" | "oldest" | "title") => void;
+	updateSort: (sort: ArticleSort) => void;
 	goToPage: (page: number) => void;
 	clearSelection: () => void;
 };

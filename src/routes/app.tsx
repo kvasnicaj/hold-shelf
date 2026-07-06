@@ -53,7 +53,7 @@ function AppLayout() {
 }
 
 function TopBar() {
-	const { actions, centerContent } = useToolbarActions();
+	const { actions } = useToolbarActions();
 
 	return (
 		<ColumnNavbar
@@ -61,13 +61,6 @@ function TopBar() {
 			left={[<AppBrandMark key="brand" />]}
 			center={[<AppSearch key="search" />]}
 			right={[
-				...(centerContent
-					? [
-							<div key="center-actions" className="@container min-w-0">
-								{centerContent}
-							</div>,
-						]
-					: []),
 				...(actions
 					? [
 							<div
