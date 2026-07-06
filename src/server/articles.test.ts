@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
 	createArticle,
 	deleteArticles,
+	getArticleReader,
 	getArticles,
 	updateArticle,
 } from "#/server/articles";
@@ -9,10 +10,12 @@ import { createArticlesRepository } from "#/server/articles-repository";
 import {
 	handleCreateArticle,
 	handleDeleteArticles,
+	handleGetArticleReader,
 	handleGetArticles,
 	handleUpdateArticle,
 	validateCreateArticleInput,
 	validateDeleteArticlesInput,
+	validateGetArticleReaderInput,
 	validateGetArticlesInput,
 	validateUpdateArticleInput,
 } from "#/server/articles-runtime";
@@ -49,10 +52,12 @@ vi.mock("#/server/helpers", () => ({
 
 vi.mock("#/server/articles-runtime", () => ({
 	handleGetArticles: vi.fn(),
+	handleGetArticleReader: vi.fn(),
 	handleCreateArticle: vi.fn(),
 	handleUpdateArticle: vi.fn(),
 	handleDeleteArticles: vi.fn(),
 	validateGetArticlesInput: vi.fn(),
+	validateGetArticleReaderInput: vi.fn(),
 	validateCreateArticleInput: vi.fn(),
 	validateUpdateArticleInput: vi.fn(),
 	validateDeleteArticlesInput: vi.fn(),
@@ -66,6 +71,7 @@ type MockServerFn = {
 
 describe("articles server functions", () => {
 	const getArticlesServerFn = getArticles as unknown as MockServerFn;
+	const getArticleReaderServerFn = getArticleReader as unknown as MockServerFn;
 	const createArticleServerFn = createArticle as unknown as MockServerFn;
 	const updateArticleServerFn = updateArticle as unknown as MockServerFn;
 	const deleteArticlesServerFn = deleteArticles as unknown as MockServerFn;
@@ -86,6 +92,44 @@ describe("articles server functions", () => {
 		).resolves.toBe(result);
 		expect(handleGetArticles).toHaveBeenCalledWith(
 			{ page: 1, q: "saved" },
+			{
+				createRepository: createArticlesRepository,
+				requireUserIdFn: requireUserId,
+			},
+		);
+	});
+
+	it("wires getArticleReader to the GET validator and runtime handler", async () => {
+		const result = {
+			article: {
+				id: "a1",
+				userId: "user-1",
+				url: "https://example.com/article",
+				title: "Article",
+				description: null,
+				hostname: "example.com",
+				faviconUrl: null,
+				isRead: false,
+				isFavorite: false,
+				readAt: null,
+				createdAt: new Date("2026-04-06T00:00:00.000Z"),
+				updatedAt: new Date("2026-04-06T00:00:00.000Z"),
+				tags: [],
+			},
+			content: { status: "unavailable" as const, reason: "blocked" },
+		};
+		vi.mocked(handleGetArticleReader).mockResolvedValue(result);
+
+		expect(getArticleReaderServerFn.options).toEqual({ method: "GET" });
+		expect(getArticleReaderServerFn.validator).toBe(
+			validateGetArticleReaderInput,
+		);
+
+		await expect(
+			getArticleReaderServerFn.handler({ data: { id: "a1" } }),
+		).resolves.toBe(result);
+		expect(handleGetArticleReader).toHaveBeenCalledWith(
+			{ id: "a1" },
 			{
 				createRepository: createArticlesRepository,
 				requireUserIdFn: requireUserId,

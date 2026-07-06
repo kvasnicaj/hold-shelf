@@ -139,6 +139,13 @@ function createArticlesRepoFixture() {
 				}),
 			),
 		),
+		getArticleById: vi.fn(async ({ userId, id }) => {
+			return (
+				articles.find(
+					(candidate) => candidate.userId === userId && candidate.id === id,
+				) ?? null
+			);
+		}),
 		findArticleByUrl: vi.fn(async ({ userId, url }) => {
 			const article = articles.find(
 				(candidate) => candidate.userId === userId && candidate.url === url,

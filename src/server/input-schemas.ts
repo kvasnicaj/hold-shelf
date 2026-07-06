@@ -22,12 +22,17 @@ export const getArticlesInputSchema = z
 		isRead: z.boolean().optional(),
 		isFavorite: z.boolean().optional(),
 		tagId: idSchema.optional(),
+		tagIds: z.array(idSchema).max(20).optional(),
 		search: z.string().trim().max(200).optional(),
 		sort: z.enum(["newest", "oldest", "title"]).optional(),
 		limit: z.number().int().min(1).max(100).optional(),
 		offset: z.number().int().min(0).max(10_000).optional(),
 	})
 	.default({});
+
+export const getArticleReaderInputSchema = z.object({
+	id: idSchema,
+});
 
 export const createArticleInputSchema = z.object({
 	url: httpUrlSchema,

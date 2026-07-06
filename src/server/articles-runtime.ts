@@ -1,13 +1,16 @@
+import { extractArticleContent } from "#/server/article-content";
 import {
 	type ArticlesRepository,
 	createArticleForUser,
 	deleteArticlesForUser,
+	getArticleReaderForUser,
 	getArticlesForUser,
 	updateArticleForUser,
 } from "#/server/articles-service";
 import {
 	createArticleInputSchema,
 	deleteArticlesInputSchema,
+	getArticleReaderInputSchema,
 	getArticlesInputSchema,
 	updateArticleInputSchema,
 	validateInput,
@@ -19,11 +22,13 @@ type ArticlesRuntimeDependencies = {
 	createRepository: () => ArticlesRepository;
 	requireUserIdFn: () => Promise<string>;
 	getArticlesForUserFn?: typeof getArticlesForUser;
+	getArticleReaderForUserFn?: typeof getArticleReaderForUser;
 	createArticleForUserFn?: typeof createArticleForUser;
 	updateArticleForUserFn?: typeof updateArticleForUser;
 	deleteArticlesForUserFn?: typeof deleteArticlesForUser;
 	checkRateLimitFn?: typeof checkRateLimit;
 	extractMetadataFn?: typeof extractMetadata;
+	extractArticleContentFn?: typeof extractArticleContent;
 };
 
 export function validateGetArticlesInput(input: unknown) {
@@ -36,6 +41,14 @@ export function validateGetArticlesInput(input: unknown) {
 
 export function validateCreateArticleInput(input: unknown) {
 	return validateInput(createArticleInputSchema, input, "Invalid article URL.");
+}
+
+export function validateGetArticleReaderInput(input: unknown) {
+	return validateInput(
+		getArticleReaderInputSchema,
+		input,
+		"Invalid article reader request.",
+	);
 }
 
 export function validateUpdateArticleInput(input: unknown) {
@@ -77,6 +90,20 @@ export async function handleCreateArticle(
 		url: data.url,
 		checkRateLimitFn: deps.checkRateLimitFn ?? checkRateLimit,
 		extractMetadataFn: deps.extractMetadataFn ?? extractMetadata,
+	});
+}
+
+export async function handleGetArticleReader(
+	data: ReturnType<typeof validateGetArticleReaderInput>,
+	deps: ArticlesRuntimeDependencies,
+) {
+	const userId = await deps.requireUserIdFn();
+	return (deps.getArticleReaderForUserFn ?? getArticleReaderForUser)({
+		repo: deps.createRepository(),
+		userId,
+		id: data.id,
+		extractArticleContentFn:
+			deps.extractArticleContentFn ?? extractArticleContent,
 	});
 }
 

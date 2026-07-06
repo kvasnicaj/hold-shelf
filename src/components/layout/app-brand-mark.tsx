@@ -2,8 +2,8 @@ import { Bookmark } from "lucide-react";
 
 export function AppBrandMark() {
 	return (
-		<div className="flex h-10 w-10 items-center justify-center rounded-lg md:hidden">
-			<Bookmark className="h-8 w-8 text-(--lagoon)" />
+		<div className="flex h-9 w-9 items-center justify-center md:hidden">
+			<Bookmark className="h-7 w-7 text-(--lagoon)" />
 			<span className="sr-only">Hold Shelf</span>
 		</div>
 	);
