@@ -33,6 +33,7 @@ High-level flow:
 |- /                          -> LandingPage
 |- /about                     -> AboutPage
 |- /api-docs                  -> ApiDocsPage
+|- /api-docs/agents           -> Agent-friendly Markdown API docs export
 |- /login                     -> LoginPage
 |- /privacy                   -> PrivacyPage
 |- /extension/save            -> ExtensionSavePage
@@ -177,6 +178,7 @@ Component tree:
 ```text
 ApiDocsPage
 |- API overview panel
+|- agent Markdown export link -> /api-docs/agents
 |- Personal REST API endpoint cards
 |- Browser extension API endpoint cards
 ```
@@ -184,6 +186,8 @@ ApiDocsPage
 Purpose:
 
 - documents the personal-token REST API available to users
+- exposes the same API docs as downloadable Markdown for AI agents and other
+  tooling
 - clarifies which app API routes are intended for the Chrome extension or
   scripts and third-party clients
 - provides request examples, response shapes, validation rules, and rate-limit
