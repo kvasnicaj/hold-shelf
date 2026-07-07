@@ -41,6 +41,11 @@ export default defineConfig({
 				test: {
 					name: "ui",
 					environment: "jsdom",
+					environmentOptions: {
+						jsdom: {
+							url: "http://localhost",
+						},
+					},
 					include: ["src/**/*.test.tsx"],
 					setupFiles: ["src/test/setup-ui.ts"],
 					clearMocks: true,

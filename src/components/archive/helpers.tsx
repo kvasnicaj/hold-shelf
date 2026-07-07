@@ -24,6 +24,10 @@ import { formatDate } from "#/lib/formatters";
 
 const columnHelper = createColumnHelper<ArticleWithTags>();
 
+function stopArticleOpen(event: { stopPropagation: () => void }) {
+	event.stopPropagation();
+}
+
 type CreateArchiveColumnsOptions = {
 	availableTags: Tag[];
 	onAddTag: (tagId: string, articleIds: string[]) => Promise<void>;
@@ -166,16 +170,18 @@ export function createArchiveColumns({
 									size="icon-xs"
 									aria-label={`Article actions for ${article.title ?? article.url}`}
 									title="More actions"
-									onClick={(event) => event.stopPropagation()}
+									onClick={stopArticleOpen}
+									onKeyDown={stopArticleOpen}
 								>
 									<EllipsisVertical className="h-3.5 w-3.5" />
 								</Button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="end">
 								<DropdownMenuItem
-									onClick={() =>
-										onToggleFavorite(article.id, !article.isFavorite)
-									}
+									onClick={(event) => {
+										stopArticleOpen(event);
+										void onToggleFavorite(article.id, !article.isFavorite);
+									}}
 								>
 									<Star
 										className={
@@ -189,7 +195,10 @@ export function createArchiveColumns({
 										: "Add to favorites"}
 								</DropdownMenuItem>
 								<DropdownMenuItem
-									onClick={() => onToggleRead(article.id, !article.isRead)}
+									onClick={(event) => {
+										stopArticleOpen(event);
+										void onToggleRead(article.id, !article.isRead);
+									}}
 								>
 									{article.isRead ? (
 										<BookOpen className="h-4 w-4" />
@@ -200,7 +209,10 @@ export function createArchiveColumns({
 								</DropdownMenuItem>
 								<DropdownMenuItem
 									variant="destructive"
-									onClick={() => onDelete([article.id])}
+									onClick={(event) => {
+										stopArticleOpen(event);
+										void onDelete([article.id]);
+									}}
 								>
 									<Trash2 className="h-4 w-4" />
 									Delete

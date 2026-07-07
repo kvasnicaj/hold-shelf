@@ -193,10 +193,7 @@ export function ArticleReaderPanel() {
 							</div>
 
 							{data.content.status === "ready" ? (
-								<ArticleReaderContent
-									blocks={data.content.blocks}
-									paragraphs={data.content.paragraphs}
-								/>
+								<ArticleReaderContent markdown={data.content.markdown} />
 							) : (
 								<ArticleReaderFallback
 									url={data.article.url}

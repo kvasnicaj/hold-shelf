@@ -1,8 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 import {
+	type ArticleContentCacheUpsert,
 	type ArticlesRepository,
 	createArticleForUser,
 	deleteArticlesForUser,
+	getArticleReaderForUser,
 	getArticlesForUser,
 	updateArticleForUser,
 } from "#/server/articles-service";
@@ -20,6 +22,10 @@ type StoredArticle = {
 	createdAt: Date;
 	updatedAt: Date;
 	readAt: Date | null;
+};
+
+type StoredArticleContentCache = ArticleContentCacheUpsert & {
+	createdAt: Date;
 };
 
 function createArticlesRepoFixture() {
@@ -75,6 +81,7 @@ function createArticlesRepoFixture() {
 			readAt: null,
 		},
 	];
+	const contentCache = new Map<string, StoredArticleContentCache>();
 
 	const repo: ArticlesRepository = {
 		listArticles: vi.fn(
@@ -170,6 +177,18 @@ function createArticlesRepoFixture() {
 			articles.push(article);
 			return article;
 		}),
+		getArticleContentCache: vi.fn(async (articleId) => {
+			return contentCache.get(articleId) ?? null;
+		}),
+		upsertArticleContentCache: vi.fn(async (data) => {
+			const existing = contentCache.get(data.articleId);
+			const cache = {
+				...data,
+				createdAt: existing?.createdAt ?? data.updatedAt,
+			};
+			contentCache.set(data.articleId, cache);
+			return cache;
+		}),
 		updateArticle: vi.fn(async ({ userId, id, changes }) => {
 			const article = articles.find(
 				(candidate) => candidate.userId === userId && candidate.id === id,
@@ -189,7 +208,7 @@ function createArticlesRepoFixture() {
 		}),
 	};
 
-	return { repo, articles };
+	return { repo, articles, contentCache };
 }
 
 describe("articles service", () => {
@@ -222,6 +241,220 @@ describe("articles service", () => {
 		expect(articles.some((candidate) => candidate.url === article.url)).toBe(
 			true,
 		);
+		expect(repo.getArticleContentCache).not.toHaveBeenCalled();
+		expect(repo.upsertArticleContentCache).not.toHaveBeenCalled();
+	});
+
+	it("extracts, converts, stores, and returns markdown when opening an uncached article", async () => {
+		const { repo, contentCache } = createArticlesRepoFixture();
+		const fetchedAt = new Date("2024-02-02T10:00:00.000Z");
+		const extractArticleContentFn = vi.fn().mockResolvedValue({
+			status: "ready",
+			blocks: [
+				{
+					type: "heading",
+					level: 2,
+					children: [{ text: "Readable section" }],
+				},
+				{
+					type: "paragraph",
+					children: [
+						{ text: "A cached " },
+						{ text: "article", bold: true },
+						{ text: " body." },
+					],
+				},
+			],
+			paragraphs: ["Readable section", "A cached article body."],
+			wordCount: 5,
+		});
+
+		const result = await getArticleReaderForUser({
+			repo,
+			userId: "user-1",
+			id: "a1",
+			extractArticleContentFn,
+			now: () => fetchedAt,
+		});
+
+		expect(result.content).toEqual({
+			status: "ready",
+			markdown: "## Readable section\n\nA cached **article** body\\.",
+			plainText: "Readable section\n\nA cached article body.",
+			wordCount: 5,
+			fetchedAt,
+		});
+		expect(contentCache.get("a1")?.markdown).toBe(
+			"## Readable section\n\nA cached **article** body\\.",
+		);
+		expect(extractArticleContentFn).toHaveBeenCalledWith(
+			"https://example.com/design",
+		);
+	});
+
+	it("returns cached markdown without refetching the original article", async () => {
+		const { repo, contentCache } = createArticlesRepoFixture();
+		const fetchedAt = new Date("2024-02-01T10:00:00.000Z");
+		contentCache.set("a1", {
+			articleId: "a1",
+			status: "ready",
+			markdown: "Cached **markdown**.",
+			plainText: "Cached markdown.",
+			wordCount: 2,
+			failureReason: null,
+			sourceUrl: "https://example.com/design",
+			extractionVersion: "markdown-v1",
+			fetchedAt,
+			createdAt: fetchedAt,
+			updatedAt: fetchedAt,
+		});
+		const extractArticleContentFn = vi.fn();
+
+		const result = await getArticleReaderForUser({
+			repo,
+			userId: "user-1",
+			id: "a1",
+			extractArticleContentFn,
+			now: () => new Date("2024-02-02T10:00:00.000Z"),
+		});
+
+		expect(result.content).toEqual({
+			status: "ready",
+			markdown: "Cached **markdown**.",
+			plainText: "Cached markdown.",
+			wordCount: 2,
+			fetchedAt,
+		});
+		expect(extractArticleContentFn).not.toHaveBeenCalled();
+	});
+
+	it("caches unavailable extraction results", async () => {
+		const { repo, contentCache } = createArticlesRepoFixture();
+		const fetchedAt = new Date("2024-02-02T10:00:00.000Z");
+		const extractArticleContentFn = vi.fn().mockResolvedValue({
+			status: "unavailable",
+			reason: "No readable content.",
+		});
+
+		const result = await getArticleReaderForUser({
+			repo,
+			userId: "user-1",
+			id: "a1",
+			extractArticleContentFn,
+			now: () => fetchedAt,
+		});
+
+		expect(result.content).toEqual({
+			status: "unavailable",
+			reason: "No readable content.",
+		});
+		expect(contentCache.get("a1")).toEqual(
+			expect.objectContaining({
+				status: "unavailable",
+				failureReason: "No readable content.",
+				fetchedAt,
+			}),
+		);
+	});
+
+	it("retries stale unavailable cache records", async () => {
+		const { repo, contentCache } = createArticlesRepoFixture();
+		const staleFetchedAt = new Date("2024-02-01T10:00:00.000Z");
+		const retryFetchedAt = new Date("2024-02-03T10:00:00.000Z");
+		contentCache.set("a1", {
+			articleId: "a1",
+			status: "unavailable",
+			markdown: null,
+			plainText: null,
+			wordCount: null,
+			failureReason: "Old failure.",
+			sourceUrl: "https://example.com/design",
+			extractionVersion: "markdown-v1",
+			fetchedAt: staleFetchedAt,
+			createdAt: staleFetchedAt,
+			updatedAt: staleFetchedAt,
+		});
+		const extractArticleContentFn = vi.fn().mockResolvedValue({
+			status: "ready",
+			blocks: [
+				{
+					type: "paragraph",
+					children: [{ text: "Fresh readable body." }],
+				},
+			],
+			paragraphs: ["Fresh readable body."],
+			wordCount: 3,
+		});
+
+		const result = await getArticleReaderForUser({
+			repo,
+			userId: "user-1",
+			id: "a1",
+			extractArticleContentFn,
+			now: () => retryFetchedAt,
+		});
+
+		expect(result.content).toEqual({
+			status: "ready",
+			markdown: "Fresh readable body\\.",
+			plainText: "Fresh readable body.",
+			wordCount: 3,
+			fetchedAt: retryFetchedAt,
+		});
+		expect(extractArticleContentFn).toHaveBeenCalledOnce();
+	});
+
+	it("still returns extracted reader content when cache lookup fails", async () => {
+		const { repo } = createArticlesRepoFixture();
+		vi.mocked(repo.getArticleContentCache).mockRejectedValueOnce(
+			new Error("no such table: article_content_cache"),
+		);
+		vi.mocked(repo.upsertArticleContentCache).mockRejectedValueOnce(
+			new Error("no such table: article_content_cache"),
+		);
+		const fetchedAt = new Date("2024-02-02T10:00:00.000Z");
+		const extractArticleContentFn = vi.fn().mockResolvedValue({
+			status: "ready",
+			blocks: [
+				{
+					type: "paragraph",
+					children: [{ text: "Reader content without cache." }],
+				},
+			],
+			paragraphs: ["Reader content without cache."],
+			wordCount: 4,
+		});
+
+		const result = await getArticleReaderForUser({
+			repo,
+			userId: "user-1",
+			id: "a1",
+			extractArticleContentFn,
+			now: () => fetchedAt,
+		});
+
+		expect(result.content).toEqual({
+			status: "ready",
+			markdown: "Reader content without cache\\.",
+			plainText: "Reader content without cache.",
+			wordCount: 4,
+			fetchedAt,
+		});
+		expect(extractArticleContentFn).toHaveBeenCalledOnce();
+	});
+
+	it("checks article ownership before reading the content cache", async () => {
+		const { repo } = createArticlesRepoFixture();
+
+		await expect(
+			getArticleReaderForUser({
+				repo,
+				userId: "user-2",
+				id: "a1",
+				extractArticleContentFn: vi.fn(),
+			}),
+		).rejects.toThrow("Article not found.");
+		expect(repo.getArticleContentCache).not.toHaveBeenCalled();
 	});
 
 	it("rejects duplicate URLs for the same user", async () => {
