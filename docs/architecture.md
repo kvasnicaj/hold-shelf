@@ -32,6 +32,7 @@ High-level flow:
 |
 |- /                          -> LandingPage
 |- /about                     -> AboutPage
+|- /api-docs                  -> ApiDocsPage
 |- /login                     -> LoginPage
 |- /privacy                   -> PrivacyPage
 |- /extension/save            -> ExtensionSavePage
@@ -166,6 +167,27 @@ PrivacyPage
 Purpose:
 
 - provides a public privacy policy for Hold Shelf and the Chrome extension
+
+### API documentation page
+
+Route: `/api-docs`
+
+Component tree:
+
+```text
+ApiDocsPage
+|- API overview panel
+|- Personal REST API endpoint cards
+|- Browser extension API endpoint cards
+```
+
+Purpose:
+
+- documents the personal-token REST API available to users
+- clarifies which app API routes are intended for the Chrome extension or
+  scripts and third-party clients
+- provides request examples, response shapes, validation rules, and rate-limit
+  notes for API clients
 
 ### Login page
 
@@ -451,6 +473,7 @@ SettingsPage
 |  |- CTA button -> Chrome Web Store
 |- AccountSummaryCard
 |- ApiTokenCard
+|  |- API documentation link -> /api-docs
 |- DeleteAccountCard
 ```
 
@@ -462,6 +485,7 @@ Core functionality:
 - links signed-in users to the Chrome Web Store extension install
 - shows the signed-in GitHub account details and provider summary
 - lets users generate, replace, and revoke one personal API token
+- links API token users to the public API documentation page
 - provides a guarded account-deletion flow that removes the auth user and cascades app data
 
 ## Shared components
