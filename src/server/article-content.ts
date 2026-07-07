@@ -6,12 +6,25 @@ import {
 } from "#/server/external-html";
 import { decodeHtmlEntities } from "#/server/html-parsing";
 
-export type ArticleReaderContent =
+export type ExtractedArticleContent =
 	| {
 			status: "ready";
 			blocks: ArticleContentBlock[];
 			paragraphs: string[];
 			wordCount: number;
+	  }
+	| {
+			status: "unavailable";
+			reason: string;
+	  };
+
+export type ArticleReaderContent =
+	| {
+			status: "ready";
+			markdown: string;
+			plainText: string;
+			wordCount: number;
+			fetchedAt: Date;
 	  }
 	| {
 			status: "unavailable";
@@ -270,7 +283,7 @@ function countWords(paragraphs: string[]): number {
 
 export async function extractArticleContent(
 	url: string,
-): Promise<ArticleReaderContent> {
+): Promise<ExtractedArticleContent> {
 	try {
 		const { response } = await fetchHtmlWithGuards(url);
 

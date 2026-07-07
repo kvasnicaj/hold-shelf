@@ -35,6 +35,10 @@ type ArchiveTableMobileProps = {
 	onDelete: (ids: string[]) => Promise<void>;
 };
 
+function stopArticleOpen(event: { stopPropagation: () => void }) {
+	event.stopPropagation();
+}
+
 export function ArchiveTableMobile({
 	articles,
 	rowSelection,
@@ -87,7 +91,8 @@ export function ArchiveTableMobile({
 												toggleRow(article.id, !!value)
 											}
 											className="mt-0.5"
-											onClick={(event) => event.stopPropagation()}
+											onClick={stopArticleOpen}
+											onKeyDown={stopArticleOpen}
 										/>
 									) : null}
 									<ArticleExternalLink
@@ -133,19 +138,26 @@ export function ArchiveTableMobile({
 											variant="ghost"
 											size="icon-xs"
 											aria-label={`Article actions for ${article.title ?? article.url}`}
-											onClick={(event) => event.stopPropagation()}
+											onClick={stopArticleOpen}
+											onKeyDown={stopArticleOpen}
 										>
 											<EllipsisVertical className="h-[1.125rem] w-[1.125rem]" />
 										</Button>
 									</DropdownMenuTrigger>
 									<DropdownMenuContent align="end">
 										<DropdownMenuItem
-											onClick={() => toggleRow(article.id, !isSelected)}
+											onClick={(event) => {
+												stopArticleOpen(event);
+												toggleRow(article.id, !isSelected);
+											}}
 										>
 											{isSelected ? "Deselect article" : "Select article"}
 										</DropdownMenuItem>
 										<DropdownMenuItem
-											onClick={() => onToggleRead(article.id, !article.isRead)}
+											onClick={(event) => {
+												stopArticleOpen(event);
+												void onToggleRead(article.id, !article.isRead);
+											}}
 										>
 											{article.isRead ? (
 												<BookOpen className="h-4 w-4" />
@@ -155,9 +167,10 @@ export function ArchiveTableMobile({
 											{article.isRead ? "Mark unread" : "Mark read"}
 										</DropdownMenuItem>
 										<DropdownMenuItem
-											onClick={() =>
-												onToggleFavorite(article.id, !article.isFavorite)
-											}
+											onClick={(event) => {
+												stopArticleOpen(event);
+												void onToggleFavorite(article.id, !article.isFavorite);
+											}}
 										>
 											<Star
 												className={
@@ -172,7 +185,10 @@ export function ArchiveTableMobile({
 										</DropdownMenuItem>
 										<DropdownMenuItem
 											variant="destructive"
-											onClick={() => onDelete([article.id])}
+											onClick={(event) => {
+												stopArticleOpen(event);
+												void onDelete([article.id]);
+											}}
 										>
 											<Trash2 className="h-4 w-4" />
 											Delete

@@ -233,6 +233,8 @@ Core functionality:
 - redirects signed-out users to `/login?redirectTo=...`
 - calls `createArticle()` once the user has an authenticated session
 - treats duplicate URLs as a successful handoff state
+- saves only article metadata; article body caching starts when the user opens the
+  article in the reader
 
 ### Extension save API
 
@@ -329,6 +331,7 @@ ArticlesPage
 Core functionality:
 
 - save a new URL with `createArticle()`
+- article creation stores URL metadata only, not the full article body
 - fetch unread articles with search/sort/pagination
 - mark one or many articles read/unread with `updateArticle()`
 - delete one or many articles with `deleteArticles()`
@@ -545,6 +548,8 @@ Responsibilities:
 - create articles from a URL
 - prevent duplicate URLs per user
 - enforce create-article rate limiting
+- load reader content from the lazy Markdown cache or extract and cache it on
+  first open
 - update read/favorite state
 - delete articles in bulk
 
@@ -575,6 +580,17 @@ Flow when saving an article:
 3. extract title, description, favicon, and hostname
 4. fall back to hostname-based metadata if extraction fails
 5. persist the article row in D1
+
+Flow when opening an article in the reader:
+
+1. verify the article belongs to the current user
+2. load tags and check `article_content_cache`
+3. return cached Markdown immediately when it is current
+4. otherwise fetch the source URL with the same external HTML guards
+5. extract readable blocks, convert them to Markdown/plain text, and upsert the
+   cache
+6. cache temporary extraction failures as `unavailable` and retry stale failures
+   later
 
 Chrome extension flow:
 
@@ -624,6 +640,8 @@ Core tables in `src/db/schema.ts`:
 
 - `user`, `session`, `account`, `verification`: Better Auth tables
 - `articles`: saved URLs and extracted metadata
+- `article_content_cache`: lazily extracted reader Markdown and plain text for
+  opened articles
 - `tags`: user-defined labels
 - `article_tags`: many-to-many join between articles and tags
 - `api_tokens`: one hashed personal API token per user

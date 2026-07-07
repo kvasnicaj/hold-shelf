@@ -66,6 +66,7 @@ describe("ArchiveTableMobile", () => {
 	it("forwards row selection and archive actions from the dropdown", async () => {
 		const user = userEvent.setup();
 		const onRowSelectionChange = vi.fn();
+		const onOpenArticle = vi.fn().mockResolvedValue(undefined);
 		const onToggleRead = vi.fn().mockResolvedValue(undefined);
 		const onToggleFavorite = vi.fn().mockResolvedValue(undefined);
 		const onDelete = vi.fn().mockResolvedValue(undefined);
@@ -79,7 +80,7 @@ describe("ArchiveTableMobile", () => {
 				onAddTag={vi.fn().mockResolvedValue(undefined)}
 				onRemoveTag={vi.fn().mockResolvedValue(undefined)}
 				onCreateTag={vi.fn().mockResolvedValue(availableTags[0])}
-				onOpenArticle={vi.fn().mockResolvedValue(undefined)}
+				onOpenArticle={onOpenArticle}
 				onToggleRead={onToggleRead}
 				onToggleFavorite={onToggleFavorite}
 				onDelete={onDelete}
@@ -93,6 +94,7 @@ describe("ArchiveTableMobile", () => {
 		);
 		await user.click(screen.getByRole("menuitem", { name: /select article/i }));
 		expect(onRowSelectionChange).toHaveBeenCalled();
+		expect(onOpenArticle).not.toHaveBeenCalled();
 
 		await user.click(
 			screen.getByRole("button", {
@@ -101,6 +103,7 @@ describe("ArchiveTableMobile", () => {
 		);
 		await user.click(screen.getByRole("menuitem", { name: /mark read/i }));
 		expect(onToggleRead).toHaveBeenCalledWith("a1", true);
+		expect(onOpenArticle).not.toHaveBeenCalled();
 
 		await user.click(
 			screen.getByRole("button", {
@@ -111,6 +114,7 @@ describe("ArchiveTableMobile", () => {
 			screen.getByRole("menuitem", { name: /add to favorites/i }),
 		);
 		expect(onToggleFavorite).toHaveBeenCalledWith("a1", true);
+		expect(onOpenArticle).not.toHaveBeenCalled();
 
 		await user.click(
 			screen.getByRole("button", {
@@ -119,6 +123,7 @@ describe("ArchiveTableMobile", () => {
 		);
 		await user.click(screen.getByRole("menuitem", { name: /^delete$/i }));
 		expect(onDelete).toHaveBeenCalledWith(["a1"]);
+		expect(onOpenArticle).not.toHaveBeenCalled();
 	});
 
 	it("shows the checkbox when bulk selection mode is active", () => {

@@ -38,6 +38,20 @@ type StoredArticleTag = {
 	tagId: string;
 };
 
+type StoredArticleContentCache = {
+	articleId: string;
+	status: "ready" | "unavailable";
+	markdown: string | null;
+	plainText: string | null;
+	wordCount: number | null;
+	failureReason: string | null;
+	sourceUrl: string;
+	extractionVersion: string;
+	fetchedAt: number;
+	createdAt: number;
+	updatedAt: number;
+};
+
 class FakeD1Statement {
 	constructor(
 		private readonly database: FakeD1Database,
@@ -71,6 +85,7 @@ class FakeD1Database {
 			articles: StoredArticle[];
 			tags: StoredTag[];
 			articleTags: StoredArticleTag[];
+			articleContentCache: StoredArticleContentCache[];
 		},
 	) {}
 
@@ -114,8 +129,20 @@ class FakeD1Database {
 			return this.selectArticles(sql, params);
 		}
 
+		if (
+			sql.startsWith(
+				'select "article_id", "status", "markdown", "plain_text", "word_count", "failure_reason", "source_url", "extraction_version", "fetched_at", "created_at", "updated_at" from "article_content_cache"',
+			)
+		) {
+			return this.selectArticleContentCache(params);
+		}
+
 		if (sql.startsWith('insert into "articles"')) {
 			return this.insertArticle(params);
+		}
+
+		if (sql.startsWith('insert into "article_content_cache"')) {
+			return this.upsertArticleContentCache(params);
 		}
 
 		throw new Error(`Unhandled raw query: ${sql}`);
@@ -239,6 +266,81 @@ class FakeD1Database {
 				article.updatedAt,
 				article.readAt,
 			],
+		];
+	}
+
+	private selectArticleContentCache(params: unknown[]) {
+		const articleId = String(params[0]);
+		const cache = this.state.articleContentCache.find(
+			(candidate) => candidate.articleId === articleId,
+		);
+
+		return cache ? [this.articleContentCacheRow(cache)] : [];
+	}
+
+	private upsertArticleContentCache(params: unknown[]) {
+		const [
+			articleId,
+			status,
+			markdown,
+			plainText,
+			wordCount,
+			failureReason,
+			sourceUrl,
+			extractionVersion,
+			fetchedAt,
+			updatedAt,
+		] = params as [
+			string,
+			"ready" | "unavailable",
+			string | null,
+			string | null,
+			number | null,
+			string | null,
+			string,
+			string,
+			number,
+			number,
+		];
+		const existing = this.state.articleContentCache.find(
+			(candidate) => candidate.articleId === articleId,
+		);
+		const cache: StoredArticleContentCache = {
+			articleId,
+			status,
+			markdown,
+			plainText,
+			wordCount,
+			failureReason,
+			sourceUrl,
+			extractionVersion,
+			fetchedAt,
+			createdAt: existing?.createdAt ?? updatedAt,
+			updatedAt,
+		};
+
+		if (existing) {
+			Object.assign(existing, cache);
+		} else {
+			this.state.articleContentCache.push(cache);
+		}
+
+		return [this.articleContentCacheRow(cache)];
+	}
+
+	private articleContentCacheRow(cache: StoredArticleContentCache) {
+		return [
+			cache.articleId,
+			cache.status,
+			cache.markdown,
+			cache.plainText,
+			cache.wordCount,
+			cache.failureReason,
+			cache.sourceUrl,
+			cache.extractionVersion,
+			cache.fetchedAt,
+			cache.createdAt,
+			cache.updatedAt,
 		];
 	}
 
@@ -400,6 +502,7 @@ function createFixture() {
 			{ articleId: "a2", tagId: "t2" },
 			{ articleId: "a3", tagId: "t2" },
 		] satisfies StoredArticleTag[],
+		articleContentCache: [] satisfies StoredArticleContentCache[],
 	};
 	const fakeDb = new FakeD1Database(state);
 
@@ -555,5 +658,39 @@ describe("createArticlesRepository", () => {
 			created.id,
 		);
 		expect(state.articles.map((article) => article.id)).toContain("a4");
+	});
+
+	it("gets and upserts article content cache rows", async () => {
+		const { repo } = createFixture();
+		const fetchedAt = new Date("2026-04-06T00:00:00.000Z");
+
+		await expect(repo.getArticleContentCache("a1")).resolves.toBeNull();
+
+		const created = await repo.upsertArticleContentCache({
+			articleId: "a1",
+			status: "ready",
+			markdown: "Cached **markdown**.",
+			plainText: "Cached markdown.",
+			wordCount: 2,
+			failureReason: null,
+			sourceUrl: "https://example.com/design-systems",
+			extractionVersion: "markdown-v1",
+			fetchedAt,
+			updatedAt: fetchedAt,
+		});
+
+		expect(created).toMatchObject({
+			articleId: "a1",
+			status: "ready",
+			markdown: "Cached **markdown**.",
+			plainText: "Cached markdown.",
+			wordCount: 2,
+			fetchedAt,
+		});
+		await expect(repo.getArticleContentCache("a1")).resolves.toMatchObject({
+			articleId: "a1",
+			status: "ready",
+			markdown: "Cached **markdown**.",
+		});
 	});
 });

@@ -2,7 +2,33 @@ import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
 import { afterEach, beforeEach, vi } from "vitest";
 
+function ensureLocalStorage() {
+	if (window.localStorage) {
+		return;
+	}
+
+	const storage = new Map<string, string>();
+
+	Object.defineProperty(window, "localStorage", {
+		configurable: true,
+		value: {
+			getItem: vi.fn((key: string) => storage.get(key) ?? null),
+			setItem: vi.fn((key: string, value: string) => {
+				storage.set(key, value);
+			}),
+			removeItem: vi.fn((key: string) => {
+				storage.delete(key);
+			}),
+			clear: vi.fn(() => {
+				storage.clear();
+			}),
+		},
+	});
+}
+
 beforeEach(() => {
+	ensureLocalStorage();
+
 	Object.defineProperty(window, "matchMedia", {
 		writable: true,
 		value: vi.fn().mockImplementation((query: string) => ({
