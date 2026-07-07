@@ -7,6 +7,10 @@ export const API_DOCS_PAGE_DESCRIPTION =
 
 export const API_DOCS_PAGE_CANONICAL_URL = "https://hold-shelf.com/api-docs";
 
+export const API_DOCS_AGENT_EXPORT_PATH = "/api-docs/agents";
+
+export const API_DOCS_AGENT_EXPORT_FILENAME = "hold-shelf-api-docs.md";
+
 export const API_DOCS_SECTIONS: ApiDocSection[] = [
 	{
 		title: "Personal REST API",
@@ -263,3 +267,118 @@ export const API_DOCS_SECTIONS: ApiDocSection[] = [
 		],
 	},
 ];
+
+export const API_DOCS_AGENT_MARKDOWN = createApiDocsAgentMarkdown();
+
+function createApiDocsAgentMarkdown() {
+	const lines = [
+		"# Hold Shelf API documentation",
+		"",
+		"Agent-friendly Markdown export generated from the same endpoint metadata as the web API docs.",
+		"",
+		"## Overview",
+		"",
+		"- Base URL: `https://hold-shelf.com`",
+		"- Token header: `Authorization: Bearer hs_your_token`",
+		"- Token management: create, regenerate, or revoke one token in Settings -> API access.",
+		"- Preferred client surface: Personal REST API. The browser extension API is documented only for extension integrations.",
+		"",
+	];
+
+	for (const section of API_DOCS_SECTIONS) {
+		lines.push(`## ${section.title}`, "", section.description, "");
+
+		for (const endpoint of section.endpoints) {
+			lines.push(
+				`### ${endpoint.method} ${endpoint.path}`,
+				"",
+				endpoint.summary,
+				"",
+				`- Authentication: \`${endpoint.auth}\``,
+			);
+
+			if (endpoint.contentType) {
+				lines.push(`- Content-Type: \`${endpoint.contentType}\``);
+			}
+
+			lines.push("");
+
+			if (endpoint.parameters) {
+				lines.push(
+					"#### Query parameters",
+					"",
+					createMarkdownFieldsTable(endpoint.parameters),
+					"",
+				);
+			}
+
+			if (endpoint.bodyFields) {
+				lines.push(
+					"#### JSON body",
+					"",
+					createMarkdownFieldsTable(endpoint.bodyFields),
+					"",
+				);
+			}
+
+			lines.push("#### Responses", "");
+
+			for (const response of endpoint.responses) {
+				lines.push(`##### ${response.status}`, "", response.description, "");
+
+				if (response.body) {
+					lines.push(createMarkdownCodeBlock(response.body), "");
+				}
+			}
+
+			lines.push(
+				"#### Example request",
+				"",
+				createMarkdownCodeBlock(endpoint.exampleRequest),
+				"",
+				"#### Example response",
+				"",
+				createMarkdownCodeBlock(endpoint.exampleResponse),
+				"",
+			);
+
+			if (endpoint.notes) {
+				lines.push("#### Notes", "");
+				lines.push(...endpoint.notes.map((note) => `- ${note}`), "");
+			}
+		}
+	}
+
+	return `${lines
+		.join("\n")
+		.replace(/\n{3,}/g, "\n\n")
+		.trimEnd()}\n`;
+}
+
+function createMarkdownFieldsTable(
+	fields: NonNullable<ApiDocSection["endpoints"][number]["parameters"]>,
+) {
+	return [
+		"| Name | Required | Type | Description |",
+		"| --- | --- | --- | --- |",
+		...fields.map(
+			(field) =>
+				`| \`${escapeMarkdownTableCell(field.name)}\` | ${field.required ? "yes" : "no"} | ${escapeMarkdownTableCell(field.type)} | ${escapeMarkdownTableCell(field.description)} |`,
+		),
+	].join("\n");
+}
+
+function createMarkdownCodeBlock(code: string) {
+	const fence = getMarkdownCodeFence(code);
+	return `${fence}\n${code}\n${fence}`;
+}
+
+function getMarkdownCodeFence(code: string) {
+	const fenceRuns = code.match(/`{3,}/g) ?? [];
+	const longestFenceRun = Math.max(2, ...fenceRuns.map((run) => run.length));
+	return "`".repeat(longestFenceRun + 1);
+}
+
+function escapeMarkdownTableCell(value: string) {
+	return value.replaceAll("|", "\\|").replace(/\s+/g, " ").trim();
+}
