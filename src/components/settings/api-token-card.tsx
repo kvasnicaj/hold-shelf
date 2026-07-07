@@ -1,4 +1,11 @@
-import { Check, Copy, KeyRound, RotateCw, Trash2 } from "lucide-react";
+import {
+	BookOpen,
+	Check,
+	Copy,
+	KeyRound,
+	RotateCw,
+	Trash2,
+} from "lucide-react";
 import { useApiTokenCard } from "#/components/settings/use-api-token-card";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
@@ -100,6 +107,13 @@ export function ApiTokenCard() {
 							: ""}
 					</p>
 				) : null}
+
+				<Button asChild variant="outline">
+					<a href="/api-docs">
+						<BookOpen className="size-4" />
+						Read API docs
+					</a>
+				</Button>
 
 				{error ? <p className="text-sm text-destructive">{error}</p> : null}
 			</CardContent>
