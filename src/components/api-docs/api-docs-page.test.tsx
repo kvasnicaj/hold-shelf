@@ -16,5 +16,8 @@ describe("ApiDocsPage", () => {
 		expect(
 			screen.getByText("Authorization: Bearer hs_your_token"),
 		).toBeInTheDocument();
+		expect(
+			screen.getByRole("link", { name: /export agent docs/i }),
+		).toHaveAttribute("href", "/api-docs/agents");
 	});
 });

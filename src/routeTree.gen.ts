@@ -22,6 +22,7 @@ import { Route as AppHomeRouteImport } from './routes/app/home'
 import { Route as AppFavoritesRouteImport } from './routes/app/favorites'
 import { Route as AppArticlesRouteImport } from './routes/app/articles'
 import { Route as AppArchiveRouteImport } from './routes/app/archive'
+import { Route as ApiDocsAgentsRouteImport } from './routes/api-docs/agents'
 import { Route as ApiV1ArticlesRouteImport } from './routes/api/v1/articles'
 import { Route as ApiExtensionArticlesRouteImport } from './routes/api/extension/articles'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
@@ -91,6 +92,11 @@ const AppArchiveRoute = AppArchiveRouteImport.update({
   path: '/archive',
   getParentRoute: () => AppRoute,
 } as any)
+const ApiDocsAgentsRoute = ApiDocsAgentsRouteImport.update({
+  id: '/agents',
+  path: '/agents',
+  getParentRoute: () => ApiDocsRoute,
+} as any)
 const ApiV1ArticlesRoute = ApiV1ArticlesRouteImport.update({
   id: '/api/v1/articles',
   path: '/api/v1/articles',
@@ -110,10 +116,11 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/api-docs': typeof ApiDocsRoute
+  '/api-docs': typeof ApiDocsRouteWithChildren
   '/app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
+  '/api-docs/agents': typeof ApiDocsAgentsRoute
   '/app/archive': typeof AppArchiveRoute
   '/app/articles': typeof AppArticlesRoute
   '/app/favorites': typeof AppFavoritesRoute
@@ -128,10 +135,11 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/api-docs': typeof ApiDocsRoute
+  '/api-docs': typeof ApiDocsRouteWithChildren
   '/app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
+  '/api-docs/agents': typeof ApiDocsAgentsRoute
   '/app/archive': typeof AppArchiveRoute
   '/app/articles': typeof AppArticlesRoute
   '/app/favorites': typeof AppFavoritesRoute
@@ -147,10 +155,11 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/api-docs': typeof ApiDocsRoute
+  '/api-docs': typeof ApiDocsRouteWithChildren
   '/app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
+  '/api-docs/agents': typeof ApiDocsAgentsRoute
   '/app/archive': typeof AppArchiveRoute
   '/app/articles': typeof AppArticlesRoute
   '/app/favorites': typeof AppFavoritesRoute
@@ -171,6 +180,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/login'
     | '/privacy'
+    | '/api-docs/agents'
     | '/app/archive'
     | '/app/articles'
     | '/app/favorites'
@@ -189,6 +199,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/login'
     | '/privacy'
+    | '/api-docs/agents'
     | '/app/archive'
     | '/app/articles'
     | '/app/favorites'
@@ -207,6 +218,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/login'
     | '/privacy'
+    | '/api-docs/agents'
     | '/app/archive'
     | '/app/articles'
     | '/app/favorites'
@@ -222,7 +234,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
-  ApiDocsRoute: typeof ApiDocsRoute
+  ApiDocsRoute: typeof ApiDocsRouteWithChildren
   AppRoute: typeof AppRouteWithChildren
   LoginRoute: typeof LoginRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -325,6 +337,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppArchiveRouteImport
       parentRoute: typeof AppRoute
     }
+    '/api-docs/agents': {
+      id: '/api-docs/agents'
+      path: '/agents'
+      fullPath: '/api-docs/agents'
+      preLoaderRoute: typeof ApiDocsAgentsRouteImport
+      parentRoute: typeof ApiDocsRoute
+    }
     '/api/v1/articles': {
       id: '/api/v1/articles'
       path: '/api/v1/articles'
@@ -349,6 +368,17 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface ApiDocsRouteChildren {
+  ApiDocsAgentsRoute: typeof ApiDocsAgentsRoute
+}
+
+const ApiDocsRouteChildren: ApiDocsRouteChildren = {
+  ApiDocsAgentsRoute: ApiDocsAgentsRoute,
+}
+
+const ApiDocsRouteWithChildren =
+  ApiDocsRoute._addFileChildren(ApiDocsRouteChildren)
+
 interface AppRouteChildren {
   AppArchiveRoute: typeof AppArchiveRoute
   AppArticlesRoute: typeof AppArticlesRoute
@@ -372,7 +402,7 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
-  ApiDocsRoute: ApiDocsRoute,
+  ApiDocsRoute: ApiDocsRouteWithChildren,
   AppRoute: AppRouteWithChildren,
   LoginRoute: LoginRoute,
   PrivacyRoute: PrivacyRoute,

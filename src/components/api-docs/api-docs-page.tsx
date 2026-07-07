@@ -1,6 +1,10 @@
-import { ArrowLeft, BookOpen, KeyRound } from "lucide-react";
+import { ArrowLeft, BookOpen, Download, KeyRound } from "lucide-react";
 import { ApiDocsEndpointCard } from "#/components/api-docs/api-docs-endpoint-card";
-import { API_DOCS_SECTIONS } from "#/components/api-docs/helpers";
+import {
+	API_DOCS_AGENT_EXPORT_FILENAME,
+	API_DOCS_AGENT_EXPORT_PATH,
+	API_DOCS_SECTIONS,
+} from "#/components/api-docs/helpers";
 import { Badge } from "#/components/ui/badge";
 import { Button } from "#/components/ui/button";
 
@@ -32,12 +36,23 @@ export function ApiDocsPage() {
 						</div>
 					</div>
 
-					<Button asChild variant="outline">
-						<a href="/app/settings">
-							<ArrowLeft className="size-4" />
-							Settings
-						</a>
-					</Button>
+					<div className="flex flex-wrap gap-2">
+						<Button asChild variant="outline">
+							<a
+								href={API_DOCS_AGENT_EXPORT_PATH}
+								download={API_DOCS_AGENT_EXPORT_FILENAME}
+							>
+								<Download className="size-4" />
+								Export agent docs
+							</a>
+						</Button>
+						<Button asChild variant="outline">
+							<a href="/app/settings">
+								<ArrowLeft className="size-4" />
+								Settings
+							</a>
+						</Button>
+					</div>
 				</header>
 
 				<section className="grid gap-3 rounded-md border bg-card p-4 text-sm text-card-foreground shadow-xs sm:grid-cols-3">
