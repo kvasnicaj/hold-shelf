@@ -1,6 +1,6 @@
 import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
 import { getDb } from "#/db/index";
-import { articles, articleTags, tags } from "#/db/schema";
+import { articleContentCache, articles, articleTags, tags } from "#/db/schema";
 import type { ArticlesRepository } from "#/server/articles-service";
 
 export function createArticlesRepository(): ArticlesRepository {
@@ -118,6 +118,41 @@ export function createArticlesRepository(): ArticlesRepository {
 				.returning();
 
 			return article;
+		},
+		getArticleContentCache: async (articleId) => {
+			const [cache] = await db
+				.select()
+				.from(articleContentCache)
+				.where(eq(articleContentCache.articleId, articleId))
+				.limit(1);
+
+			return cache ?? null;
+		},
+		upsertArticleContentCache: async (data) => {
+			const [cache] = await db
+				.insert(articleContentCache)
+				.values(data)
+				.onConflictDoUpdate({
+					target: articleContentCache.articleId,
+					set: {
+						status: data.status,
+						markdown: data.markdown,
+						plainText: data.plainText,
+						wordCount: data.wordCount,
+						failureReason: data.failureReason,
+						sourceUrl: data.sourceUrl,
+						extractionVersion: data.extractionVersion,
+						fetchedAt: data.fetchedAt,
+						updatedAt: data.updatedAt,
+					},
+				})
+				.returning();
+
+			if (!cache) {
+				throw new Error("Failed to store article content cache.");
+			}
+
+			return cache;
 		},
 		updateArticle: async ({ userId, id, changes }) => {
 			await db

@@ -86,11 +86,13 @@ describe("ArchiveTable", () => {
 	it("renders the desktop table layout and forwards row actions", async () => {
 		const user = userEvent.setup();
 		const onRowSelectionChange = vi.fn();
+		const onOpenArticle = vi.fn().mockResolvedValue(undefined);
 		const onToggleRead = vi.fn().mockResolvedValue(undefined);
 		const onDelete = vi.fn().mockResolvedValue(undefined);
 
 		renderArchiveTable({
 			onRowSelectionChange,
+			onOpenArticle,
 			onToggleRead,
 			onDelete,
 		});
@@ -111,6 +113,7 @@ describe("ArchiveTable", () => {
 
 		await user.click(screen.getAllByRole("checkbox")[1]);
 		expect(onRowSelectionChange).toHaveBeenCalled();
+		expect(onOpenArticle).not.toHaveBeenCalled();
 
 		await user.click(
 			screen.getByRole("button", {
@@ -119,6 +122,7 @@ describe("ArchiveTable", () => {
 		);
 		await user.click(screen.getByRole("menuitem", { name: /mark read/i }));
 		expect(onToggleRead).toHaveBeenCalledWith("a1", true);
+		expect(onOpenArticle).not.toHaveBeenCalled();
 
 		await user.click(
 			screen.getByRole("button", {
@@ -127,6 +131,7 @@ describe("ArchiveTable", () => {
 		);
 		await user.click(screen.getByRole("menuitem", { name: /^delete$/i }));
 		expect(onDelete).toHaveBeenCalledWith(["a1"]);
+		expect(onOpenArticle).not.toHaveBeenCalled();
 		expect(archiveTableMobileMock).not.toHaveBeenCalled();
 	});
 

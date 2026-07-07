@@ -132,6 +132,26 @@ export const articleTags = sqliteTable(
 	],
 );
 
+export const articleContentCache = sqliteTable("article_content_cache", {
+	articleId: text("article_id")
+		.primaryKey()
+		.references(() => articles.id, { onDelete: "cascade" }),
+	status: text({ enum: ["ready", "unavailable"] }).notNull(),
+	markdown: text(),
+	plainText: text("plain_text"),
+	wordCount: integer("word_count"),
+	failureReason: text("failure_reason"),
+	sourceUrl: text("source_url").notNull(),
+	extractionVersion: text("extraction_version").notNull(),
+	fetchedAt: integer("fetched_at", { mode: "timestamp" }).notNull(),
+	createdAt: integer("created_at", { mode: "timestamp" })
+		.notNull()
+		.default(sql`(unixepoch())`),
+	updatedAt: integer("updated_at", { mode: "timestamp" })
+		.notNull()
+		.default(sql`(unixepoch())`),
+});
+
 export const apiTokens = sqliteTable(
 	"api_tokens",
 	{

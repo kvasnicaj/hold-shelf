@@ -22,3 +22,25 @@ describe("user settings schema", () => {
 		);
 	});
 });
+
+describe("article content cache schema", () => {
+	it("stores lazily extracted article markdown separately from metadata", () => {
+		const schemaSource = readFileSync(
+			resolve(process.cwd(), "src/db/schema.ts"),
+			"utf8",
+		);
+		const migrationSource = readFileSync(
+			resolve(process.cwd(), "drizzle/0006_breezy_moon_knight.sql"),
+			"utf8",
+		);
+
+		expect(schemaSource).toContain(
+			'export const articleContentCache = sqliteTable("article_content_cache"',
+		);
+		expect(schemaSource).toContain("markdown: text()");
+		expect(schemaSource).toContain('plainText: text("plain_text")');
+		expect(migrationSource).toContain("CREATE TABLE `article_content_cache`");
+		expect(migrationSource).toContain("`markdown` text");
+		expect(migrationSource).toContain("ON DELETE cascade");
+	});
+});
