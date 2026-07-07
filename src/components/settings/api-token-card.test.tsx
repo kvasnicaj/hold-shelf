@@ -48,6 +48,9 @@ describe("ApiTokenCard", () => {
 		renderWithProviders(<ApiTokenCard />);
 
 		expect(screen.getByText("No personal token")).toBeInTheDocument();
+		expect(
+			screen.getByRole("link", { name: /read api docs/i }),
+		).toHaveAttribute("href", "/api-docs");
 
 		await user.click(screen.getByRole("button", { name: /generate token/i }));
 
