@@ -13,6 +13,8 @@ const {
 	createTagMock,
 	deleteTagMock,
 	updateTagMock,
+	signOutMock,
+	useSessionMock,
 } = vi.hoisted(() => ({
 	routerState: {
 		location: {
@@ -27,6 +29,8 @@ const {
 	createTagMock: vi.fn(),
 	deleteTagMock: vi.fn(),
 	updateTagMock: vi.fn(),
+	signOutMock: vi.fn(),
+	useSessionMock: vi.fn(),
 }));
 
 vi.mock("@tanstack/react-router", async () => {
@@ -68,6 +72,13 @@ vi.mock("#/server/tags", () => ({
 	updateTag: updateTagMock,
 }));
 
+vi.mock("#/lib/auth-client", () => ({
+	authClient: {
+		signOut: signOutMock,
+		useSession: useSessionMock,
+	},
+}));
+
 describe("AppSidebar", () => {
 	beforeEach(() => {
 		routerState.location.pathname = "/app/favorites";
@@ -83,6 +94,15 @@ describe("AppSidebar", () => {
 		});
 		deleteTagMock.mockReset().mockResolvedValue({});
 		updateTagMock.mockReset().mockResolvedValue({});
+		signOutMock.mockReset().mockResolvedValue(undefined);
+		useSessionMock.mockReset().mockReturnValue({
+			data: {
+				user: {
+					email: "reader@example.com",
+					name: "Reader",
+				},
+			},
+		});
 	});
 
 	it("renders the favorites navigation item as active", async () => {
