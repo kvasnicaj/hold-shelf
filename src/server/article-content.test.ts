@@ -72,4 +72,30 @@ describe("extractArticleContent", () => {
 		);
 		expect(result.wordCount).toBeGreaterThan(10);
 	});
+
+	it("does not cache X application markup as an article body", async () => {
+		vi.mocked(fetchHtmlWithGuards).mockResolvedValue({
+			response: {
+				ok: true,
+				headers: new Headers({ "content-type": "text/html" }),
+			} as Response,
+			finalUrl: new URL("https://x.com/alvinsng/status/2077114275412512868"),
+		});
+		vi.mocked(readTextWithinLimit).mockResolvedValue(`
+			<script>
+				entity={__typename:"ArticleEntity",rest_id:"2077106065959989248",title:"Why we stopped using SDKs",preview_text:"We call REST APIs directly instead of caching the surrounding X application markup.",cover_media_results:null}
+			</script>
+			<style>:host{display:inline-block}.number{padding:1px}</style>
+		`);
+
+		const result = await extractArticleContent(
+			"https://x.com/alvinsng/status/2077114275412512868?s=20",
+		);
+
+		expect(result).toEqual({
+			status: "unavailable",
+			reason:
+				"X exposes the article preview publicly, but not the complete article body.",
+		});
+	});
 });
