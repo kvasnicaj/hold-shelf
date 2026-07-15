@@ -5,6 +5,7 @@ import {
 	readTextWithinLimit,
 } from "#/server/external-html";
 import { decodeHtmlEntities } from "#/server/html-parsing";
+import { extractXArticleMetadata, isXStatusUrl } from "#/server/x-parser";
 
 export type ExtractedArticleContent =
 	| {
@@ -285,7 +286,7 @@ export async function extractArticleContent(
 	url: string,
 ): Promise<ExtractedArticleContent> {
 	try {
-		const { response } = await fetchHtmlWithGuards(url);
+		const { response, finalUrl } = await fetchHtmlWithGuards(url);
 
 		if (!response.ok) {
 			return {
@@ -302,6 +303,13 @@ export async function extractArticleContent(
 		}
 
 		const html = await readTextWithinLimit(response, metadataConfig.maxBytes);
+		if (isXStatusUrl(finalUrl) && extractXArticleMetadata(html)) {
+			return {
+				status: "unavailable",
+				reason:
+					"X exposes the article preview publicly, but not the complete article body.",
+			};
+		}
 		const blocks = htmlToBlocks(html);
 		const paragraphs =
 			blocks.length > 0 ? blocksToParagraphs(blocks) : htmlToParagraphs(html);

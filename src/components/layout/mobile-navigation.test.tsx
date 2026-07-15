@@ -1,4 +1,5 @@
 import { screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { MobileNavigation } from "#/components/layout/mobile-navigation";
 import { renderWithProviders } from "#/test/render";
@@ -9,6 +10,10 @@ const { routerState } = vi.hoisted(() => ({
 			pathname: "/app/favorites",
 		},
 	},
+}));
+
+vi.mock("#/components/articles/use-save-article", () => ({
+	useSaveArticle: () => ({ handleAdd: vi.fn() }),
 }));
 
 vi.mock("@tanstack/react-router", async () => {
@@ -36,7 +41,8 @@ vi.mock("@tanstack/react-router", async () => {
 });
 
 describe("MobileNavigation", () => {
-	it("renders all primary navigation shortcuts", () => {
+	it("renders primary navigation and a one-tap Add article action", async () => {
+		const user = userEvent.setup();
 		renderWithProviders(<MobileNavigation />);
 
 		expect(screen.getByRole("navigation", { name: /primary/i })).toBeVisible();
@@ -46,6 +52,13 @@ describe("MobileNavigation", () => {
 		);
 		const favoritesLink = screen.getByRole("link", { name: /favorites/i });
 		expect(favoritesLink).toHaveAttribute("href", "/app/favorites");
+		const addArticleButton = screen.getByRole("button", {
+			name: "Add article",
+		});
+		expect(addArticleButton).toBeVisible();
+		await user.click(addArticleButton);
+		expect(screen.getByRole("heading", { name: "Save article" })).toBeVisible();
+		await user.keyboard("{Escape}");
 		expect(screen.getAllByRole("link")).toHaveLength(5);
 	});
 });

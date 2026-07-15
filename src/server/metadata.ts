@@ -11,6 +11,7 @@ import {
 	extractTag,
 } from "#/server/html-parsing";
 import { validateExternalUrl } from "#/server/url-validation";
+import { extractXArticleMetadata, isXStatusUrl } from "#/server/x-parser";
 
 export type ArticleMetadata = {
 	title: string | null;
@@ -46,14 +47,20 @@ export async function extractMetadata(url: string): Promise<ArticleMetadata> {
 		}
 
 		const html = await readTextWithinLimit(response, metadataConfig.maxBytes);
+		const xArticleMetadata = isXStatusUrl(finalUrl)
+			? extractXArticleMetadata(html)
+			: null;
 
 		const rawTitle =
+			xArticleMetadata?.title ??
 			extractTag(html, /<title[^>]*>([^<]*)<\/title>/i) ??
 			extractMeta(html, "og:title");
 		const title = rawTitle ? decodeHtmlEntities(rawTitle) : hostname;
 
 		const rawDescription =
-			extractMeta(html, "og:description") ?? extractMeta(html, "description");
+			xArticleMetadata?.description ??
+			extractMeta(html, "og:description") ??
+			extractMeta(html, "description");
 		const description = rawDescription
 			? decodeHtmlEntities(rawDescription)
 			: null;

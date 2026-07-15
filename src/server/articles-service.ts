@@ -8,7 +8,7 @@ import { extractedArticleToMarkdown } from "#/server/article-markdown";
 type ArticleRecord = typeof articles.$inferSelect;
 type ArticleContentCacheRecord = typeof articleContentCache.$inferSelect;
 
-const ARTICLE_CONTENT_EXTRACTION_VERSION = "markdown-v1";
+const ARTICLE_CONTENT_EXTRACTION_VERSION = "markdown-v2";
 const ARTICLE_CONTENT_UNAVAILABLE_RETRY_MS = 86_400_000;
 
 type ArticleTagRecord = {

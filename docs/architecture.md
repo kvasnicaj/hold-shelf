@@ -92,6 +92,7 @@ Responsibilities:
 - provides shared desktop/mobile navigation
 - keeps the brand mark in the mobile top bar while the mobile navigation stays route-focused
 - renders a full-width mobile bottom navigation strip styled from the sidebar primitives
+- keeps Add article as a persistent one-tap mobile action above the bottom navigation
 - provides a dynamic toolbar channel via `ToolbarActionsProvider`
 - renders column-owned navbars through `ColumnNavbar`, which accepts left,
   center, and right action arrays and collapses side tools into a mobile
@@ -580,6 +581,12 @@ Flow when saving an article:
 3. extract title, description, favicon, and hostname
 4. fall back to hostname-based metadata if extraction fails
 5. persist the article row in D1
+
+X seed posts that point to an X Article use a dedicated parser for the public
+article entity embedded in the post HTML. This preserves the real article title
+and preview without requiring X API credentials. X does not expose the complete
+article body in that public response, so lazy reader extraction can still fall
+back to the original X link.
 
 Flow when opening an article in the reader:
 
