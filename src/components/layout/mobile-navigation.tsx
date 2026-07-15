@@ -1,4 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
+import { MobileAddArticleAction } from "#/components/layout/mobile-add-article-action";
 import { mobileNavItems } from "#/components/layout/nav-items";
 import { cn } from "#/lib/utils";
 
@@ -10,6 +11,9 @@ export function MobileNavigation() {
 			aria-label="Primary"
 			className="fixed inset-x-0 bottom-0 z-40 border-t border-sidebar-border bg-sidebar/95 px-3 pt-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] shadow-[0_-1px_8px_rgba(0,0,0,0.06)] backdrop-blur-md supports-[backdrop-filter]:bg-sidebar/85 md:hidden"
 		>
+			<div className="absolute right-3 -top-12">
+				<MobileAddArticleAction />
+			</div>
 			<ul className="grid grid-cols-5 gap-1">
 				{mobileNavItems.map((item) => {
 					const isActive = currentPath === item.href;

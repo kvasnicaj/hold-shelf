@@ -303,7 +303,7 @@ describe("articles service", () => {
 			wordCount: 2,
 			failureReason: null,
 			sourceUrl: "https://example.com/design",
-			extractionVersion: "markdown-v1",
+			extractionVersion: "markdown-v2",
 			fetchedAt,
 			createdAt: fetchedAt,
 			updatedAt: fetchedAt,

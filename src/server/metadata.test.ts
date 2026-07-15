@@ -37,6 +37,43 @@ describe("extractMetadata", () => {
 		});
 	});
 
+	it("extracts X Article metadata from a public seed post", async () => {
+		vi.spyOn(globalThis, "fetch").mockResolvedValue(
+			new Response(
+				`
+					<html>
+						<head>
+							<title>Alvin Sng on X: &quot;https://t.co/example&quot; / X</title>
+							<meta name="description" content="https://t.co/example" />
+							<link rel="icon" href="/favicon.ico" />
+						</head>
+						<body>
+							<script>
+								entity={__typename:"ArticleEntity",rest_id:"2077106065959989248",title:"Why we stopped using SDKs",preview_text:"We call REST APIs directly through a small wrapper &amp; keep the contract explicit.",cover_media_results:null}
+							</script>
+						</body>
+					</html>
+				`,
+				{
+					status: 200,
+					headers: { "content-type": "text/html; charset=utf-8" },
+				},
+			),
+		);
+
+		const metadata = await extractMetadata(
+			"https://x.com/alvinsng/status/2077114275412512868?s=20",
+		);
+
+		expect(metadata).toEqual({
+			title: "Why we stopped using SDKs",
+			description:
+				"We call REST APIs directly through a small wrapper & keep the contract explicit.",
+			faviconUrl: "https://x.com/favicon.ico",
+			hostname: "x.com",
+		});
+	});
+
 	it("returns fallback metadata for non-html responses", async () => {
 		vi.spyOn(globalThis, "fetch").mockResolvedValue(
 			new Response("{}", {
