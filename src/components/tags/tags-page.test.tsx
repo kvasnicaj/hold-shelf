@@ -19,6 +19,9 @@ const {
 	getTagsMock,
 	removeTagFromArticlesMock,
 	updateTagMock,
+	getTagShareMock,
+	createTagShareMock,
+	revokeTagShareMock,
 } = vi.hoisted(() => ({
 	routeState: {
 		loaderData: {
@@ -27,6 +30,11 @@ const {
 				{ id: "t2", name: "Research", color: null, articleCount: 1 },
 			],
 			articles: null as { items: ArticleWithTags[]; total: number } | null,
+			share: null as {
+				tagId: string;
+				token: string;
+				createdAt: Date;
+			} | null,
 		},
 		search: {},
 	},
@@ -42,6 +50,9 @@ const {
 	getTagsMock: vi.fn(),
 	removeTagFromArticlesMock: vi.fn(),
 	updateTagMock: vi.fn(),
+	getTagShareMock: vi.fn(),
+	createTagShareMock: vi.fn(),
+	revokeTagShareMock: vi.fn(),
 }));
 
 vi.mock("@tanstack/react-router", async () => {
@@ -75,6 +86,12 @@ vi.mock("#/server/tags", () => ({
 	getTags: getTagsMock,
 	removeTagFromArticles: removeTagFromArticlesMock,
 	updateTag: updateTagMock,
+}));
+
+vi.mock("#/server/tag-shares", () => ({
+	getTagShare: getTagShareMock,
+	createTagShare: createTagShareMock,
+	revokeTagShare: revokeTagShareMock,
 }));
 
 vi.mock("#/components/articles/use-auto-mark-read-on-open", () => ({
@@ -149,6 +166,7 @@ describe("TagsPage", () => {
 				{ id: "t2", name: "Research", color: null, articleCount: 1 },
 			],
 			articles: null,
+			share: null,
 		};
 		routeState.search = {};
 		mobileState.value = false;
@@ -169,6 +187,9 @@ describe("TagsPage", () => {
 		getTagsMock.mockReset().mockResolvedValue(routeState.loaderData.tags);
 		removeTagFromArticlesMock.mockReset().mockResolvedValue({});
 		updateTagMock.mockReset().mockResolvedValue({});
+		getTagShareMock.mockReset().mockResolvedValue(null);
+		createTagShareMock.mockReset();
+		revokeTagShareMock.mockReset();
 	});
 
 	it("renders the list view, filters tags, and supports rename and delete actions", async () => {
@@ -233,6 +254,10 @@ describe("TagsPage", () => {
 			screen.getByLabelText("Search tagged articles..."),
 		).toBeInTheDocument();
 		expect(
+			screen.getByRole("button", { name: /share design/i }),
+		).toBeInTheDocument();
+		expect(screen.queryByLabelText("Design is shared")).not.toBeInTheDocument();
+		expect(
 			screen.getByRole("button", { name: /rename design/i }),
 		).toBeInTheDocument();
 		expect(
@@ -260,6 +285,23 @@ describe("TagsPage", () => {
 			queryKey: ["articles"],
 		});
 		expect(routerInvalidateMock).toHaveBeenCalled();
+	});
+
+	it("shows an active sharing indicator without opening the share dialog", () => {
+		routeState.search = { tag: "t1" };
+		routeState.loaderData.articles = { items: articleFixtures, total: 1 };
+		routeState.loaderData.share = {
+			tagId: "t1",
+			token: `hss_${"a".repeat(32)}`,
+			createdAt: new Date("2026-07-31T00:00:00.000Z"),
+		};
+
+		renderWithProviders(<TagsPage />);
+
+		expect(screen.getByLabelText("Design is shared")).toHaveTextContent(
+			"Shared",
+		);
+		expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
 	});
 
 	it("increments the page when using the next control in a selected tag view", async () => {

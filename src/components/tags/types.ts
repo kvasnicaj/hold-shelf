@@ -4,3 +4,9 @@ export type Tag = {
 	color: string | null;
 	articleCount?: number;
 };
+
+export type TagShare = {
+	tagId: string;
+	token: string;
+	createdAt: Date;
+};

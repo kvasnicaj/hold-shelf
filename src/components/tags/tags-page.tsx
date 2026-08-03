@@ -19,6 +19,7 @@ export function TagsPage() {
 		tagList,
 		filteredTags,
 		activeTag,
+		activeShare,
 		articles,
 		total,
 		totalPages,
@@ -46,7 +47,10 @@ export function TagsPage() {
 	const selectedTagTitle = activeTag?.name ?? "Tag";
 	const selectedTagActions = activeTag ? (
 		<TagHeadingActions
+			key={`${activeTag.id}:${activeShare?.token ?? "private"}`}
+			tagId={activeTag.id}
 			tagName={activeTag.name}
+			initialShare={activeShare}
 			showBack={isMobile}
 			onBack={goBackToTags}
 			onRename={(name) => handleRename(activeTag.id, name)}

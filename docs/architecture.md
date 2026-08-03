@@ -36,6 +36,7 @@ High-level flow:
 |- /api-docs/agents           -> Agent-friendly Markdown API docs export
 |- /login                     -> LoginPage
 |- /privacy                   -> PrivacyPage
+|- /share/:token              -> SharedTagPage
 |- /extension/save            -> ExtensionSavePage
 |- /api/extension/articles    -> Chrome extension save endpoint
 |- /api/v1/articles           -> Personal-token REST articles API
@@ -241,6 +242,30 @@ Core functionality:
 - saves only article metadata; article body caching starts when the user opens the
   article in the reader
 
+### Shared tag page
+
+Route: `/share/:token`
+
+Component tree:
+
+```text
+SharedTagPage
+|- Hold Shelf branding
+|- owner first-name heading / shared tag summary
+|- SharedArticleList
+|  |- SharedArticleCard*
+|- pagination
+```
+
+Purpose:
+
+- gives anyone holding an active sharing URL read-only access to one tag
+- shows the sharing account's first name, the shared tag name, and current
+  article metadata
+- never exposes other tags, account details, read/favorite state, or reader
+  content
+- uses a generic unavailable state for invalid, revoked, and deleted links
+
 ### Extension save API
 
 Route: `/api/extension/articles`
@@ -406,6 +431,7 @@ TagsPage
 |- selected tag mode
 |  |- back button
 |  |- selected tag title / count
+|  |- visible Shared status / share action / ShareTagDialog
 |  |- ArticleList
 |  |- pagination
 ```
@@ -416,6 +442,9 @@ Core functionality:
 - rename tags with `updateTag()`
 - delete tags with `deleteTag()`
 - browse articles scoped to a single tag
+- create, copy, and revoke one public sharing link per tag
+- show active sharing state in the selected tag header without opening the
+  sharing dialog
 - reuse `ArticleList` to manage article state and tag assignment
 
 ### Archive
@@ -464,6 +493,8 @@ Core functionality:
 - global library search from the top toolbar routes users here
 - filters by tag, read state, sort order, and page
 - supports the same article mutations as the unread page
+- keeps tag-picker portal interactions inside the picker so assigning one or
+  several tags never opens the article reader
 - uses a table instead of cards for denser browsing
 
 ### Settings
@@ -518,6 +549,13 @@ Core functionality:
 
 - `CreateTagDialog`: dedicated tag creation flow
 - `TagPicker`: attach/detach tags and create new ones inline
+- `ShareTagDialog`: creates, copies, and revokes a selected tag's public link
+
+### Shared tags
+
+- `SharedTagPage`: standalone anonymous page for an active tag link
+- `SharedArticleList` and `SharedArticleCard`: read-only public article
+  presentation with no authenticated article actions or tag badges
 
 ### Home route
 
@@ -625,6 +663,24 @@ Responsibilities:
 - remove tags from many articles
 - verify tag ownership and article ownership before mutations
 
+### Tag shares domain
+
+Files:
+
+- `src/server/tag-shares.ts`
+- `src/server/tag-shares-repository.ts`
+- `src/server/tag-shares-runtime.ts`
+- `src/server/tag-shares-service.ts`
+
+Responsibilities:
+
+- create at most one active opaque sharing token per owned tag
+- return an existing active token idempotently to the owner
+- revoke a sharing token and ensure a later share receives a new token
+- resolve an active token without requiring a Hold Shelf session
+- return only the owner's derived first name, the selected tag name, and an
+  explicit public article metadata projection
+
 ### Dashboard domain
 
 File: `src/server/dashboard.ts`
@@ -654,6 +710,7 @@ Core tables in `src/db/schema.ts`:
 - `article_content_cache`: lazily extracted reader Markdown and plain text for
   opened articles
 - `tags`: user-defined labels
+- `tag_shares`: one optional active public sharing token per tag
 - `article_tags`: many-to-many join between articles and tags
 - `api_tokens`: one hashed personal API token per user
 - `rate_limits`: persistent rate-limit counters
@@ -662,10 +719,12 @@ Important relationships:
 
 - one user has many articles
 - one user has many tags
+- one tag can have one active sharing link
 - one article can have many tags through `article_tags`
 - one user can have one API token
 - article URLs are unique per user
 - tag names are unique per user
+- tag-share tokens are globally unique and deleting a tag cascades its share
 
 ## Data flow by page
 

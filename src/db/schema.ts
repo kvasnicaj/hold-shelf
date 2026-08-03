@@ -116,6 +116,20 @@ export const tags = sqliteTable(
 	(table) => [uniqueIndex("tags_user_name_idx").on(table.userId, table.name)],
 );
 
+export const tagShares = sqliteTable(
+	"tag_shares",
+	{
+		tagId: text("tag_id")
+			.primaryKey()
+			.references(() => tags.id, { onDelete: "cascade" }),
+		token: text().notNull(),
+		createdAt: integer("created_at", { mode: "timestamp" })
+			.notNull()
+			.default(sql`(unixepoch())`),
+	},
+	(table) => [uniqueIndex("tag_shares_token_idx").on(table.token)],
+);
+
 export const articleTags = sqliteTable(
 	"article_tags",
 	{

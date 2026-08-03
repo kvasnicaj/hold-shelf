@@ -15,6 +15,7 @@ import { Route as AppRouteImport } from './routes/app'
 import { Route as ApiDocsRouteImport } from './routes/api-docs'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ShareTokenRouteImport } from './routes/share/$token'
 import { Route as ExtensionSaveRouteImport } from './routes/extension/save'
 import { Route as AppTagsRouteImport } from './routes/app/tags'
 import { Route as AppSettingsRouteImport } from './routes/app/settings'
@@ -55,6 +56,11 @@ const AboutRoute = AboutRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShareTokenRoute = ShareTokenRouteImport.update({
+  id: '/share/$token',
+  path: '/share/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExtensionSaveRoute = ExtensionSaveRouteImport.update({
@@ -128,6 +134,7 @@ export interface FileRoutesByFullPath {
   '/app/settings': typeof AppSettingsRoute
   '/app/tags': typeof AppTagsRoute
   '/extension/save': typeof ExtensionSaveRoute
+  '/share/$token': typeof ShareTokenRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/extension/articles': typeof ApiExtensionArticlesRoute
   '/api/v1/articles': typeof ApiV1ArticlesRoute
@@ -147,6 +154,7 @@ export interface FileRoutesByTo {
   '/app/settings': typeof AppSettingsRoute
   '/app/tags': typeof AppTagsRoute
   '/extension/save': typeof ExtensionSaveRoute
+  '/share/$token': typeof ShareTokenRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/extension/articles': typeof ApiExtensionArticlesRoute
   '/api/v1/articles': typeof ApiV1ArticlesRoute
@@ -167,6 +175,7 @@ export interface FileRoutesById {
   '/app/settings': typeof AppSettingsRoute
   '/app/tags': typeof AppTagsRoute
   '/extension/save': typeof ExtensionSaveRoute
+  '/share/$token': typeof ShareTokenRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/extension/articles': typeof ApiExtensionArticlesRoute
   '/api/v1/articles': typeof ApiV1ArticlesRoute
@@ -188,6 +197,7 @@ export interface FileRouteTypes {
     | '/app/settings'
     | '/app/tags'
     | '/extension/save'
+    | '/share/$token'
     | '/api/auth/$'
     | '/api/extension/articles'
     | '/api/v1/articles'
@@ -207,6 +217,7 @@ export interface FileRouteTypes {
     | '/app/settings'
     | '/app/tags'
     | '/extension/save'
+    | '/share/$token'
     | '/api/auth/$'
     | '/api/extension/articles'
     | '/api/v1/articles'
@@ -226,6 +237,7 @@ export interface FileRouteTypes {
     | '/app/settings'
     | '/app/tags'
     | '/extension/save'
+    | '/share/$token'
     | '/api/auth/$'
     | '/api/extension/articles'
     | '/api/v1/articles'
@@ -239,6 +251,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   PrivacyRoute: typeof PrivacyRoute
   ExtensionSaveRoute: typeof ExtensionSaveRoute
+  ShareTokenRoute: typeof ShareTokenRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiExtensionArticlesRoute: typeof ApiExtensionArticlesRoute
   ApiV1ArticlesRoute: typeof ApiV1ArticlesRoute
@@ -286,6 +299,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/share/$token': {
+      id: '/share/$token'
+      path: '/share/$token'
+      fullPath: '/share/$token'
+      preLoaderRoute: typeof ShareTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/extension/save': {
@@ -407,6 +427,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   PrivacyRoute: PrivacyRoute,
   ExtensionSaveRoute: ExtensionSaveRoute,
+  ShareTokenRoute: ShareTokenRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiExtensionArticlesRoute: ApiExtensionArticlesRoute,
   ApiV1ArticlesRoute: ApiV1ArticlesRoute,

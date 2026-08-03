@@ -111,6 +111,24 @@ export function PrivacyPage() {
 						<p>Hold Shelf does not sell user data.</p>
 					</CardContent>
 				</Card>
+
+				<Card>
+					<CardHeader>
+						<CardTitle>Shared tag links</CardTitle>
+					</CardHeader>
+					<CardContent className="space-y-4 text-sm leading-7 text-muted-foreground">
+						<p>
+							If you explicitly create a sharing link for a tag, anyone with
+							that link can see your first name, the shared tag name, and the
+							current article links and metadata inside that tag.
+						</p>
+						<p>
+							Other tags, account details, reading status, favorites, and saved
+							article content are not included. You can stop sharing at any
+							time, which invalidates the existing link.
+						</p>
+					</CardContent>
+				</Card>
 			</div>
 		</div>
 	);

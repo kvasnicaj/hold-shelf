@@ -4,6 +4,7 @@ import {
 	validateArticleCollectionSearch,
 } from "#/components/articles/helpers";
 import { TagsPage } from "#/components/tags/tags-page";
+import { getTagShare } from "#/server/tag-shares";
 import { getTags } from "#/server/tags";
 
 type TagsSearch = {
@@ -22,13 +23,18 @@ export const Route = createFileRoute("/app/tags")({
 	loader: async ({ deps }) => {
 		if (!deps.tag) {
 			const tags = await getTags();
-			return { tags, articles: null };
+			return { tags, articles: null, share: null };
 		}
 
-		return loadArticleCollectionRoute({
-			filters: { tagId: deps.tag },
-			search: deps,
-		});
+		const [collection, share] = await Promise.all([
+			loadArticleCollectionRoute({
+				filters: { tagId: deps.tag },
+				search: deps,
+			}),
+			getTagShare({ data: { tagId: deps.tag } }),
+		]);
+
+		return { ...collection, share };
 	},
 	component: TagsPage,
 });
