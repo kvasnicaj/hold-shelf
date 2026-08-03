@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { TAG_SHARE_TOKEN_PATTERN } from "#/lib/shared-tag";
 
 const idSchema = z.string().trim().min(1).max(128);
 const articleIdsSchema = z.array(idSchema).min(1).max(100);
@@ -76,6 +77,15 @@ export const deleteTagInputSchema = z.object({
 export const tagMutationInputSchema = z.object({
 	tagId: idSchema,
 	articleIds: articleIdsSchema,
+});
+
+export const tagShareInputSchema = z.object({
+	tagId: idSchema,
+});
+
+export const sharedTagInputSchema = z.object({
+	token: z.string().trim().regex(TAG_SHARE_TOKEN_PATTERN),
+	page: z.number().int().min(1).max(10_000).optional(),
 });
 
 export function validateInput<T>(

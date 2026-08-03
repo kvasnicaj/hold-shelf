@@ -44,3 +44,25 @@ describe("article content cache schema", () => {
 		expect(migrationSource).toContain("ON DELETE cascade");
 	});
 });
+
+describe("tag shares schema", () => {
+	it("stores one revocable unique sharing token per tag", () => {
+		const schemaSource = readFileSync(
+			resolve(process.cwd(), "src/db/schema.ts"),
+			"utf8",
+		);
+		const migrationSource = readFileSync(
+			resolve(process.cwd(), "drizzle/0007_familiar_power_pack.sql"),
+			"utf8",
+		);
+
+		expect(schemaSource).toContain("export const tagShares = sqliteTable(");
+		expect(schemaSource).toContain('"tag_shares"');
+		expect(migrationSource).toContain("CREATE TABLE `tag_shares`");
+		expect(migrationSource).toContain("`tag_id` text PRIMARY KEY NOT NULL");
+		expect(migrationSource).toContain("ON DELETE cascade");
+		expect(migrationSource).toContain(
+			"CREATE UNIQUE INDEX `tag_shares_token_idx`",
+		);
+	});
+});

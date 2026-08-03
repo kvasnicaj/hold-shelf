@@ -85,4 +85,31 @@ describe("TagPicker", () => {
 		await waitFor(() => expect(onCreateTag).toHaveBeenCalledWith("Research"));
 		expect(onAddTag).toHaveBeenCalledWith("t3", ["a1", "a2"]);
 	});
+
+	it("keeps portal interactions from opening a parent article row", async () => {
+		const user = userEvent.setup();
+		const onParentClick = vi.fn();
+		const onAddTag = vi.fn();
+		renderWithProviders(
+			// biome-ignore lint/a11y/noStaticElementInteractions: models the composite clickable archive row that owns the picker.
+			<div onClick={onParentClick} onKeyDown={onParentClick}>
+				<TagPicker
+					availableTags={availableTags}
+					selectedTagIds={[]}
+					onAddTag={onAddTag}
+					onRemoveTag={vi.fn()}
+					onCreateTag={vi.fn()}
+					articleIds={["a1"]}
+				/>
+			</div>,
+		);
+
+		await user.click(screen.getByRole("button", { name: /manage tags/i }));
+		onParentClick.mockClear();
+		await user.click(screen.getByText("Design"));
+		await user.click(screen.getByText("Engineering"));
+
+		expect(onAddTag).toHaveBeenCalledTimes(2);
+		expect(onParentClick).not.toHaveBeenCalled();
+	});
 });

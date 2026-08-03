@@ -56,7 +56,12 @@ export function TagPicker({
 					<Tags className="h-[1.125rem] w-[1.125rem]" />
 				</Button>
 			</PopoverTrigger>
-			<PopoverContent className="w-56 p-2" align="start">
+			<PopoverContent
+				className="w-56 p-2"
+				align="start"
+				onClick={(event) => event.stopPropagation()}
+				onKeyDown={(event) => event.stopPropagation()}
+			>
 				<Input
 					placeholder="Search or create tag..."
 					value={search}

@@ -76,6 +76,7 @@ export function useTagsPage() {
 
 	return {
 		...collectionState,
+		activeShare: initialData.share,
 		selectedTagId,
 		filter,
 		tagList,
