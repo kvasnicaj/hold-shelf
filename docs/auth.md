@@ -91,6 +91,21 @@ Signed-in users are redirected away from public auth screens:
 - `/` redirects to `/app/home` when a session exists
 - `/login` redirects to `/app/home` when a session exists
 
+### Public tag-sharing exception
+
+`/share/:token` is intentionally accessible without a session. The opaque token
+is a bearer capability for exactly one tag; it does not grant access to `/app`
+or to authenticated server functions.
+
+The public loader returns only:
+
+- the sharing account's first name, derived from `user.name`
+- the shared tag name
+- current public article metadata for that tag
+
+Creating, inspecting, and revoking a share still require `requireUserId()` and
+tag ownership. Invalid and revoked tokens reveal no account or tag information.
+
 ### Server function authorization
 
 `requireUserId()` is the main server-side guard for user-owned data.
@@ -214,6 +229,8 @@ hashes.
 - article and tag mutations validate ownership before writes
 - auth POST traffic is rate-limited
 - auth state is server-checked before entering `/app`
+- public tag-share reads are scoped by a high-entropy token and explicit public
+  data projection
 - GitHub OAuth is the only enabled sign-in method
 
 ## Troubleshooting
