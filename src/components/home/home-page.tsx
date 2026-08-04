@@ -1,4 +1,5 @@
 import { getRouteApi } from "@tanstack/react-router";
+import { useArticleMutations } from "#/components/articles/use-article-mutations";
 import { useAutoMarkReadOnOpen } from "#/components/articles/use-auto-mark-read-on-open";
 import { EmptyLibraryCta } from "#/components/home/empty-library-cta";
 import { HomeStatsSection } from "#/components/home/home-stats-section";
@@ -7,8 +8,10 @@ import { RecentArticlesSection } from "#/components/home/recent-articles-section
 const route = getRouteApi("/app/home");
 
 export function HomePage() {
-	const { stats, recent } = route.useLoaderData();
+	const { stats, recent, tags } = route.useLoaderData();
 	const { handleOpenArticle } = useAutoMarkReadOnOpen();
+	const { handleAddTag, handleRemoveTag, handleCreateTag } =
+		useArticleMutations();
 
 	return (
 		<div className="w-full space-y-6">
@@ -25,6 +28,10 @@ export function HomePage() {
 				recentlyFavorite={recent.recentlyFavorite}
 				oldestUnread={recent.oldestUnread}
 				onOpenArticle={handleOpenArticle}
+				availableTags={tags}
+				onAddTag={handleAddTag}
+				onRemoveTag={handleRemoveTag}
+				onCreateTag={handleCreateTag}
 			/>
 
 			{stats.total === 0 && <EmptyLibraryCta />}

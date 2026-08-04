@@ -69,7 +69,7 @@ export function TagPicker({
 					className="mb-2 h-8"
 				/>
 
-				<div className="max-h-40 space-y-1 overflow-y-auto">
+				<div className="max-h-40 space-y-1 overflow-x-hidden overflow-y-auto">
 					{filtered.map((tag) => {
 						const isSelected = selectedTagIds.includes(tag.id);
 						return (
@@ -83,11 +83,17 @@ export function TagPicker({
 										onAddTag(tag.id, articleIds);
 									}
 								}}
-								className="flex w-full items-center justify-between rounded px-2 py-1.5 text-sm hover:bg-accent"
+								className="flex w-full min-w-0 items-center justify-between gap-2 overflow-hidden rounded px-2 py-1.5 text-sm hover:bg-accent"
 							>
-								<Badge variant="secondary">{tag.name}</Badge>
+								<Badge
+									variant="secondary"
+									className="min-w-0 shrink truncate"
+									title={tag.name}
+								>
+									{tag.name}
+								</Badge>
 								{isSelected && (
-									<X className="h-3.5 w-3.5 text-muted-foreground" />
+									<X className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
 								)}
 							</button>
 						);
@@ -104,10 +110,10 @@ export function TagPicker({
 								setSearch("");
 								setCreating(false);
 							}}
-							className="flex w-full items-center gap-1 rounded px-2 py-1.5 text-sm text-muted-foreground hover:bg-accent"
+							className="flex w-full min-w-0 items-center gap-1 overflow-hidden rounded px-2 py-1.5 text-sm text-muted-foreground hover:bg-accent"
 						>
-							<Plus className="h-3.5 w-3.5" />
-							Create "{search.trim()}"
+							<Plus className="h-3.5 w-3.5 shrink-0" />
+							<span className="truncate">Create "{search.trim()}"</span>
 						</button>
 					)}
 				</div>

@@ -10,6 +10,28 @@ const availableTags = [
 ];
 
 describe("TagPicker", () => {
+	it("truncates long tag names without widening the picker", async () => {
+		const user = userEvent.setup();
+		const longTagName =
+			"A very long tag name that should stay inside the tag picker";
+		renderWithProviders(
+			<TagPicker
+				availableTags={[{ id: "t1", name: longTagName, color: null }]}
+				selectedTagIds={["t1"]}
+				onAddTag={vi.fn()}
+				onRemoveTag={vi.fn()}
+				onCreateTag={vi.fn()}
+				articleIds={["a1"]}
+			/>,
+		);
+
+		await user.click(screen.getByRole("button", { name: /manage tags/i }));
+
+		const tag = screen.getByText(longTagName);
+		expect(tag).toHaveClass("min-w-0", "shrink", "truncate");
+		expect(tag).toHaveAttribute("title", longTagName);
+	});
+
 	it("filters available tags from the search field", async () => {
 		const user = userEvent.setup();
 		renderWithProviders(
