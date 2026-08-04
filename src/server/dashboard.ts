@@ -2,6 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { and, asc, desc, eq, sql } from "drizzle-orm";
 import { getDb } from "#/db/index";
 import { articles } from "#/db/schema";
+import { createArticlesRepository } from "#/server/articles-repository";
+import { getArticlesForUser } from "#/server/articles-service";
 import {
 	type DashboardRepository,
 	handleGetDashboardStats,
@@ -11,6 +13,7 @@ import { requireUserId } from "#/server/helpers";
 
 function createDashboardRepository(): DashboardRepository {
 	const db = getDb();
+	const articleRepository = createArticlesRepository();
 
 	return {
 		getStats: async (userId) => {
@@ -27,52 +30,59 @@ function createDashboardRepository(): DashboardRepository {
 			return stats ?? null;
 		},
 		getRecentArticles: async (userId) => {
-			const recentlySaved = await db
-				.select({
-					id: articles.id,
-					title: articles.title,
-					hostname: articles.hostname,
-					url: articles.url,
-					faviconUrl: articles.faviconUrl,
-					createdAt: articles.createdAt,
-					isRead: articles.isRead,
-				})
-				.from(articles)
-				.where(eq(articles.userId, userId))
-				.orderBy(desc(articles.createdAt))
-				.limit(5);
+			const [recentlySavedResult, oldestUnread, recentlyFavorite] =
+				await Promise.all([
+					getArticlesForUser({
+						repo: articleRepository,
+						userId,
+						data: { sort: "newest", limit: 5 },
+					}),
+					db
+						.select({
+							id: articles.id,
+							title: articles.title,
+							hostname: articles.hostname,
+							url: articles.url,
+							faviconUrl: articles.faviconUrl,
+							createdAt: articles.createdAt,
+							isRead: articles.isRead,
+						})
+						.from(articles)
+						.where(and(eq(articles.userId, userId), eq(articles.isRead, false)))
+						.orderBy(asc(articles.createdAt))
+						.limit(5),
+					db
+						.select({
+							id: articles.id,
+							title: articles.title,
+							hostname: articles.hostname,
+							url: articles.url,
+							faviconUrl: articles.faviconUrl,
+							createdAt: articles.createdAt,
+							isRead: articles.isRead,
+						})
+						.from(articles)
+						.where(
+							and(eq(articles.userId, userId), eq(articles.isFavorite, true)),
+						)
+						.orderBy(desc(articles.updatedAt))
+						.limit(5),
+				]);
 
-			const oldestUnread = await db
-				.select({
-					id: articles.id,
-					title: articles.title,
-					hostname: articles.hostname,
-					url: articles.url,
-					faviconUrl: articles.faviconUrl,
-					createdAt: articles.createdAt,
-					isRead: articles.isRead,
-				})
-				.from(articles)
-				.where(and(eq(articles.userId, userId), eq(articles.isRead, false)))
-				.orderBy(asc(articles.createdAt))
-				.limit(5);
-
-			const recentlyFavorite = await db
-				.select({
-					id: articles.id,
-					title: articles.title,
-					hostname: articles.hostname,
-					url: articles.url,
-					faviconUrl: articles.faviconUrl,
-					createdAt: articles.createdAt,
-					isRead: articles.isRead,
-				})
-				.from(articles)
-				.where(and(eq(articles.userId, userId), eq(articles.isFavorite, true)))
-				.orderBy(desc(articles.updatedAt))
-				.limit(5);
-
-			return { recentlySaved, recentlyFavorite, oldestUnread };
+			return {
+				recentlySaved: recentlySavedResult.items.map((article) => ({
+					id: article.id,
+					title: article.title,
+					hostname: article.hostname,
+					url: article.url,
+					faviconUrl: article.faviconUrl,
+					createdAt: article.createdAt,
+					isRead: article.isRead,
+					tags: article.tags,
+				})),
+				recentlyFavorite,
+				oldestUnread,
+			};
 		},
 	};
 }

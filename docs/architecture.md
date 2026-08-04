@@ -302,6 +302,7 @@ Loader dependencies:
 
 - `getDashboardStats()`
 - `getRecentArticles()`
+- `getTags()`
 
 Component tree:
 
@@ -313,7 +314,7 @@ HomePage
 |  |- StatCard x4
 |- recent content grid
 |  |- recently saved card
-|  |  |- ArticleLink*
+|  |  |- ArticleLink* + TagPicker*
 |  |- favorites card
 |  |  |- ArticleLink*
 |  |- oldest unread card
@@ -327,6 +328,8 @@ Purpose:
 - surfaces reading volume and quick links into saved content
 - dashboard article links use the shared open handler, so unread items can auto-mark
   as read when the user preference is enabled
+- recently saved articles reuse `TagPicker` and the shared article mutation hook
+  for tag creation, assignment, and removal
 
 ### Unread articles
 
@@ -689,6 +692,7 @@ Responsibilities:
 
 - aggregate counts for total, unread, saved this week, and read this week
 - fetch recently saved, favorite, and oldest unread article slices for the home screen
+- include assigned tags for recently saved articles so the dashboard can manage them
 - include article read state in home link payloads so shared open behavior stays
   consistent across app surfaces
 
