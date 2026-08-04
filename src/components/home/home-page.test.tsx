@@ -19,6 +19,7 @@ type HomeLoaderData = {
 			faviconUrl: string | null;
 			isRead: boolean;
 			createdAt?: Date | null;
+			tags: Array<{ id: string; name: string; color: string | null }>;
 		}>;
 		recentlyFavorite: Array<{
 			id: string;
@@ -39,9 +40,15 @@ type HomeLoaderData = {
 			createdAt?: Date | null;
 		}>;
 	};
+	tags: Array<{ id: string; name: string; color: string | null }>;
 };
 
-const { routeState } = vi.hoisted(() => ({
+const {
+	routeState,
+	handleAddTagMock,
+	handleRemoveTagMock,
+	handleCreateTagMock,
+} = vi.hoisted(() => ({
 	routeState: {
 		loaderData: {
 			stats: {
@@ -55,8 +62,12 @@ const { routeState } = vi.hoisted(() => ({
 				recentlyFavorite: [],
 				oldestUnread: [],
 			},
+			tags: [],
 		} as HomeLoaderData,
 	},
+	handleAddTagMock: vi.fn(),
+	handleRemoveTagMock: vi.fn(),
+	handleCreateTagMock: vi.fn(),
 }));
 
 vi.mock("@tanstack/react-router", async () => {
@@ -88,6 +99,14 @@ vi.mock("#/components/articles/use-auto-mark-read-on-open", () => ({
 	}),
 }));
 
+vi.mock("#/components/articles/use-article-mutations", () => ({
+	useArticleMutations: () => ({
+		handleAddTag: handleAddTagMock,
+		handleRemoveTag: handleRemoveTagMock,
+		handleCreateTag: handleCreateTagMock,
+	}),
+}));
+
 describe("HomePage", () => {
 	beforeEach(() => {
 		vi.useFakeTimers();
@@ -109,6 +128,7 @@ describe("HomePage", () => {
 						faviconUrl: null,
 						isRead: false,
 						createdAt: new Date("2026-07-01T12:00:00.000Z"),
+						tags: [{ id: "t1", name: "Design", color: null }],
 					},
 				],
 				recentlyFavorite: [
@@ -134,6 +154,10 @@ describe("HomePage", () => {
 					},
 				],
 			},
+			tags: [
+				{ id: "t1", name: "Design", color: null },
+				{ id: "t2", name: "Research", color: null },
+			],
 		};
 	});
 
@@ -154,6 +178,7 @@ describe("HomePage", () => {
 		expect(screen.getByText("Favorite article")).toBeInTheDocument();
 		expect(screen.getByText("Unread article")).toBeInTheDocument();
 		expect(screen.getByText("Unread for 89 days")).toBeInTheDocument();
+		expect(screen.getByTitle("Manage tags")).toBeInTheDocument();
 	});
 
 	it("shows the empty library guidance when there are no articles", () => {
@@ -169,6 +194,7 @@ describe("HomePage", () => {
 				recentlyFavorite: [],
 				oldestUnread: [],
 			},
+			tags: [],
 		};
 
 		renderWithProviders(<HomePage />);
@@ -197,11 +223,13 @@ describe("HomePage", () => {
 						faviconUrl: null,
 						isRead: true,
 						createdAt: new Date("2026-07-02T12:00:00.000Z"),
+						tags: [],
 					},
 				],
 				recentlyFavorite: [],
 				oldestUnread: [],
 			},
+			tags: [],
 		};
 
 		renderWithProviders(<HomePage />);

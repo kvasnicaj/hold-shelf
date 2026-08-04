@@ -1,6 +1,8 @@
 import { BookMarked, BookOpen, Clock } from "lucide-react";
 import { getUnreadAgeLabel } from "#/components/article-reader/helpers";
 import { ArticleLink } from "#/components/home/article-link";
+import { TagPicker } from "#/components/tags/tag-picker";
+import type { Tag } from "#/components/tags/types";
 import { Badge } from "#/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 
@@ -14,11 +16,19 @@ type RecentArticle = {
 	createdAt?: Date | null;
 };
 
+type RecentlySavedArticle = RecentArticle & {
+	tags: Tag[];
+};
+
 type RecentArticlesSectionProps = {
-	recentlySaved: RecentArticle[];
+	recentlySaved: RecentlySavedArticle[];
 	recentlyFavorite: RecentArticle[];
 	oldestUnread: RecentArticle[];
 	onOpenArticle: (id: string, isRead: boolean) => void | Promise<void>;
+	availableTags: Tag[];
+	onAddTag: (tagId: string, articleIds: string[]) => void;
+	onRemoveTag: (tagId: string, articleIds: string[]) => void;
+	onCreateTag: (name: string) => Promise<Tag>;
 };
 
 export function RecentArticlesSection({
@@ -26,6 +36,10 @@ export function RecentArticlesSection({
 	recentlyFavorite,
 	oldestUnread,
 	onOpenArticle,
+	availableTags,
+	onAddTag,
+	onRemoveTag,
+	onCreateTag,
 }: RecentArticlesSectionProps) {
 	const hasSecondaryCards = recentlySaved.length > 0 || oldestUnread.length > 0;
 
@@ -64,11 +78,23 @@ export function RecentArticlesSection({
 							</CardHeader>
 							<CardContent className="min-w-0 space-y-2">
 								{recentlySaved.map((article) => (
-									<ArticleLink
+									<div
 										key={article.id}
-										article={article}
-										onOpenArticle={onOpenArticle}
-									/>
+										className="flex min-w-0 items-center gap-1"
+									>
+										<ArticleLink
+											article={article}
+											onOpenArticle={onOpenArticle}
+										/>
+										<TagPicker
+											availableTags={availableTags}
+											selectedTagIds={article.tags.map((tag) => tag.id)}
+											onAddTag={onAddTag}
+											onRemoveTag={onRemoveTag}
+											onCreateTag={onCreateTag}
+											articleIds={[article.id]}
+										/>
+									</div>
 								))}
 							</CardContent>
 						</Card>

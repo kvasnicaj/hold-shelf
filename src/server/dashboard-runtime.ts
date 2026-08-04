@@ -1,4 +1,5 @@
 import type { articles } from "#/db/schema";
+import type { ArticleWithTagsRecord } from "#/server/articles-service";
 
 export type DashboardStatsRow = {
 	total: number | null;
@@ -12,10 +13,22 @@ export type DashboardRecentArticle = Pick<
 	"id" | "title" | "hostname" | "url" | "faviconUrl" | "createdAt" | "isRead"
 >;
 
+export type DashboardRecentlySavedArticle = Pick<
+	ArticleWithTagsRecord,
+	| "id"
+	| "title"
+	| "hostname"
+	| "url"
+	| "faviconUrl"
+	| "createdAt"
+	| "isRead"
+	| "tags"
+>;
+
 export type DashboardRepository = {
 	getStats: (userId: string) => Promise<DashboardStatsRow | null>;
 	getRecentArticles: (userId: string) => Promise<{
-		recentlySaved: DashboardRecentArticle[];
+		recentlySaved: DashboardRecentlySavedArticle[];
 		recentlyFavorite: DashboardRecentArticle[];
 		oldestUnread: DashboardRecentArticle[];
 	}>;
