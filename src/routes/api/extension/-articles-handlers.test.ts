@@ -70,7 +70,7 @@ describe("extension article handlers", () => {
 			code: "UNAUTHORIZED",
 			message: "Sign in to Hold Shelf to save from Chrome.",
 			loginUrl:
-				"https://hold-shelf.com/extension/save?url=https%3A%2F%2Fexample.com%2Farticle",
+				"https://hold-shelf.com/save?url=https%3A%2F%2Fexample.com%2Farticle",
 		});
 	});
 

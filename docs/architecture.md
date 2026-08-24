@@ -37,7 +37,8 @@ High-level flow:
 |- /login                     -> LoginPage
 |- /privacy                   -> PrivacyPage
 |- /share/:token              -> SharedTagPage
-|- /extension/save            -> ExtensionSavePage
+|- /save                      -> SavePage
+|- /extension/save            -> compatibility redirect to /save
 |- /api/extension/articles    -> Chrome extension save endpoint
 |- /api/v1/articles           -> Personal-token REST articles API
 |- /app                       -> AppLayout (auth-gated)
@@ -215,17 +216,17 @@ Core functionality:
 - creates the user account on first successful GitHub sign-in
 - signs returning GitHub users back into the app
 - redirects authenticated users to `/app/home`
-- accepts an optional `redirectTo` search param so extension handoff flows can
+- accepts an optional `redirectTo` search param so article-save handoff flows can
   return users to a save page after login
 
-### Extension save handoff
+### Article save handoff
 
-Route: `/extension/save`
+Route: `/save`
 
 Component tree:
 
 ```text
-ExtensionSavePage
+SavePage
 |- status icon
 |- save result copy
 |- saved URL
@@ -235,12 +236,15 @@ ExtensionSavePage
 
 Core functionality:
 
-- accepts a `url` search param from the extension or login handoff
+- accepts a `url` search param from integrations such as The Digest and the
+  Chrome extension
 - redirects signed-out users to `/login?redirectTo=...`
 - calls `createArticle()` once the user has an authenticated session
 - treats duplicate URLs as a successful handoff state
 - saves only article metadata; article body caching starts when the user opens the
   article in the reader
+- keeps `/extension/save` as a compatibility redirect for existing extension
+  installations
 
 ### Shared tag page
 
@@ -650,8 +654,8 @@ Chrome extension flow:
 2. the API checks the current session from request headers
 3. if authenticated, the server saves the article immediately
 4. if not authenticated, the API returns a `loginUrl` pointing at
-   `/extension/save?url=...`
-5. the site redirects through `/login` and returns to `/extension/save`
+   `/save?url=...`
+5. the site redirects through `/login` and returns to `/save`
 6. the extension handoff page saves the article in the normal web session
 
 ### Tags domain
