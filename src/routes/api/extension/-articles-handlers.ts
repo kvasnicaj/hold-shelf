@@ -83,7 +83,7 @@ export async function handleExtensionArticlesPost(
 			})
 		: getAuth().api.getSession({ headers: request.headers }));
 
-	const loginUrl = new URL("/extension/save", request.url);
+	const loginUrl = new URL("/save", request.url);
 	loginUrl.searchParams.set("url", data.url);
 
 	if (!session?.user?.id) {

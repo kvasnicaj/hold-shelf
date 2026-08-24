@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { createArticle } from "#/server/articles";
 
-type ExtensionSaveStatus =
+type SaveStatus =
 	| "idle"
 	| "saving"
 	| "saved"
@@ -9,11 +9,9 @@ type ExtensionSaveStatus =
 	| "invalid"
 	| "error";
 
-export function useExtensionSavePage(url?: string) {
+export function useSavePage(url?: string) {
 	const [message, setMessage] = useState("");
-	const [status, setStatus] = useState<ExtensionSaveStatus>(
-		url ? "saving" : "invalid",
-	);
+	const [status, setStatus] = useState<SaveStatus>(url ? "saving" : "invalid");
 
 	useEffect(() => {
 		if (!url) {
@@ -33,6 +31,7 @@ export function useExtensionSavePage(url?: string) {
 				if (cancelled) {
 					return;
 				}
+
 				setStatus("saved");
 				setMessage("Saved to your Hold Shelf library.");
 			} catch (error) {
