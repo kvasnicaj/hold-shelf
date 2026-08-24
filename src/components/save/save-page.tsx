@@ -5,17 +5,16 @@ import {
 	CircleAlert,
 	LoaderCircle,
 } from "lucide-react";
-import { useExtensionSavePage } from "#/components/extension/use-extension-save-page";
+import { useSavePage } from "#/components/save/use-save-page";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 
-type ExtensionSavePageProps = {
+type SavePageProps = {
 	url?: string;
 };
 
-export function ExtensionSavePage({ url }: ExtensionSavePageProps) {
-	const { message, status } = useExtensionSavePage(url);
-
+export function SavePage({ url }: SavePageProps) {
+	const { message, status } = useSavePage(url);
 	const isSuccess = status === "saved" || status === "duplicate";
 
 	return (

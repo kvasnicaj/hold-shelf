@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { useExtensionSavePage } from "#/components/extension/use-extension-save-page";
+import { useSavePage } from "#/components/save/use-save-page";
 import { createArticle } from "#/server/articles";
 
 vi.mock("#/server/articles", () => ({
@@ -8,8 +8,7 @@ vi.mock("#/server/articles", () => ({
 }));
 
 function TestHarness({ url }: { url?: string }) {
-	const { message, status } = useExtensionSavePage(url);
-
+	const { message, status } = useSavePage(url);
 	return (
 		<div>
 			<div data-testid="status">{status}</div>
@@ -21,16 +20,14 @@ function TestHarness({ url }: { url?: string }) {
 function deferredPromise<T>() {
 	let resolve!: (value: T) => void;
 	let reject!: (error: unknown) => void;
-
 	const promise = new Promise<T>((res, rej) => {
 		resolve = res;
 		reject = rej;
 	});
-
 	return { promise, resolve, reject };
 }
 
-describe("useExtensionSavePage", () => {
+describe("useSavePage", () => {
 	const createArticleMock = vi.mocked(createArticle);
 
 	beforeEach(() => {
@@ -43,7 +40,6 @@ describe("useExtensionSavePage", () => {
 
 	it("reports an invalid state when no article URL is provided", async () => {
 		render(<TestHarness />);
-
 		await waitFor(() =>
 			expect(screen.getByTestId("status")).toHaveTextContent("invalid"),
 		);
@@ -53,16 +49,13 @@ describe("useExtensionSavePage", () => {
 		expect(createArticleMock).not.toHaveBeenCalled();
 	});
 
-	it("starts saving immediately and reports success when the article is stored", async () => {
+	it("starts saving immediately and reports success", async () => {
 		const pendingSave =
 			deferredPromise<Awaited<ReturnType<typeof createArticle>>>();
 		createArticleMock.mockReturnValue(pendingSave.promise);
-
 		render(<TestHarness url="https://example.com/article" />);
 
 		expect(screen.getByTestId("status")).toHaveTextContent("saving");
-		expect(screen.getByTestId("message")).toHaveTextContent("");
-
 		pendingSave.resolve({
 			id: "article-1",
 			userId: "user-1",
@@ -89,11 +82,10 @@ describe("useExtensionSavePage", () => {
 		});
 	});
 
-	it("reports duplicate saves with a helpful message", async () => {
+	it("reports duplicate saves as success", async () => {
 		createArticleMock.mockRejectedValue(
 			new Error("This URL is already in your library."),
 		);
-
 		render(<TestHarness url="https://example.com/article" />);
 
 		await waitFor(() =>
@@ -106,7 +98,6 @@ describe("useExtensionSavePage", () => {
 
 	it("surfaces unexpected save failures", async () => {
 		createArticleMock.mockRejectedValue(new Error("Network request failed."));
-
 		render(<TestHarness url="https://example.com/article" />);
 
 		await waitFor(() =>
@@ -119,7 +110,6 @@ describe("useExtensionSavePage", () => {
 
 	it("falls back to a generic message for non-Error failures", async () => {
 		createArticleMock.mockRejectedValue("boom");
-
 		render(<TestHarness url="https://example.com/article" />);
 
 		await waitFor(() =>

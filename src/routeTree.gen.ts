@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SaveRouteImport } from './routes/save'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppRouteImport } from './routes/app'
@@ -28,6 +29,11 @@ import { Route as ApiV1ArticlesRouteImport } from './routes/api/v1/articles'
 import { Route as ApiExtensionArticlesRouteImport } from './routes/api/extension/articles'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
+const SaveRoute = SaveRouteImport.update({
+  id: '/save',
+  path: '/save',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
@@ -126,6 +132,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
+  '/save': typeof SaveRoute
   '/api-docs/agents': typeof ApiDocsAgentsRoute
   '/app/archive': typeof AppArchiveRoute
   '/app/articles': typeof AppArticlesRoute
@@ -146,6 +153,7 @@ export interface FileRoutesByTo {
   '/app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
+  '/save': typeof SaveRoute
   '/api-docs/agents': typeof ApiDocsAgentsRoute
   '/app/archive': typeof AppArchiveRoute
   '/app/articles': typeof AppArticlesRoute
@@ -167,6 +175,7 @@ export interface FileRoutesById {
   '/app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
+  '/save': typeof SaveRoute
   '/api-docs/agents': typeof ApiDocsAgentsRoute
   '/app/archive': typeof AppArchiveRoute
   '/app/articles': typeof AppArticlesRoute
@@ -189,6 +198,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/login'
     | '/privacy'
+    | '/save'
     | '/api-docs/agents'
     | '/app/archive'
     | '/app/articles'
@@ -209,6 +219,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/login'
     | '/privacy'
+    | '/save'
     | '/api-docs/agents'
     | '/app/archive'
     | '/app/articles'
@@ -229,6 +240,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/login'
     | '/privacy'
+    | '/save'
     | '/api-docs/agents'
     | '/app/archive'
     | '/app/articles'
@@ -250,6 +262,7 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   LoginRoute: typeof LoginRoute
   PrivacyRoute: typeof PrivacyRoute
+  SaveRoute: typeof SaveRoute
   ExtensionSaveRoute: typeof ExtensionSaveRoute
   ShareTokenRoute: typeof ShareTokenRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -259,6 +272,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/save': {
+      id: '/save'
+      path: '/save'
+      fullPath: '/save'
+      preLoaderRoute: typeof SaveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacy': {
       id: '/privacy'
       path: '/privacy'
@@ -426,6 +446,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   LoginRoute: LoginRoute,
   PrivacyRoute: PrivacyRoute,
+  SaveRoute: SaveRoute,
   ExtensionSaveRoute: ExtensionSaveRoute,
   ShareTokenRoute: ShareTokenRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
