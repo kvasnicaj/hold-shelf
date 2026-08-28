@@ -51,6 +51,7 @@ Install shadcn components: `pnpm dlx shadcn@latest add <component>`
 
 - always run biome and typecheck after modification
 - run biome or typecheck via pnpm commands
+- Autological tests considered harmful.
 
 ### Conventiosn
 
