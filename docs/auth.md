@@ -1,14 +1,16 @@
 # Hold Shelf Authentication
 
-This document describes how authentication works in Hold Shelf, from route
-protection to Better Auth wiring and required secrets.
+This document describes how authentication works in Hold Shelf, from browser
+route protection and Better Auth wiring to personal REST API credentials and
+required secrets.
 
 ## Overview
 
-Hold Shelf uses Better Auth with:
+Hold Shelf has two authenticated client surfaces:
 
-- GitHub OAuth authentication
-- cookie-based session handling for TanStack Start
+- the web app uses Better Auth with GitHub OAuth and cookie-based sessions
+- the personal REST API and CLI use app-owned personal access tokens in the
+  `Authorization` header
 
 Authentication is split across:
 
@@ -16,6 +18,9 @@ Authentication is split across:
 - client helpers in `src/lib/auth-client.ts`
 - auth API route in `src/routes/api/auth/$.ts`
 - session access helpers in `src/server/auth.ts` and `src/server/helpers.ts`
+- personal-access-token lifecycle code in `src/server/api-tokens*.ts`
+- personal-access-token verification and shared REST request handling in
+  `src/server/api-token-auth.ts` and `src/server/api-v1.ts`
 
 ## Core building blocks
 
@@ -106,6 +111,9 @@ The public loader returns only:
 Creating, inspecting, and revoking a share still require `requireUserId()` and
 tag ownership. Invalid and revoked tokens reveal no account or tag information.
 
+This sharing token is a narrow public capability and is unrelated to a personal
+access token. It cannot authenticate an API request.
+
 ### Server function authorization
 
 `requireUserId()` is the main server-side guard for user-owned data.
@@ -122,6 +130,84 @@ Behavior:
 2. asks Better Auth for the session using request headers
 3. throws `Unauthorized` if no authenticated user exists
 4. returns `session.user.id` for downstream queries
+
+## Personal REST API authentication
+
+`/api/v1/*` does not use the Better Auth browser session cookie. Every request
+must send:
+
+```text
+Authorization: Bearer hs_...
+```
+
+The flow is:
+
+1. the shared v1 request helper rate-limits the request by client IP before
+   token lookup
+2. `api-token-auth.ts` parses exactly one Bearer credential and validates the
+   `hs_` token format
+3. the token is SHA-256 hashed and looked up by hash; the raw token is never
+   queried or stored
+4. a successful lookup yields the owning user ID and updates `lastUsedAt`
+5. the shared helper applies the authenticated per-user request limit
+6. the endpoint delegates to a user-scoped application service
+
+Missing or invalid credentials return `401`. Requests are limited to 60 per
+minute per client IP at the authentication boundary and authenticated requests
+to 120 per minute per user. Limit responses return `429` with `Retry-After`.
+Missing and unowned singular resources both return `404`, so the API does not
+disclose another account's resource IDs.
+
+### Token lifecycle and current limitation
+
+Users create, regenerate, and revoke a personal access token from Settings. A
+token starts with `hs_` and contains 32 random bytes encoded with base64url. The
+full token is returned only when generated; D1 stores its SHA-256 hash, a short
+display prefix, creation time, and last-used time.
+
+`api_tokens.user_id` is currently the table's primary key, so each account can
+have only one active personal access token. Regeneration replaces the stored
+hash immediately and therefore invalidates the CLI and every other integration
+using the previous token. This is accepted for CLI v1 and is called out during
+login; multiple named, scoped, expiring credentials require a later schema and
+product change.
+
+### CLI login decision
+
+CLI v1 reuses this personal access token rather than exporting a Better Auth
+cookie or treating a CLI as a browser session:
+
+1. `hold-shelf auth login` points the user to Settings -> API access
+2. the CLI reads the pasted token without echoing it
+3. `GET /api/v1/me` validates both the credential and selected service URL
+4. the CLI stores the token in the operating-system credential store
+
+The token is never accepted as a normal command argument or written to the
+non-secret CLI config file. `HOLD_SHELF_TOKEN` supports CI and headless use
+without persistence. `auth logout` removes only the local credential; token
+revocation and regeneration remain account-level Settings actions.
+
+### Future browser-assisted login
+
+If copy-and-paste login becomes a material usability problem, the intended
+migration is the
+[OAuth 2.0 Device Authorization Grant (RFC 8628)](https://www.rfc-editor.org/rfc/rfc8628),
+using an external browser as recommended for native clients by
+[RFC 8252](https://www.rfc-editor.org/rfc/rfc8252). Better Auth now documents a
+[Device Authorization plugin](https://www.better-auth.com/docs/plugins/device-authorization)
+and an OAuth-provider integration specifically for CLI clients.
+
+The target is a registered public native client receiving short-lived,
+audience-bound, scoped OAuth access tokens plus a rotating refresh token stored
+in the OS credential store. Better Auth's standalone device flow can yield a
+Better Auth session token; that browser-equivalent session token is not the
+target API credential. The production design should combine device
+authorization with the OAuth Provider/JWT resource-server path instead.
+
+This is intentionally later work. It adds plugin/dependency and schema changes,
+client registration, approval UI, polling limits, scope/resource design, JWT
+verification, refresh/revocation behavior, and a compatibility period for
+existing `hs_` tokens.
 
 ## UI flows
 
@@ -217,11 +303,16 @@ App-owned content tables reference `user.id`, for example:
 
 - `articles.userId`
 - `tags.userId`
+- `api_tokens.userId`
 
 This is what makes user data isolation possible in server queries.
 
 The `account` table stores OAuth provider data and no longer stores password
 hashes.
+
+`api_tokens.userId` is both a foreign key and the primary key. This enforces the
+current one-active-token-per-user model and cascades token deletion with account
+deletion.
 
 ## Security notes
 
@@ -229,6 +320,11 @@ hashes.
 - article and tag mutations validate ownership before writes
 - auth POST traffic is rate-limited
 - auth state is server-checked before entering `/app`
+- personal access tokens are stored only as SHA-256 hashes and accepted only from
+  the Bearer header
+- token-auth attempts and authenticated v1 requests are rate-limited separately
+- CLI credentials are kept in the operating-system credential store or supplied
+  ephemerally through `HOLD_SHELF_TOKEN`
 - public tag-share reads are scoped by a high-entropy token and explicit public
   data projection
 - GitHub OAuth is the only enabled sign-in method
@@ -258,3 +354,15 @@ Check:
 - the request is authenticated
 - the server function uses `requireUserId()` inside a valid request context
 - the target article or tag belongs to the current user
+
+### CLI or personal API returns `401`
+
+Check:
+
+- the header is exactly `Authorization: Bearer hs_...`
+- the token was copied in full when Settings displayed it
+- another integration has not regenerated the account's one active token
+- the CLI is pointed at the same Hold Shelf service where the token was created
+
+Use `GET /api/v1/me` or `hold-shelf auth status` as the smallest credential
+health check. Do not put the token in a URL, shell history, or diagnostic output.

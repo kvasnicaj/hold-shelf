@@ -25,9 +25,14 @@ import { Route as AppFavoritesRouteImport } from './routes/app/favorites'
 import { Route as AppArticlesRouteImport } from './routes/app/articles'
 import { Route as AppArchiveRouteImport } from './routes/app/archive'
 import { Route as ApiDocsAgentsRouteImport } from './routes/api-docs/agents'
+import { Route as ApiV1TagsRouteImport } from './routes/api/v1/tags'
+import { Route as ApiV1MeRouteImport } from './routes/api/v1/me'
+import { Route as ApiV1DashboardRouteImport } from './routes/api/v1/dashboard'
 import { Route as ApiV1ArticlesRouteImport } from './routes/api/v1/articles'
 import { Route as ApiExtensionArticlesRouteImport } from './routes/api/extension/articles'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ApiV1ArticlesIdRouteImport } from './routes/api/v1/articles/$id'
+import { Route as ApiV1ArticlesIdTagsTagIdRouteImport } from './routes/api/v1/articles/$id/tags/$tagId'
 
 const SaveRoute = SaveRouteImport.update({
   id: '/save',
@@ -109,6 +114,21 @@ const ApiDocsAgentsRoute = ApiDocsAgentsRouteImport.update({
   path: '/agents',
   getParentRoute: () => ApiDocsRoute,
 } as any)
+const ApiV1TagsRoute = ApiV1TagsRouteImport.update({
+  id: '/api/v1/tags',
+  path: '/api/v1/tags',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1MeRoute = ApiV1MeRouteImport.update({
+  id: '/api/v1/me',
+  path: '/api/v1/me',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiV1DashboardRoute = ApiV1DashboardRouteImport.update({
+  id: '/api/v1/dashboard',
+  path: '/api/v1/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiV1ArticlesRoute = ApiV1ArticlesRouteImport.update({
   id: '/api/v1/articles',
   path: '/api/v1/articles',
@@ -124,6 +144,17 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiV1ArticlesIdRoute = ApiV1ArticlesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => ApiV1ArticlesRoute,
+} as any)
+const ApiV1ArticlesIdTagsTagIdRoute =
+  ApiV1ArticlesIdTagsTagIdRouteImport.update({
+    id: '/tags/$tagId',
+    path: '/tags/$tagId',
+    getParentRoute: () => ApiV1ArticlesIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -144,7 +175,12 @@ export interface FileRoutesByFullPath {
   '/share/$token': typeof ShareTokenRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/extension/articles': typeof ApiExtensionArticlesRoute
-  '/api/v1/articles': typeof ApiV1ArticlesRoute
+  '/api/v1/articles': typeof ApiV1ArticlesRouteWithChildren
+  '/api/v1/dashboard': typeof ApiV1DashboardRoute
+  '/api/v1/me': typeof ApiV1MeRoute
+  '/api/v1/tags': typeof ApiV1TagsRoute
+  '/api/v1/articles/$id': typeof ApiV1ArticlesIdRouteWithChildren
+  '/api/v1/articles/$id/tags/$tagId': typeof ApiV1ArticlesIdTagsTagIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -165,7 +201,12 @@ export interface FileRoutesByTo {
   '/share/$token': typeof ShareTokenRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/extension/articles': typeof ApiExtensionArticlesRoute
-  '/api/v1/articles': typeof ApiV1ArticlesRoute
+  '/api/v1/articles': typeof ApiV1ArticlesRouteWithChildren
+  '/api/v1/dashboard': typeof ApiV1DashboardRoute
+  '/api/v1/me': typeof ApiV1MeRoute
+  '/api/v1/tags': typeof ApiV1TagsRoute
+  '/api/v1/articles/$id': typeof ApiV1ArticlesIdRouteWithChildren
+  '/api/v1/articles/$id/tags/$tagId': typeof ApiV1ArticlesIdTagsTagIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -187,7 +228,12 @@ export interface FileRoutesById {
   '/share/$token': typeof ShareTokenRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/extension/articles': typeof ApiExtensionArticlesRoute
-  '/api/v1/articles': typeof ApiV1ArticlesRoute
+  '/api/v1/articles': typeof ApiV1ArticlesRouteWithChildren
+  '/api/v1/dashboard': typeof ApiV1DashboardRoute
+  '/api/v1/me': typeof ApiV1MeRoute
+  '/api/v1/tags': typeof ApiV1TagsRoute
+  '/api/v1/articles/$id': typeof ApiV1ArticlesIdRouteWithChildren
+  '/api/v1/articles/$id/tags/$tagId': typeof ApiV1ArticlesIdTagsTagIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -211,6 +257,11 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/extension/articles'
     | '/api/v1/articles'
+    | '/api/v1/dashboard'
+    | '/api/v1/me'
+    | '/api/v1/tags'
+    | '/api/v1/articles/$id'
+    | '/api/v1/articles/$id/tags/$tagId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -232,6 +283,11 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/extension/articles'
     | '/api/v1/articles'
+    | '/api/v1/dashboard'
+    | '/api/v1/me'
+    | '/api/v1/tags'
+    | '/api/v1/articles/$id'
+    | '/api/v1/articles/$id/tags/$tagId'
   id:
     | '__root__'
     | '/'
@@ -253,6 +309,11 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/extension/articles'
     | '/api/v1/articles'
+    | '/api/v1/dashboard'
+    | '/api/v1/me'
+    | '/api/v1/tags'
+    | '/api/v1/articles/$id'
+    | '/api/v1/articles/$id/tags/$tagId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -267,7 +328,10 @@ export interface RootRouteChildren {
   ShareTokenRoute: typeof ShareTokenRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiExtensionArticlesRoute: typeof ApiExtensionArticlesRoute
-  ApiV1ArticlesRoute: typeof ApiV1ArticlesRoute
+  ApiV1ArticlesRoute: typeof ApiV1ArticlesRouteWithChildren
+  ApiV1DashboardRoute: typeof ApiV1DashboardRoute
+  ApiV1MeRoute: typeof ApiV1MeRoute
+  ApiV1TagsRoute: typeof ApiV1TagsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -384,6 +448,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiDocsAgentsRouteImport
       parentRoute: typeof ApiDocsRoute
     }
+    '/api/v1/tags': {
+      id: '/api/v1/tags'
+      path: '/api/v1/tags'
+      fullPath: '/api/v1/tags'
+      preLoaderRoute: typeof ApiV1TagsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/me': {
+      id: '/api/v1/me'
+      path: '/api/v1/me'
+      fullPath: '/api/v1/me'
+      preLoaderRoute: typeof ApiV1MeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/dashboard': {
+      id: '/api/v1/dashboard'
+      path: '/api/v1/dashboard'
+      fullPath: '/api/v1/dashboard'
+      preLoaderRoute: typeof ApiV1DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/v1/articles': {
       id: '/api/v1/articles'
       path: '/api/v1/articles'
@@ -404,6 +489,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/auth/$'
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/articles/$id': {
+      id: '/api/v1/articles/$id'
+      path: '/$id'
+      fullPath: '/api/v1/articles/$id'
+      preLoaderRoute: typeof ApiV1ArticlesIdRouteImport
+      parentRoute: typeof ApiV1ArticlesRoute
+    }
+    '/api/v1/articles/$id/tags/$tagId': {
+      id: '/api/v1/articles/$id/tags/$tagId'
+      path: '/tags/$tagId'
+      fullPath: '/api/v1/articles/$id/tags/$tagId'
+      preLoaderRoute: typeof ApiV1ArticlesIdTagsTagIdRouteImport
+      parentRoute: typeof ApiV1ArticlesIdRoute
     }
   }
 }
@@ -439,6 +538,30 @@ const AppRouteChildren: AppRouteChildren = {
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
+interface ApiV1ArticlesIdRouteChildren {
+  ApiV1ArticlesIdTagsTagIdRoute: typeof ApiV1ArticlesIdTagsTagIdRoute
+}
+
+const ApiV1ArticlesIdRouteChildren: ApiV1ArticlesIdRouteChildren = {
+  ApiV1ArticlesIdTagsTagIdRoute: ApiV1ArticlesIdTagsTagIdRoute,
+}
+
+const ApiV1ArticlesIdRouteWithChildren = ApiV1ArticlesIdRoute._addFileChildren(
+  ApiV1ArticlesIdRouteChildren,
+)
+
+interface ApiV1ArticlesRouteChildren {
+  ApiV1ArticlesIdRoute: typeof ApiV1ArticlesIdRouteWithChildren
+}
+
+const ApiV1ArticlesRouteChildren: ApiV1ArticlesRouteChildren = {
+  ApiV1ArticlesIdRoute: ApiV1ArticlesIdRouteWithChildren,
+}
+
+const ApiV1ArticlesRouteWithChildren = ApiV1ArticlesRoute._addFileChildren(
+  ApiV1ArticlesRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -451,7 +574,10 @@ const rootRouteChildren: RootRouteChildren = {
   ShareTokenRoute: ShareTokenRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiExtensionArticlesRoute: ApiExtensionArticlesRoute,
-  ApiV1ArticlesRoute: ApiV1ArticlesRoute,
+  ApiV1ArticlesRoute: ApiV1ArticlesRouteWithChildren,
+  ApiV1DashboardRoute: ApiV1DashboardRoute,
+  ApiV1MeRoute: ApiV1MeRoute,
+  ApiV1TagsRoute: ApiV1TagsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

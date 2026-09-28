@@ -40,6 +40,13 @@ export function ApiDocsEndpointCard({ endpoint }: ApiDocsEndpointCardProps) {
 					) : null}
 				</div>
 
+				{endpoint.pathParameters ? (
+					<ApiDocsFieldList
+						title="Path parameters"
+						fields={endpoint.pathParameters}
+					/>
+				) : null}
+
 				{endpoint.parameters ? (
 					<ApiDocsFieldList
 						title="Query parameters"

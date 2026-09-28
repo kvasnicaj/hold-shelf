@@ -1,8 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 import {
+	ArticleAlreadyExistsError,
 	type ArticleContentCacheUpsert,
 	type ArticlesRepository,
 	createArticleForUser,
+	deleteArticleForUser,
 	deleteArticlesForUser,
 	getArticleReaderForUser,
 	getArticlesForUser,
@@ -460,18 +462,25 @@ describe("articles service", () => {
 	it("rejects duplicate URLs for the same user", async () => {
 		const { repo } = createArticlesRepoFixture();
 
-		await expect(
-			createArticleForUser({
-				repo,
-				userId: "user-1",
-				url: "https://example.com/design",
-				checkRateLimitFn: vi.fn().mockResolvedValue({
-					allowed: true,
-					retryAfterMs: 0,
-				}),
-				extractMetadataFn: vi.fn(),
+		const error = await createArticleForUser({
+			repo,
+			userId: "user-1",
+			url: "https://example.com/design",
+			checkRateLimitFn: vi.fn().mockResolvedValue({
+				allowed: true,
+				retryAfterMs: 0,
 			}),
-		).rejects.toThrow("This URL is already in your library.");
+			extractMetadataFn: vi.fn(),
+		})
+			.then(() => null)
+			.catch((caught: unknown) => caught);
+
+		expect(error).toBeInstanceOf(ArticleAlreadyExistsError);
+		expect(error).toMatchObject({
+			articleId: "a1",
+			url: "https://example.com/design",
+			message: "This URL is already in your library.",
+		});
 	});
 
 	it("rejects article creation when rate limited", async () => {
@@ -514,6 +523,38 @@ describe("articles service", () => {
 		});
 
 		expect(articles.find((article) => article.id === "a2")?.readAt).toBeNull();
+	});
+
+	it("rejects updates to missing or unowned articles", async () => {
+		const { repo } = createArticlesRepoFixture();
+
+		await expect(
+			updateArticleForUser({
+				repo,
+				userId: "user-2",
+				data: { id: "a1", isRead: true },
+			}),
+		).rejects.toThrow("Article not found.");
+		expect(repo.updateArticle).not.toHaveBeenCalled();
+	});
+
+	it("deletes one owned article and rejects a missing or unowned article", async () => {
+		const { repo, articles } = createArticlesRepoFixture();
+
+		await deleteArticleForUser({
+			repo,
+			userId: "user-1",
+			id: "a1",
+		});
+		expect(articles.map((article) => article.id)).toEqual(["a2", "a3"]);
+
+		await expect(
+			deleteArticleForUser({
+				repo,
+				userId: "user-1",
+				id: "a3",
+			}),
+		).rejects.toThrow("Article not found.");
 	});
 
 	it("deletes only the requested articles for the active user", async () => {

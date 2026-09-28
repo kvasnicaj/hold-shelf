@@ -8,9 +8,16 @@ describe("ApiDocsPage", () => {
 		renderWithProviders(<ApiDocsPage />);
 
 		expect(
-			screen.getByRole("heading", { name: "API documentation" }),
+			screen.getByRole("heading", { name: "REST API documentation" }),
 		).toBeInTheDocument();
+		expect(screen.getByText("/api/v1/me")).toBeInTheDocument();
 		expect(screen.getAllByText("/api/v1/articles")).toHaveLength(2);
+		expect(screen.getAllByText("/api/v1/articles/:id")).toHaveLength(3);
+		expect(
+			screen.getAllByText("/api/v1/articles/:id/tags/:tagId"),
+		).toHaveLength(2);
+		expect(screen.getByText("/api/v1/tags")).toBeInTheDocument();
+		expect(screen.getByText("/api/v1/dashboard")).toBeInTheDocument();
 		expect(screen.getAllByText("/api/extension/articles")).toHaveLength(2);
 		expect(screen.queryByText("/api/auth/*")).not.toBeInTheDocument();
 		expect(
@@ -19,5 +26,8 @@ describe("ApiDocsPage", () => {
 		expect(
 			screen.getByRole("link", { name: /export agent docs/i }),
 		).toHaveAttribute("href", "/api-docs/agents");
+		expect(
+			screen.getByText(/create, regenerate, or revoke your one active token/i),
+		).toBeInTheDocument();
 	});
 });

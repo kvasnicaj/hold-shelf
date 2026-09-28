@@ -18,19 +18,38 @@ describe("api-token-auth", () => {
 		await expect(
 			getUserIdFromBearerToken({ authorization: "Bearer abc extra", repo }),
 		).resolves.toBeNull();
+		await expect(
+			getUserIdFromBearerToken({
+				authorization: `Bearer hs_${"A".repeat(42)}`,
+				repo,
+			}),
+		).resolves.toBeNull();
+		await expect(
+			getUserIdFromBearerToken({
+				authorization: `Bearer oauth_${"A".repeat(43)}`,
+				repo,
+			}),
+		).resolves.toBeNull();
+		await expect(
+			getUserIdFromBearerToken({
+				authorization: `Bearer hs_${"A".repeat(42)}+`,
+				repo,
+			}),
+		).resolves.toBeNull();
 
 		expect(repo.findUserIdByTokenHash).not.toHaveBeenCalled();
 	});
 
 	it("hashes the bearer token and marks it as used", async () => {
-		const tokenHash = await hashApiToken("hs_secret");
+		const token = `hs_${"A".repeat(43)}`;
+		const tokenHash = await hashApiToken(token);
 		const repo = {
 			findUserIdByTokenHash: vi.fn().mockResolvedValue("user-1"),
 			markApiTokenUsed: vi.fn().mockResolvedValue(undefined),
 		};
 
 		const userId = await getUserIdFromBearerToken({
-			authorization: "Bearer hs_secret",
+			authorization: `Bearer ${token}`,
 			repo,
 		});
 

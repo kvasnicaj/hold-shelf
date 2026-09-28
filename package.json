@@ -6,15 +6,19 @@
     "#/*": "./src/*"
   },
   "scripts": {
+    "predev": "pnpm --filter @hold-shelf/api-contracts build",
     "dev": "vite dev --port 3000",
-    "build": "vite build",
+    "build": "pnpm --filter @hold-shelf/api-contracts build && pnpm run build:web && pnpm --filter @hold-shelf/cli build",
+    "build:web": "vite build",
     "preview": "vite preview",
-    "test": "vitest run",
+    "test": "pnpm --filter @hold-shelf/api-contracts build && pnpm run test:web && pnpm --filter @hold-shelf/api-contracts test && pnpm --filter @hold-shelf/cli test",
+    "test:web": "vitest run",
     "test:coverage": "vitest run --coverage",
     "format": "biome format",
     "lint": "biome lint",
     "check": "biome check",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "pnpm --filter @hold-shelf/api-contracts build && pnpm run typecheck:web && pnpm --filter @hold-shelf/api-contracts typecheck && pnpm --filter @hold-shelf/cli typecheck",
+    "typecheck:web": "tsc --noEmit",
     "deploy": "pnpm build && wrangler deploy",
     "cf-typegen": "wrangler types",
     "db:generate": "drizzle-kit generate",
@@ -24,6 +28,7 @@
     "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "@hold-shelf/api-contracts": "workspace:*",
     "@sentry/cloudflare": "10.58.0",
     "@sentry/react": "10.58.0",
     "@tailwindcss/vite": "4.3.1",

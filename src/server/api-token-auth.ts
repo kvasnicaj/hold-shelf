@@ -1,6 +1,7 @@
 import {
 	type ApiTokensRepository,
 	hashApiToken,
+	PERSONAL_API_TOKEN_PATTERN,
 } from "#/server/api-tokens-service";
 
 export async function getUserIdFromBearerToken({
@@ -28,7 +29,12 @@ export async function getUserIdFromBearerToken({
 function parseBearerToken(authorization: string | null) {
 	const [scheme, token, extra] = authorization?.trim().split(/\s+/) ?? [];
 
-	if (scheme?.toLowerCase() !== "bearer" || !token || extra) {
+	if (
+		scheme?.toLowerCase() !== "bearer" ||
+		!token ||
+		extra ||
+		!PERSONAL_API_TOKEN_PATTERN.test(token)
+	) {
 		return null;
 	}
 

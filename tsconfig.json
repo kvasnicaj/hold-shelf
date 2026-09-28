@@ -1,10 +1,12 @@
 {
-  "include": ["**/*.ts", "**/*.tsx"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "*.ts"],
+  "exclude": ["packages"],
   "compilerOptions": {
     "target": "ES2022",
     "jsx": "react-jsx",
     "module": "ESNext",
     "paths": {
+      "@hold-shelf/api-contracts": ["./packages/api-contracts/src/index.ts"],
       "#/*": ["./src/*"],
       "@/*": ["./src/*"]
     },

@@ -22,15 +22,15 @@ export function ApiDocsPage() {
 						<div className="space-y-2">
 							<Badge variant="outline" className="gap-1">
 								<KeyRound className="size-3" />
-								Personal tokens
+								Personal access tokens
 							</Badge>
 							<div>
 								<h1 className="display-title text-3xl font-bold text-(--sea-ink)">
-									API documentation
+									REST API documentation
 								</h1>
 								<p className="mt-2 max-w-2xl text-sm leading-6 text-(--sea-ink-soft)">
-									List your saved articles and save new links from scripts,
-									automation, and trusted clients.
+									Browse, search, read, save, and organize your library from the
+									Hold Shelf CLI, scripts, automation, and trusted clients.
 								</p>
 							</div>
 						</div>
@@ -71,7 +71,7 @@ export function ApiDocsPage() {
 					<div>
 						<p className="font-medium">Token management</p>
 						<p className="mt-1 text-muted-foreground">
-							Create, regenerate, or revoke one token in Settings.
+							Create, regenerate, or revoke your one active token in Settings.
 						</p>
 					</div>
 				</section>

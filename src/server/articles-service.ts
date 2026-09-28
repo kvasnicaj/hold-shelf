@@ -56,6 +56,18 @@ export type ArticleRateLimitResult = {
 	retryAfterMs: number;
 };
 
+export class ArticleAlreadyExistsError extends Error {
+	readonly articleId: string;
+	readonly url: string;
+
+	constructor({ articleId, url }: { articleId: string; url: string }) {
+		super("This URL is already in your library.");
+		this.name = "ArticleAlreadyExistsError";
+		this.articleId = articleId;
+		this.url = url;
+	}
+}
+
 export type ArticleContentCacheUpsert = {
 	articleId: string;
 	status: "ready" | "unavailable";
@@ -402,7 +414,7 @@ export async function createArticleForUser({
 
 	const existing = await repo.findArticleByUrl({ userId, url });
 	if (existing) {
-		throw new Error("This URL is already in your library.");
+		throw new ArticleAlreadyExistsError({ articleId: existing.id, url });
 	}
 
 	const metadata = await extractMetadataFn(url);
@@ -420,6 +432,11 @@ export async function updateArticleForUser({
 	data: UpdateArticleInput;
 	now?: () => Date;
 }) {
+	const article = await repo.getArticleById({ userId, id: data.id });
+	if (!article) {
+		throw new Error("Article not found.");
+	}
+
 	const timestamp = now();
 	const changes: {
 		isRead?: boolean;
@@ -441,6 +458,23 @@ export async function updateArticleForUser({
 
 	await repo.updateArticle({ userId, id: data.id, changes });
 	return { success: true };
+}
+
+export async function deleteArticleForUser({
+	repo,
+	userId,
+	id,
+}: {
+	repo: ArticlesRepository;
+	userId: string;
+	id: string;
+}) {
+	const article = await repo.getArticleById({ userId, id });
+	if (!article) {
+		throw new Error("Article not found.");
+	}
+
+	return deleteArticlesForUser({ repo, userId, ids: [id] });
 }
 
 export async function deleteArticlesForUser({
