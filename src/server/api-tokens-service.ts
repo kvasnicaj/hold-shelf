@@ -4,6 +4,8 @@ export type ApiTokenRecord = {
 	lastUsedAt: Date | null;
 };
 
+export const PERSONAL_API_TOKEN_PATTERN = /^hs_[A-Za-z0-9_-]{43}$/;
+
 export type GeneratedApiTokenRecord = ApiTokenRecord & {
 	token: string;
 };

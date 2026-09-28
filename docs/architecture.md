@@ -11,15 +11,26 @@ structured. It focuses on:
 ## System overview
 
 Hold Shelf is a read-it-later app built with TanStack Start and deployed to
-Cloudflare Workers with D1.
+Cloudflare Workers with D1. The repository also contains a TypeScript CLI that
+uses the same application domains through the versioned REST API.
 
-High-level flow:
+High-level web flow:
 
 1. TanStack Router resolves a route and runs loaders/server functions.
 2. Page components render from `src/components/*`.
 3. Server functions in `src/server/*` validate input, require auth, and query D1
    through Drizzle.
 4. React Query keeps route data fresh after mutations.
+
+High-level CLI flow:
+
+1. The Node.js CLI parses a command and reads a personal access token from the
+   environment or operating-system credential store.
+2. Its typed HTTP client calls `/api/v1` over HTTPS.
+3. Shared API transport code authenticates, rate-limits, validates, and maps
+   errors.
+4. API handlers delegate to the same application services and repositories as
+   the web app.
 
 ## Route tree
 
@@ -40,10 +51,16 @@ High-level flow:
 |- /save                      -> SavePage
 |- /extension/save            -> compatibility redirect to /save
 |- /api/extension/articles    -> Chrome extension save endpoint
-|- /api/v1/articles           -> Personal-token REST articles API
+|- /api/v1/me                 -> Personal-token credential check
+|- /api/v1/articles           -> List and save articles
+|- /api/v1/articles/:id       -> Read, update, or delete one article
+|- /api/v1/articles/:id/tags/:tagId -> Assign or remove one article tag
+|- /api/v1/tags               -> List tags and article counts
+|- /api/v1/dashboard          -> Library and reading statistics
 |- /app                       -> AppLayout (auth-gated)
    |- /app/home               -> HomePage
    |- /app/articles           -> ArticlesPage
+   |- /app/favorites          -> FavoritesPage
    |- /app/tags               -> TagsPage
    |- /app/archive            -> ArchivePage
    |- /app/settings           -> SettingsPage
@@ -182,13 +199,14 @@ Component tree:
 ApiDocsPage
 |- API overview panel
 |- agent Markdown export link -> /api-docs/agents
-|- Personal REST API endpoint cards
+|- Personal REST API endpoint cards for articles, tags, stats, and auth checks
 |- Browser extension API endpoint cards
 ```
 
 Purpose:
 
-- documents the personal-token REST API available to users
+- documents the complete personal-access-token REST API available to users and
+  the CLI
 - exposes the same API docs as downloadable Markdown for AI agents and other
   tooling
 - clarifies which app API routes are intended for the Chrome extension or
@@ -283,18 +301,60 @@ Responsibilities:
 - returns `409` for duplicates so the extension can treat repeat saves as
   success
 
-### REST articles API
+### Personal REST API
 
-Route: `/api/v1/articles`
+Routes:
+
+- `GET /api/v1/me`
+- `GET|POST /api/v1/articles`
+- `GET|PATCH|DELETE /api/v1/articles/:id`
+- `PUT|DELETE /api/v1/articles/:id/tags/:tagId`
+- `GET /api/v1/tags`
+- `GET /api/v1/dashboard`
 
 Responsibilities:
 
-- authenticates with `Authorization: Bearer <personal-token>`
-- `GET` lists articles with the same filters used by the app article domain
-- `POST` saves an article from `{ url }` using the shared metadata extraction
-  flow
-- rate limits auth attempts by client IP and authenticated API requests by user
-- returns an idempotent `status: "exists"` response for duplicate saves
+- authenticates every route with
+  `Authorization: Bearer <personal-access-token>`
+- validates a credential without exposing profile data through `GET /me`
+- lists, searches, filters, sorts, and paginates articles
+- saves URLs and returns the existing article ID for retry-safe duplicates
+- loads cached or freshly extracted reader text for one owned article
+- updates read/favorite state and deletes one owned article
+- assigns and removes existing tags idempotently
+- returns tag summaries and normalized dashboard counters
+- maps malformed input, invalid credentials, missing or unowned resources, and
+  rate limits to the shared v1 JSON error shape
+- rate limits auth attempts by client IP and authenticated requests by user
+
+### Command-line client
+
+Package: `packages/cli`
+
+The CLI is a Node.js TypeScript client rather than another Worker entry point.
+It owns command parsing, secure credential access, HTTP calls, and terminal/JSON
+output. It never imports D1 repositories, Cloudflare bindings, React code, or
+browser-session helpers.
+
+Its command groups cover:
+
+- token login, logout, and status
+- article list, search, favorites, reader text, save, state changes, tagging,
+  and deletion
+- tag listing
+- dashboard statistics
+
+The package centralizes service URL resolution, the typed v1 HTTP client,
+credential-store access, error-to-exit-code mapping, and human/JSON rendering so
+commands do not repeat transport or output logic. See
+[CLI architecture](./cli.md) for the command contract, authentication decision,
+and delivery plan.
+
+The sibling `packages/api-contracts` workspace contains the environment-neutral
+Zod schemas and inferred TypeScript types for the v1 wire format. Both REST
+transport code and the CLI consume this package, keeping validation and response
+shapes independent of D1 records while avoiding duplicate client/server
+contracts.
 
 ## Authenticated routes
 
@@ -530,7 +590,7 @@ Core functionality:
 - stores the auto-mark-read-on-open preference in the database per user
 - links signed-in users to the Chrome Web Store extension install
 - shows the signed-in GitHub account details and provider summary
-- lets users generate, replace, and revoke one personal API token
+- lets users generate, replace, and revoke one personal access token
 - links API token users to the public API documentation page
 - provides a guarded account-deletion flow that removes the auth user and cascades app data
 
@@ -590,7 +650,12 @@ Responsibilities:
 
 ### Articles domain
 
-File: `src/server/articles.ts`
+Files:
+
+- `src/server/articles.ts`
+- `src/server/articles-runtime.ts`
+- `src/server/articles-service.ts`
+- `src/server/articles-repository.ts`
 
 Responsibilities:
 
@@ -603,13 +668,43 @@ Responsibilities:
 - update read/favorite state
 - delete articles in bulk
 
-### API tokens domain
+The route-facing runtime validates input and obtains the current web-session
+user, the service owns user-scoped behavior, and the repository is the only
+layer that queries D1. REST handlers reuse the service/repository layers without
+reusing the browser-session boundary.
 
-File: `src/server/api-tokens.ts`
+### Personal API transport
+
+Files:
+
+- `packages/api-contracts/src/index.ts`
+- `src/server/api-v1.ts`
+- `src/server/api-v1-articles.ts`
+- `src/routes/api/v1/-*-handlers.ts`
 
 Responsibilities:
 
-- expose one personal API token per authenticated user
+- authenticate `hs_` personal access tokens through one request helper
+- apply the shared unauthenticated-client and authenticated-user limits
+- parse JSON and return a consistent `{ code, message }` error shape
+- serialize article records into a stable API projection with ISO 8601 dates
+- keep route files thin while delegating domain work to shared services and
+  repositories
+- return `404` for both missing and unowned singular resources so ownership is
+  not disclosed
+
+### API tokens domain
+
+Files:
+
+- `src/server/api-tokens.ts`
+- `src/server/api-token-auth.ts`
+- `src/server/api-tokens-service.ts`
+- `src/server/api-tokens-repository.ts`
+
+Responsibilities:
+
+- expose one personal access token per authenticated user
 - show the raw token only immediately after generation
 - store only the token hash and display prefix in D1
 - revoke or replace the token from settings
@@ -660,7 +755,12 @@ Chrome extension flow:
 
 ### Tags domain
 
-File: `src/server/tags.ts`
+Files:
+
+- `src/server/tags.ts`
+- `src/server/tags-runtime.ts`
+- `src/server/tags-service.ts`
+- `src/server/tags-repository.ts`
 
 Responsibilities:
 
@@ -690,11 +790,16 @@ Responsibilities:
 
 ### Dashboard domain
 
-File: `src/server/dashboard.ts`
+Files:
+
+- `src/server/dashboard.ts`
+- `src/server/dashboard-runtime.ts`
+- `src/server/dashboard-repository.ts`
 
 Responsibilities:
 
-- aggregate counts for total, unread, saved this week, and read this week
+- aggregate counts for total, read, unread, saved in the rolling previous seven
+  days, and read in the rolling previous seven days
 - fetch recently saved, favorite, and oldest unread article slices for the home screen
 - include assigned tags for recently saved articles so the dashboard can manage them
 - include article read state in home link payloads so shared open behavior stays
@@ -720,7 +825,7 @@ Core tables in `src/db/schema.ts`:
 - `tags`: user-defined labels
 - `tag_shares`: one optional active public sharing token per tag
 - `article_tags`: many-to-many join between articles and tags
-- `api_tokens`: one hashed personal API token per user
+- `api_tokens`: one hashed personal access token per user
 - `rate_limits`: persistent rate-limit counters
 
 Important relationships:
@@ -729,7 +834,7 @@ Important relationships:
 - one user has many tags
 - one tag can have one active sharing link
 - one article can have many tags through `article_tags`
-- one user can have one API token
+- one user can have one active personal access token
 - article URLs are unique per user
 - tag names are unique per user
 - tag-share tokens are globally unique and deleting a tag cascades its share
@@ -757,4 +862,18 @@ UI action
 -> invalidate React Query keys
 -> router.invalidate()
 -> refreshed page state
+```
+
+### CLI path
+
+```text
+hold-shelf command
+-> shared CLI configuration / credential store
+-> typed HTTP client
+-> /api/v1 handler
+-> shared application service
+-> repository
+-> D1
+-> serialized JSON response
+-> human table/text or JSON-only stdout
 ```

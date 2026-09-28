@@ -17,6 +17,7 @@ export type ApiEndpoint = {
 	summary: string;
 	auth: string;
 	contentType?: string;
+	pathParameters?: ApiParameter[];
 	parameters?: ApiParameter[];
 	bodyFields?: ApiParameter[];
 	responses: ApiResponse[];

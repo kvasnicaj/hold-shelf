@@ -1,0 +1,42 @@
+{
+	"name": "@hold-shelf/cli",
+	"version": "0.1.0",
+	"private": true,
+	"type": "module",
+	"bin": {
+		"hold-shelf": "./dist/bin.js",
+		"hs": "./dist/bin.js"
+	},
+	"engines": {
+		"node": ">=22"
+	},
+	"exports": {
+		".": {
+			"types": "./src/index.ts",
+			"import": "./dist/index.js"
+		}
+	},
+	"scripts": {
+		"prebuild": "pnpm --filter @hold-shelf/api-contracts build",
+		"build": "esbuild src/bin.ts src/index.ts --bundle --packages=external --platform=node --target=node22 --format=esm --outdir=dist",
+		"postbuild": "node scripts/smoke-built.mjs",
+		"pretest": "pnpm --filter @hold-shelf/api-contracts build",
+		"test": "vitest run",
+		"pretypecheck": "pnpm --filter @hold-shelf/api-contracts build",
+		"typecheck": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@hold-shelf/api-contracts": "workspace:*",
+		"@inquirer/prompts": "8.1.0",
+		"commander": "14.0.3"
+	},
+	"optionalDependencies": {
+		"@napi-rs/keyring": "1.3.0"
+	},
+	"devDependencies": {
+		"@types/node": "25.9.3",
+		"esbuild": "0.28.1",
+		"typescript": "6.0.3",
+		"vitest": "4.1.9"
+	}
+}

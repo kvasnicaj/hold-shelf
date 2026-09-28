@@ -1,56 +1,29 @@
+import {
+	articleListQuerySchema,
+	articlePathSchema,
+	createArticleRequestSchema,
+	identifierSchema,
+	updateArticleRequestSchema,
+} from "@hold-shelf/api-contracts";
 import { z } from "zod";
 import { TAG_SHARE_TOKEN_PATTERN } from "#/lib/shared-tag";
 
-const idSchema = z.string().trim().min(1).max(128);
+const idSchema = identifierSchema;
 const articleIdsSchema = z.array(idSchema).min(1).max(100);
 
-const httpUrlSchema = z
-	.string()
-	.trim()
-	.max(2_048)
-	.url()
-	.refine((url) => {
-		try {
-			const parsed = new URL(url);
-			return parsed.protocol === "http:" || parsed.protocol === "https:";
-		} catch {
-			return false;
-		}
-	}, "Only http/https URLs are allowed");
-
-export const getArticlesInputSchema = z
-	.object({
-		isRead: z.boolean().optional(),
-		isFavorite: z.boolean().optional(),
-		tagId: idSchema.optional(),
+export const getArticlesInputSchema = articleListQuerySchema
+	.extend({
 		tagIds: z.array(idSchema).max(20).optional(),
-		search: z.string().trim().max(200).optional(),
-		sort: z.enum(["newest", "oldest", "title"]).optional(),
-		limit: z.number().int().min(1).max(100).optional(),
-		offset: z.number().int().min(0).max(10_000).optional(),
 	})
 	.default({});
 
-export const getArticleReaderInputSchema = z.object({
-	id: idSchema,
-});
+export const getArticleReaderInputSchema = articlePathSchema;
 
-export const createArticleInputSchema = z.object({
-	url: httpUrlSchema,
-});
+export const createArticleInputSchema = createArticleRequestSchema;
 
-export const updateArticleInputSchema = z
-	.object({
-		id: idSchema,
-		isRead: z.boolean().optional(),
-		isFavorite: z.boolean().optional(),
-	})
-	.refine(
-		(input) => input.isRead !== undefined || input.isFavorite !== undefined,
-		{
-			message: "At least one mutable field is required",
-		},
-	);
+export const updateArticleInputSchema = articlePathSchema.and(
+	updateArticleRequestSchema,
+);
 
 export const deleteArticlesInputSchema = z.object({
 	ids: articleIdsSchema,
