@@ -79,7 +79,8 @@ repeated between commands.
 
 The package targets supported Node.js LTS releases, uses built-in `fetch`, and
 builds to ESM JavaScript for installation as `hold-shelf` with the short `hs`
-alias. It remains private until the install and release workflow is decided.
+alias. Anyone can build and run it from the public repository using the
+[setup guide](./cli-guide.md). The package is not published to npm yet.
 
 ## Command surface
 

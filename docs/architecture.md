@@ -942,9 +942,9 @@ container, with consistent padding. Reader and navigation columns remain separat
 Toasts inherit app CSS theme colors, including a contrasting Undo button; mobile
 toasts sit above bottom navigation. Continue reading's Mark as read action atomically
 marks the article read and completes its progress, removing it from that section.
-The public CLI guide is linked from Settings and documents source installation for
-collaborators with private-repository access, authentication, commands, recovery,
-and automation. It explicitly explains that public installation is not available.
+The public CLI guide is linked from Settings and documents installation from the
+public repository, authentication, commands, recovery, and automation. It explains
+that anyone can build the CLI from source and that it is not published to npm yet.
 `CliDocsPage` uses the same `DocumentationLayout` and `DocumentationSection` as the
 API page, with matching cards and code blocks. Its content comes from
 `docs/cli-guide.md`; Markdown heading positions define sections without treating
