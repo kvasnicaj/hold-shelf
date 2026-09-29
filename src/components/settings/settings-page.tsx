@@ -1,9 +1,12 @@
 import { getRouteApi, useRouter } from "@tanstack/react-router";
 import { Globe } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import { AddToChromeButton } from "#/components/extension/add-to-chrome-button";
+import { LibraryBackupCard } from "#/components/library/library-backup-card";
 import { AccountSummaryCard } from "#/components/settings/account-summary-card";
 import { ApiTokenCard } from "#/components/settings/api-token-card";
+import { CliCard } from "#/components/settings/cli-card";
 import { DeleteAccountCard } from "#/components/settings/delete-account-card";
 import { ReadingSettingsCard } from "#/components/settings/reading-settings-card";
 import ThemeToggle from "#/components/theme-toggle";
@@ -25,6 +28,8 @@ export function SettingsPage() {
 		try {
 			await updateUserSettings({ data: { markReadOnOpen: nextValue } });
 			await router.invalidate();
+		} catch {
+			toast.error("Could not save reading preferences. Please try again.");
 		} finally {
 			setPendingValue(null);
 		}
@@ -81,8 +86,10 @@ export function SettingsPage() {
 				</div>
 
 				<div className="space-y-4">
+					<LibraryBackupCard />
 					<AccountSummaryCard />
 					<ApiTokenCard />
+					<CliCard />
 					<DeleteAccountCard />
 				</div>
 			</div>

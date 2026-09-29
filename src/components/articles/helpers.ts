@@ -1,9 +1,12 @@
+import type { QueryClient } from "@tanstack/react-query";
+import {
+	articleListOptions,
+	tagListOptions,
+} from "#/components/articles/query-options";
 import type {
 	ArticleCollectionFilters,
 	ArticleCollectionSearch,
 } from "#/components/articles/types";
-import { getArticles } from "#/server/articles";
-import { getTags } from "#/server/tags";
 
 export const ARTICLE_COLLECTION_PAGE_SIZE = 20;
 
@@ -16,7 +19,10 @@ export function validateArticleCollectionSearch(
 			? (search.sort as ArticleCollectionSearch["sort"])
 			: undefined,
 		page:
-			typeof search.page === "number" && search.page > 1
+			typeof search.page === "number" &&
+			Number.isInteger(search.page) &&
+			search.page > 1 &&
+			search.page <= 501
 				? search.page
 				: undefined,
 	};
@@ -25,22 +31,24 @@ export function validateArticleCollectionSearch(
 export async function loadArticleCollectionRoute({
 	filters,
 	search,
+	queryClient,
 }: {
+	queryClient: QueryClient;
 	filters: ArticleCollectionFilters;
 	search: ArticleCollectionSearch;
 }) {
 	const page = search.page ?? 1;
 	const [articles, tags] = await Promise.all([
-		getArticles({
-			data: {
+		queryClient.ensureQueryData(
+			articleListOptions({
 				...filters,
 				search: search.q,
 				sort: search.sort,
 				limit: ARTICLE_COLLECTION_PAGE_SIZE,
 				offset: (page - 1) * ARTICLE_COLLECTION_PAGE_SIZE,
-			},
-		}),
-		getTags(),
+			}),
+		),
+		queryClient.ensureQueryData(tagListOptions()),
 	]);
 
 	return { articles, tags };

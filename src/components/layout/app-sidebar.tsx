@@ -1,20 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link, useRouter, useRouterState } from "@tanstack/react-router";
-import { Bookmark, LogOut, Settings, User } from "lucide-react";
+import { Link, useRouterState } from "@tanstack/react-router";
+import { Bookmark } from "lucide-react";
 import {
 	desktopLibraryNavItems,
 	homeNavItem,
 } from "#/components/layout/nav-items";
 import { NavLink } from "#/components/layout/nav-link";
 import { SidebarTagsSection } from "#/components/layout/sidebar-tags-section";
-import { SidebarUserMenuItem } from "#/components/layout/sidebar-user-menu-item";
-import ThemeToggle from "#/components/theme-toggle";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuTrigger,
-} from "#/components/ui/dropdown-menu";
-import { authClient } from "#/lib/auth-client";
+import { SidebarUserMenu } from "#/components/layout/sidebar-user-menu";
 import { getArticles } from "#/server/articles";
 import { getTags } from "#/server/tags";
 
@@ -30,7 +23,7 @@ export function AppSidebar() {
 
 	const { data: unreadResult } = useQuery({
 		queryKey: ["articles", "unread-count"],
-		queryFn: () => getArticles({ data: { isRead: false, limit: 0 } }),
+		queryFn: () => getArticles({ data: { isRead: false, limit: 1 } }),
 	});
 	const unreadCount = unreadResult?.total ?? 0;
 
@@ -85,53 +78,5 @@ export function AppSidebar() {
 
 			<SidebarUserMenu />
 		</aside>
-	);
-}
-
-function SidebarUserMenu() {
-	const router = useRouter();
-	const { data: session } = authClient.useSession();
-
-	return (
-		<div className="mr-3 mt-2 border-t border-sidebar-border pt-2">
-			<DropdownMenu>
-				<DropdownMenuTrigger asChild>
-					<button
-						type="button"
-						className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-sm text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
-					>
-						<User className="h-4 w-4 shrink-0" />
-						<span className="flex-1 truncate text-left">
-							{session?.user?.name ?? session?.user?.email ?? "Account"}
-						</span>
-					</button>
-				</DropdownMenuTrigger>
-				<DropdownMenuContent align="start" side="top" className="w-48">
-					{session?.user?.email && (
-						<div className="px-2 py-1.5 text-sm text-muted-foreground">
-							{session.user.email}
-						</div>
-					)}
-					<ThemeToggle variant="menu-item" />
-					<SidebarUserMenuItem
-						icon={Settings}
-						onSelect={() => {
-							void router.navigate({ to: "/app/settings" });
-						}}
-					>
-						Settings
-					</SidebarUserMenuItem>
-					<SidebarUserMenuItem
-						icon={LogOut}
-						onClick={async () => {
-							await authClient.signOut();
-							router.navigate({ to: "/login" });
-						}}
-					>
-						Sign out
-					</SidebarUserMenuItem>
-				</DropdownMenuContent>
-			</DropdownMenu>
-		</div>
 	);
 }

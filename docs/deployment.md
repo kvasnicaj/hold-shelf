@@ -18,6 +18,34 @@ Key files:
 - `src/server-entry.ts`
 - `src/env.d.ts`
 
+## Deploying your own instance
+
+The checked-in Worker, database identifier, and custom domains target the original
+Hold Shelf service. Before deploying a fork, create your own D1 database and update
+`wrangler.jsonc` with your Worker name, database ID, domain routes, and
+`BETTER_AUTH_URL`. Register a GitHub OAuth app with callback
+`https://YOUR_DOMAIN/api/auth/callback/github` and configure its credentials as
+Worker secrets. To enable automatic deployment for your fork, update the
+`github.repository` condition in the CI deployment job to your repository name.
+Do not point a fork at the original service's resources.
+
+For local development, `.dev.vars` overrides the auth URL and OAuth credentials;
+the D1 emulator keeps development data local. No Cloudflare API token is needed
+for that setup.
+
+## Public contribution safeguards
+
+CI declares read-only repository permissions and does not persist checkout
+credentials. Third-party actions are pinned to commit SHAs. The separate secret
+scan verifies the Gitleaks download checksum and scans available Git history with
+redacted output. Pull-request jobs receive no Cloudflare deployment token; the
+deployment job runs only for pushes to `main`.
+
+When making the repository public, enable private vulnerability reporting,
+secret scanning/push protection, and require the `check` and `secrets` jobs in a
+branch ruleset. Require approval for workflows from outside contributors. These
+are repository settings, not settings applied by the workflow files themselves.
+
 ## Runtime architecture
 
 ### Worker entrypoint
@@ -162,6 +190,12 @@ Recommended production order:
 3. apply it to the target database
 4. deploy the app code that depends on it
 
+Migrations `0008` and `0009` add Trash, reading progress, and Better Auth’s nullable
+account password field. Password sign-in remains disabled. Apply both before
+running this version. These changes are additive and compatible with the previous
+application version. A migration failure stops automatic deployment. Manual
+`pnpm deploy` still requires applying remote migrations first.
+
 ## CI/CD pipeline
 
 GitHub Actions workflow: `.github/workflows/ci.yml`
@@ -183,6 +217,7 @@ Runs on `ubuntu-latest` and performs:
 6. `pnpm check`
 7. `pnpm typecheck`
 8. `pnpm test`
+9. `pnpm build` (web production compilation and CLI build/smoke check)
 
 ### Deploy job
 
@@ -199,11 +234,12 @@ Deployment steps:
 3. Node 22 setup
 4. `pnpm install --frozen-lockfile`
 5. `pnpm build`
-6. `cloudflare/wrangler-action@v3` with `command: deploy`
+6. `pnpm wrangler d1 migrations apply hold-shelf-db --remote`
+7. `cloudflare/wrangler-action@v3` with `command: deploy`
 
 Required GitHub secret:
 
-- `CLOUDFLARE_API_TOKEN`
+- `CLOUDFLARE_API_TOKEN`, with Worker deployment and D1 write permissions
 
 ## Release model
 
@@ -307,3 +343,21 @@ Usually worth checking:
 - deployed origin vs `BETTER_AUTH_URL`
 - Worker secrets in the production environment
 - cookie/session behavior on the configured domain
+
+## Background maintenance and capture
+
+The Worker keeps save-time article capture alive through `ExecutionContext.waitUntil`.
+This is best-effort work within the Worker lifetime, not a durable queue. Opening a
+reader retries missing/stale content, and Refresh saved content explicitly retries
+capture. Failed refreshes retain an existing readable copy. No browser authentication
+cookies are sent to the source website.
+
+The hourly Cron Trigger (`0 * * * *`) removes rate-limit rows whose windows expired
+more than 24 hours ago. Counter consumption uses an atomic D1 upsert. Regenerate
+Worker types after editing `wrangler.jsonc`.
+
+Local repository tests apply the actual migrations to Miniflare D1. The direct
+Miniflare test dependency matches Wrangler's runtime version; its v4 option
+converter preserves the existing local D1 configuration on Miniflare 5. The narrow
+esbuild override in `pnpm-workspace.yaml` patches drizzle-kit's legacy loader chain;
+recheck migration generation when updating it.

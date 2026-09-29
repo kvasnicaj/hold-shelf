@@ -7,6 +7,7 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { AppToaster } from "#/components/layout/app-toaster";
 import { initSentry } from "#/lib/sentry";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import appCss from "../styles.css?url";
@@ -78,6 +79,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			</head>
 			<body className="font-sans antialiased wrap-anywhere">
 				{children}
+				<AppToaster />
 				<TanStackDevtools
 					config={{ position: "bottom-right" }}
 					plugins={[

@@ -1,6 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ARTICLE_COLLECTION_PAGE_SIZE } from "#/components/articles/helpers";
+import {
+	articleListOptions,
+	tagListOptions,
+} from "#/components/articles/query-options";
 import type {
 	ArticleCollectionFilters,
 	ArticleCollectionLoaderData,
@@ -11,8 +15,6 @@ import type {
 } from "#/components/articles/types";
 import { useArticleMutations } from "#/components/articles/use-article-mutations";
 import { useAutoMarkReadOnOpen } from "#/components/articles/use-auto-mark-read-on-open";
-import { getArticles } from "#/server/articles";
-import { getTags } from "#/server/tags";
 
 type UseArticleCollectionPageOptions = {
 	initialData: ArticleCollectionLoaderData;
@@ -26,7 +28,6 @@ type UseArticleCollectionPageOptions = {
 export function useArticleCollectionPage({
 	initialData,
 	search,
-	queryKey,
 	filters,
 	navigate,
 	enabled = true,
@@ -48,29 +49,35 @@ export function useArticleCollectionPage({
 	});
 
 	const { data: result } = useQuery({
-		queryKey: ["articles", queryKey, q, sort, page],
-		queryFn: () =>
-			getArticles({
-				data: {
-					...filters,
-					search: q,
-					sort,
-					limit: ARTICLE_COLLECTION_PAGE_SIZE,
-					offset: (page - 1) * ARTICLE_COLLECTION_PAGE_SIZE,
-				},
-			}),
+		...articleListOptions({
+			...filters,
+			search: q,
+			sort,
+			limit: ARTICLE_COLLECTION_PAGE_SIZE,
+			offset: (page - 1) * ARTICLE_COLLECTION_PAGE_SIZE,
+		}),
 		initialData: initialData.articles,
 		enabled,
 	});
 	const { data: tagList = [] } = useQuery({
-		queryKey: ["tags"],
-		queryFn: () => getTags(),
+		...tagListOptions(),
 		initialData: initialData.tags,
 	});
 
 	const articles = result?.items ?? [];
 	const total = result?.total ?? 0;
 	const totalPages = Math.ceil(total / ARTICLE_COLLECTION_PAGE_SIZE);
+	useEffect(() => {
+		if (enabled && result && page > Math.max(1, totalPages))
+			void navigate({
+				search: (prev) => ({
+					...prev,
+					page: totalPages > 1 ? totalPages : undefined,
+				}),
+				replace: true,
+			});
+	}, [enabled, result, page, totalPages, navigate]);
+
 	const selectedIds = Array.from(selected);
 
 	function handleSelect(id: string, isSelected: boolean) {

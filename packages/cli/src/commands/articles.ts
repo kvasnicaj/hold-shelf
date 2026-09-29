@@ -41,7 +41,7 @@ export function registerArticleCommands(
 	addListOptions(
 		articles
 			.command("search <query>")
-			.description("Search titles, descriptions, and URLs"),
+			.description("Search article metadata and saved content"),
 	).action(
 		async (query: string, localOptions: ListOptions, command: Command) => {
 			await listArticles({
@@ -237,7 +237,7 @@ export function registerArticleCommands(
 
 	articles
 		.command("delete <article-id>")
-		.description("Delete an article")
+		.description("Move an article to Trash")
 		.option("--yes", "Skip confirmation")
 		.action(
 			async (
@@ -258,7 +258,7 @@ export function registerArticleCommands(
 						);
 					}
 					const accepted = await dependencies.confirm(
-						`Delete article ${id}? This cannot be undone.`,
+						`Move article ${id} to Trash? You can restore it in the web app.`,
 					);
 					if (!accepted) {
 						writeLine(dependencies.stdout, "Cancelled.");
@@ -269,7 +269,7 @@ export function registerArticleCommands(
 				if (context.options.json) {
 					writeJson(dependencies.stdout, { ...result, articleId: id });
 				} else {
-					writeLine(dependencies.stdout, `Deleted article ${id}.`);
+					writeLine(dependencies.stdout, `Moved article ${id} to Trash.`);
 				}
 			},
 		);

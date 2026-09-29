@@ -120,9 +120,10 @@ export function extractedArticleToMarkdown(content: ExtractedArticleContent): {
 	}
 
 	const markdown =
-		content.blocks.length > 0
+		content.markdown ??
+		(content.blocks.length > 0
 			? articleBlocksToMarkdown(content.blocks)
-			: content.paragraphs.map(escapeMarkdownText).join("\n\n");
+			: content.paragraphs.map(escapeMarkdownText).join("\n\n"));
 	const plainText =
 		content.blocks.length > 0
 			? articleBlocksToPlainText(content.blocks)

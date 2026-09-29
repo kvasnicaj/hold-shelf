@@ -20,7 +20,7 @@ export const Route = createFileRoute("/app/tags")({
 		tag: typeof search.tag === "string" ? search.tag : undefined,
 	}),
 	loaderDeps: ({ search }) => search,
-	loader: async ({ deps }) => {
+	loader: async ({ deps, context }) => {
 		if (!deps.tag) {
 			const tags = await getTags();
 			return { tags, articles: null, share: null };
@@ -28,6 +28,7 @@ export const Route = createFileRoute("/app/tags")({
 
 		const [collection, share] = await Promise.all([
 			loadArticleCollectionRoute({
+				queryClient: context.queryClient,
 				filters: { tagId: deps.tag },
 				search: deps,
 			}),

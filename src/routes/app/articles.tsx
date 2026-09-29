@@ -8,8 +8,9 @@ import {
 export const Route = createFileRoute("/app/articles")({
 	validateSearch: validateArticleCollectionSearch,
 	loaderDeps: ({ search }) => search,
-	loader: ({ deps }) =>
+	loader: ({ deps, context }) =>
 		loadArticleCollectionRoute({
+			queryClient: context.queryClient,
 			filters: { isRead: false },
 			search: deps,
 		}),

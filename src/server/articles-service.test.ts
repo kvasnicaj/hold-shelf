@@ -305,7 +305,7 @@ describe("articles service", () => {
 			wordCount: 2,
 			failureReason: null,
 			sourceUrl: "https://example.com/design",
-			extractionVersion: "markdown-v2",
+			extractionVersion: "markdown-v3",
 			fetchedAt,
 			createdAt: fetchedAt,
 			updatedAt: fetchedAt,
@@ -328,6 +328,43 @@ describe("articles service", () => {
 			fetchedAt,
 		});
 		expect(extractArticleContentFn).not.toHaveBeenCalled();
+	});
+
+	it("keeps a saved copy when an explicit refresh fails", async () => {
+		const { repo } = createArticlesRepoFixture();
+		const extract = vi.fn().mockResolvedValueOnce({
+			status: "ready",
+			blocks: [],
+			markdown: "Preserved article",
+			paragraphs: ["Preserved article"],
+			wordCount: 2,
+		});
+		await getArticleReaderForUser({
+			repo,
+			userId: "user-1",
+			id: "a1",
+			extractArticleContentFn: extract,
+		});
+		extract.mockResolvedValueOnce({
+			status: "unavailable",
+			reason: "Source is offline",
+		});
+		const refreshed = await getArticleReaderForUser({
+			repo,
+			userId: "user-1",
+			id: "a1",
+			extractArticleContentFn: extract,
+			forceRefresh: true,
+		});
+		expect(refreshed.content).toMatchObject({
+			status: "ready",
+			markdown: "Preserved article",
+			refreshError: "Source is offline",
+		});
+		expect(await repo.getArticleContentCache("a1")).toMatchObject({
+			status: "ready",
+			markdown: "Preserved article",
+		});
 	});
 
 	it("caches unavailable extraction results", async () => {

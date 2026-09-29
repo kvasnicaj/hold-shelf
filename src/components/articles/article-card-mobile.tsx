@@ -26,7 +26,7 @@ export function ArticleCardMobile({
 			className="cursor-pointer rounded-lg border p-4 transition-colors hover:bg-accent/50"
 			onClick={() => void onOpenArticle(article.id, article.isRead)}
 			onKeyDown={(event) => {
-				if (event.key === "Enter") {
+				if (event.key === "Enter" && event.target === event.currentTarget) {
 					void onOpenArticle(article.id, article.isRead);
 				}
 			}}
@@ -53,6 +53,7 @@ export function ArticleCardMobile({
 				<div className="flex flex-wrap items-start gap-2">
 					<div className="flex shrink-0 items-center gap-1">
 						<Checkbox
+							aria-label={`Select ${article.title ?? article.url}`}
 							checked={selected}
 							onCheckedChange={(checked) => onSelect(article.id, !!checked)}
 							onClick={(event) => event.stopPropagation()}

@@ -25,7 +25,7 @@ describe("ArticleExternalLink", () => {
 		expect(onOpenArticle).toHaveBeenCalledWith("a1", false);
 	});
 
-	it("also triggers the handler for modified clicks and middle clicks", () => {
+	it("preserves native browser behavior for modified and middle clicks", () => {
 		const onOpenArticle = vi.fn();
 
 		renderWithProviders(
@@ -50,7 +50,6 @@ describe("ArticleExternalLink", () => {
 			}),
 		);
 
-		expect(onOpenArticle).toHaveBeenNthCalledWith(1, "a1", false);
-		expect(onOpenArticle).toHaveBeenNthCalledWith(2, "a1", false);
+		expect(onOpenArticle).not.toHaveBeenCalled();
 	});
 });

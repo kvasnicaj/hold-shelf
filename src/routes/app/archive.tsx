@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ArchivePage } from "#/components/archive/archive-page";
-import { getArticles } from "#/server/articles";
-import { getTags } from "#/server/tags";
+import {
+	articleListOptions,
+	tagListOptions,
+} from "#/components/articles/query-options";
 
 const PAGE_SIZE = 20;
 
@@ -31,13 +33,16 @@ export const Route = createFileRoute("/app/archive")({
 			tag: typeof search.tag === "string" ? search.tag : undefined,
 			tags: tags && tags.length > 0 ? tags : undefined,
 			page:
-				typeof search.page === "number" && search.page > 1
+				typeof search.page === "number" &&
+				Number.isInteger(search.page) &&
+				search.page > 1 &&
+				search.page <= 501
 					? search.page
 					: undefined,
 		};
 	},
 	loaderDeps: ({ search }) => search,
-	loader: async ({ deps }) => {
+	loader: async ({ deps, context }) => {
 		const isRead =
 			deps.filter === "read"
 				? true
@@ -47,17 +52,17 @@ export const Route = createFileRoute("/app/archive")({
 		const page = deps.page ?? 1;
 		const tagIds = deps.tags?.length ? deps.tags : deps.tag ? [deps.tag] : [];
 		const [articles, tags] = await Promise.all([
-			getArticles({
-				data: {
+			context.queryClient.ensureQueryData(
+				articleListOptions({
 					isRead,
 					search: deps.q,
 					sort: deps.sort,
 					tagIds,
 					limit: PAGE_SIZE,
 					offset: (page - 1) * PAGE_SIZE,
-				},
-			}),
-			getTags(),
+				}),
+			),
+			context.queryClient.ensureQueryData(tagListOptions()),
 		]);
 		return { articles, tags };
 	},

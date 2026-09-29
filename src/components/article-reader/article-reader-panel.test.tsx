@@ -1,3 +1,5 @@
+import { screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { ArticleReaderPanel } from "#/components/article-reader/article-reader-panel";
 import { renderWithProviders } from "#/test/render";
@@ -40,16 +42,15 @@ describe("ArticleReaderPanel", () => {
 		readerState.isOpen = false;
 		getTagsMock.mockResolvedValue([]);
 
-		const { container } = renderWithProviders(<ArticleReaderPanel />);
+		renderWithProviders(<ArticleReaderPanel />);
 
-		const reader = container.querySelector(
-			'aside[aria-label="Article reader"]',
-		);
-		expect(reader).toHaveAttribute("aria-hidden", "true");
-		expect(reader).toHaveAttribute("inert");
+		expect(
+			screen.queryByRole("dialog", { name: "Article reader" }),
+		).not.toBeInTheDocument();
 	});
 
-	it("keeps the open reader accessible", () => {
+	it("moves focus into the overlay and supports Escape", async () => {
+		const user = userEvent.setup();
 		readerState.articleId = "a1";
 		readerState.isOpen = true;
 		getTagsMock.mockResolvedValue([]);
@@ -72,12 +73,14 @@ describe("ArticleReaderPanel", () => {
 			},
 		});
 
-		const { container } = renderWithProviders(<ArticleReaderPanel />);
+		renderWithProviders(<ArticleReaderPanel />);
 
-		const reader = container.querySelector(
-			'aside[aria-label="Article reader"]',
-		);
-		expect(reader).toHaveAttribute("aria-hidden", "false");
-		expect(reader).not.toHaveAttribute("inert");
+		expect(
+			screen.getByRole("dialog", { name: "Article reader" }),
+		).toBeInTheDocument();
+		const dialog = screen.getByRole("dialog", { name: "Article reader" });
+		expect(dialog.contains(document.activeElement)).toBe(true);
+		await user.keyboard("{Escape}");
+		expect(readerState.closeArticle).toHaveBeenCalled();
 	});
 });

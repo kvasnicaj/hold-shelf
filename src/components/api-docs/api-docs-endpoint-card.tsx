@@ -16,7 +16,7 @@ export function ApiDocsEndpointCard({ endpoint }: ApiDocsEndpointCardProps) {
 					<Badge variant="secondary" className="font-mono">
 						{endpoint.method}
 					</Badge>
-					<code className="rounded-md bg-muted px-2 py-1 text-sm">
+					<code className="break-all rounded-md bg-muted px-2 py-1 text-sm">
 						{endpoint.path}
 					</code>
 				</div>
@@ -28,7 +28,9 @@ export function ApiDocsEndpointCard({ endpoint }: ApiDocsEndpointCardProps) {
 						<p className="text-xs font-medium uppercase tracking-normal text-muted-foreground">
 							Authentication
 						</p>
-						<p className="mt-1 font-mono text-xs">{endpoint.auth}</p>
+						<p className="mt-1 break-words font-mono text-xs">
+							{endpoint.auth}
+						</p>
 					</div>
 					{endpoint.contentType ? (
 						<div>

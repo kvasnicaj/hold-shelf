@@ -13,13 +13,23 @@ A read-it-later web app. Save articles, organize with tags, read when you're rea
 
 ## Getting started
 
+Use Node.js 22 or later and pnpm 10.32.1 (the version pinned in `package.json`).
+Create a GitHub OAuth app for local development with homepage
+`http://localhost:3000` and callback `http://localhost:3000/api/auth/callback/github`.
+GitHub is the only enabled sign-in provider; local email/password login is not
+available.
+
 ```bash
-pnpm install
+pnpm install --frozen-lockfile
 cp .dev.vars.example .dev.vars     # fill in your secrets
 pnpm cf-typegen                     # generate Cloudflare types
 pnpm wrangler d1 migrations apply hold-shelf-db --local
 pnpm dev
 ```
+
+Generate `BETTER_AUTH_SECRET` with `openssl rand -base64 32`. Put it and your local
+OAuth app credentials in `.dev.vars`, which Git ignores. Development uses an
+emulated D1 database; production credentials are not needed for local development.
 
 ## Scripts
 
@@ -37,6 +47,11 @@ pnpm typecheck    # TypeScript checks
 Pushes to `main` trigger CI/CD via GitHub Actions: lint, typecheck, test, then deploy to Cloudflare Workers.
 
 Worker secrets are managed via `pnpm wrangler secret put <NAME>`.
+
+For your own deployment, first replace the production domain, Worker name, D1
+database ID, and auth URL in `wrangler.jsonc` with your own resources. See the
+[deployment guide](./docs/deployment.md). The checked-in identifiers describe the
+Hold Shelf service; they do not grant access to its Cloudflare account.
 
 ## CLI
 
@@ -62,4 +77,14 @@ chosen.
 - [Architecture and component tree](./docs/architecture.md)
 - [Authentication](./docs/auth.md)
 - [CLI architecture and command contract](./docs/cli.md)
+- [CLI setup and usage](./docs/cli-guide.md)
 - [Deployment](./docs/deployment.md)
+- [Contributing](./CONTRIBUTING.md)
+- [Security reporting](./SECURITY.md)
+- [Third-party notices](./THIRD_PARTY_NOTICES.md)
+
+## License
+
+Hold Shelf's original code is licensed under the [MIT License](./LICENSE).
+Third-party components and artwork retain their respective licenses; see
+[third-party notices](./THIRD_PARTY_NOTICES.md).

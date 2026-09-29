@@ -8,8 +8,9 @@ import { FavoritesPage } from "#/components/favorites/favorites-page";
 export const Route = createFileRoute("/app/favorites")({
 	validateSearch: validateArticleCollectionSearch,
 	loaderDeps: ({ search }) => search,
-	loader: ({ deps }) =>
+	loader: ({ deps, context }) =>
 		loadArticleCollectionRoute({
+			queryClient: context.queryClient,
 			filters: { isFavorite: true },
 			search: deps,
 		}),

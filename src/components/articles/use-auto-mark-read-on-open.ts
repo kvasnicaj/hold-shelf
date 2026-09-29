@@ -1,5 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { getRouteApi, useRouter } from "@tanstack/react-router";
+import { toast } from "sonner";
 import { useArticleReader } from "#/components/article-reader/use-article-reader";
 import { updateArticle } from "#/server/articles";
 
@@ -18,8 +19,15 @@ export function useAutoMarkReadOnOpen() {
 			return;
 		}
 
-		await updateArticle({ data: { id, isRead: true } });
+		try {
+			await updateArticle({ data: { id, isRead: true } });
+		} catch {
+			toast.error(
+				"Could not mark this article as read. Try again from the reader.",
+			);
+		}
 		void queryClient.invalidateQueries({ queryKey: ["articles"] });
+		void queryClient.invalidateQueries({ queryKey: ["article-reader", id] });
 		void router.invalidate();
 	}
 

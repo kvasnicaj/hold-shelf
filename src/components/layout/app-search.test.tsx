@@ -62,7 +62,7 @@ describe("AppSearch", () => {
 		renderWithProviders(<AppSearch />);
 
 		await user.type(
-			screen.getByPlaceholderText("Search saved articles..."),
+			screen.getByPlaceholderText("Search all saved articles..."),
 			"design",
 		);
 
@@ -106,7 +106,7 @@ describe("AppSearch", () => {
 		renderWithProviders(<AppSearch />);
 
 		await user.type(
-			screen.getByPlaceholderText("Search saved articles..."),
+			screen.getByPlaceholderText("Search all saved articles..."),
 			"css-tricks",
 		);
 
@@ -132,7 +132,7 @@ describe("AppSearch", () => {
 		const user = userEvent.setup();
 		renderWithProviders(<AppSearch />);
 
-		const search = screen.getByPlaceholderText("Search saved articles...");
+		const search = screen.getByPlaceholderText("Search all saved articles...");
 		await user.type(search, "rust{Enter}");
 
 		expect(navigateMock).toHaveBeenCalledWith({

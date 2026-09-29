@@ -8,3 +8,9 @@ allowBuilds:
   lightningcss: true
   sharp: true
   workerd: true
+
+# drizzle-kit's legacy loader otherwise retains an affected esbuild dev server.
+overrides:
+  '@esbuild-kit/core-utils>esbuild': '0.28.2'
+  # GHSA-3wwx-pv8p-q78v: Miniflare pins an affected WebSocket client.
+  'miniflare>undici': '7.29.1'

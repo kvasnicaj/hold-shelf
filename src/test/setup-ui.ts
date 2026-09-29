@@ -1,6 +1,7 @@
 import "@testing-library/jest-dom/vitest";
 import { cleanup } from "@testing-library/react";
 import { afterEach, beforeEach, vi } from "vitest";
+import { getContinueReading, getReadingProgress } from "#/server/library";
 
 function ensureLocalStorage() {
 	if (window.localStorage) {
@@ -28,6 +29,8 @@ function ensureLocalStorage() {
 
 beforeEach(() => {
 	ensureLocalStorage();
+	vi.mocked(getContinueReading).mockResolvedValue([]);
+	vi.mocked(getReadingProgress).mockResolvedValue(0);
 
 	Object.defineProperty(window, "matchMedia", {
 		writable: true,
@@ -74,3 +77,16 @@ afterEach(() => {
 	vi.unstubAllEnvs();
 	vi.unstubAllGlobals();
 });
+
+vi.mock("#/server/library", () => ({
+	permanentlyDeleteTrash: vi.fn(),
+	finishReading: vi.fn(),
+	restoreArticles: vi.fn().mockResolvedValue({ success: true }),
+	getTrash: vi.fn().mockResolvedValue([]),
+	getReadingProgress: vi.fn().mockResolvedValue(0),
+	saveReadingProgress: vi.fn().mockResolvedValue({ success: true }),
+	getContinueReading: vi.fn().mockResolvedValue([]),
+	refreshArticleContent: vi.fn(),
+	exportLibraryPage: vi.fn().mockResolvedValue([]),
+	importLibraryBatch: vi.fn(),
+}));

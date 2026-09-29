@@ -22,7 +22,7 @@ export const homeNavItem: AppNavItem = {
 export const libraryNavItems: AppNavItem[] = [
 	{ href: "/app/articles", icon: BookOpen, label: "Unread" },
 	{ href: "/app/favorites", icon: BookMarked, label: "Favorites" },
-	{ href: "/app/archive", icon: Archive, label: "Archive" },
+	{ href: "/app/archive", icon: Archive, label: "Library" },
 	{ href: "/app/tags", icon: Tags, label: "Tags" },
 ];
 

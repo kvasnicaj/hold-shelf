@@ -1,27 +1,30 @@
-import { useMemo, useState } from "react";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
+import { articleIdFromHash } from "#/components/article-reader/helpers";
 import { ArticleReaderContext } from "#/components/article-reader/use-article-reader";
 
-type ArticleReaderProviderProps = {
-	children: React.ReactNode;
-};
-
+type ArticleReaderProviderProps = { children: React.ReactNode };
 export function ArticleReaderProvider({
 	children,
 }: ArticleReaderProviderProps) {
-	const [articleId, setArticleId] = useState<string | null>(null);
-
-	const value = useMemo(
-		() => ({
-			articleId,
-			isOpen: Boolean(articleId),
-			openArticle: (id: string) => setArticleId(id),
-			closeArticle: () => setArticleId(null),
-		}),
-		[articleId],
-	);
-
+	const hash = useRouterState({ select: (state) => state.location.hash });
+	const navigate = useNavigate();
+	const articleId = articleIdFromHash(hash);
 	return (
-		<ArticleReaderContext.Provider value={value}>
+		<ArticleReaderContext.Provider
+			value={{
+				articleId,
+				isOpen: Boolean(articleId),
+				openArticle: (id) => {
+					void navigate({
+						hash: `article=${encodeURIComponent(id)}`,
+						search: true,
+					});
+				},
+				closeArticle: () => {
+					void navigate({ hash: "", search: true });
+				},
+			}}
+		>
 			{children}
 		</ArticleReaderContext.Provider>
 	);

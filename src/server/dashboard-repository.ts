@@ -4,6 +4,7 @@ import { articles } from "#/db/schema";
 import { createArticlesRepository } from "#/server/articles-repository";
 import { getArticlesForUser } from "#/server/articles-service";
 import type { DashboardRepository } from "#/server/dashboard-runtime";
+import { activeArticle } from "#/server/db-helpers";
 
 export function createDashboardRepository(): DashboardRepository {
 	const db = getDb();
@@ -19,7 +20,7 @@ export function createDashboardRepository(): DashboardRepository {
 					savedThisWeek: sql<number>`SUM(CASE WHEN ${articles.createdAt} >= unixepoch('now', '-7 days') THEN 1 ELSE 0 END)`,
 				})
 				.from(articles)
-				.where(eq(articles.userId, userId));
+				.where(and(eq(articles.userId, userId), activeArticle()));
 
 			return stats ?? null;
 		},
@@ -42,7 +43,13 @@ export function createDashboardRepository(): DashboardRepository {
 							isRead: articles.isRead,
 						})
 						.from(articles)
-						.where(and(eq(articles.userId, userId), eq(articles.isRead, false)))
+						.where(
+							and(
+								eq(articles.userId, userId),
+								eq(articles.isRead, false),
+								activeArticle(),
+							),
+						)
 						.orderBy(asc(articles.createdAt))
 						.limit(5),
 					db
@@ -57,7 +64,11 @@ export function createDashboardRepository(): DashboardRepository {
 						})
 						.from(articles)
 						.where(
-							and(eq(articles.userId, userId), eq(articles.isFavorite, true)),
+							and(
+								eq(articles.userId, userId),
+								eq(articles.isFavorite, true),
+								activeArticle(),
+							),
 						)
 						.orderBy(desc(articles.updatedAt))
 						.limit(5),

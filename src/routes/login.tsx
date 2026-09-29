@@ -1,5 +1,6 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { LoginPage } from "#/components/auth/login-page";
+import { safeReturnPath } from "#/components/auth/helpers";
+import { LoginRoutePage } from "#/components/auth/login-route-page";
 import { getSession } from "#/server/auth";
 
 type LoginSearch = {
@@ -8,10 +9,7 @@ type LoginSearch = {
 
 export const Route = createFileRoute("/login")({
 	validateSearch: (search: Record<string, unknown>): LoginSearch => ({
-		redirectTo:
-			typeof search.redirectTo === "string" && search.redirectTo.startsWith("/")
-				? search.redirectTo
-				: undefined,
+		redirectTo: safeReturnPath(search.redirectTo),
 	}),
 	beforeLoad: async ({ search }) => {
 		const session = await getSession();
@@ -22,19 +20,5 @@ export const Route = createFileRoute("/login")({
 			throw redirect({ to: "/app/home" });
 		}
 	},
-	component: LoginRouteComponent,
+	component: LoginRoutePage,
 });
-
-function LoginRouteComponent() {
-	const { redirectTo } = Route.useSearch();
-	return (
-		<LoginPage
-			callbackURL={redirectTo ?? "/app/home"}
-			errorCallbackURL={
-				redirectTo
-					? `/login?redirectTo=${encodeURIComponent(redirectTo)}`
-					: "/login"
-			}
-		/>
-	);
-}

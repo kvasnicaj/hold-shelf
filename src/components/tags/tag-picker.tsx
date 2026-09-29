@@ -13,8 +13,8 @@ import {
 type TagPickerProps = {
 	availableTags: Tag[];
 	selectedTagIds: string[];
-	onAddTag: (tagId: string, articleIds: string[]) => void;
-	onRemoveTag: (tagId: string, articleIds: string[]) => void;
+	onAddTag: (tagId: string, articleIds: string[]) => void | Promise<void>;
+	onRemoveTag: (tagId: string, articleIds: string[]) => void | Promise<void>;
 	onCreateTag: (name: string) => Promise<Tag>;
 	articleIds: string[];
 	triggerClassName?: string;
@@ -32,6 +32,7 @@ export function TagPicker({
 	const [open, setOpen] = useState(false);
 	const [search, setSearch] = useState("");
 	const [creating, setCreating] = useState(false);
+	const [error, setError] = useState<string | null>(null);
 
 	const filtered = availableTags.filter((tag) =>
 		tag.name.toLowerCase().includes(search.toLowerCase()),
@@ -63,6 +64,7 @@ export function TagPicker({
 				onKeyDown={(event) => event.stopPropagation()}
 			>
 				<Input
+					maxLength={64}
 					placeholder="Search or create tag..."
 					value={search}
 					onChange={(e) => setSearch(e.target.value)}
@@ -76,11 +78,19 @@ export function TagPicker({
 							<button
 								type="button"
 								key={tag.id}
-								onClick={() => {
-									if (isSelected) {
-										onRemoveTag(tag.id, articleIds);
-									} else {
-										onAddTag(tag.id, articleIds);
+								onClick={async () => {
+									try {
+										if (isSelected) {
+											await onRemoveTag(tag.id, articleIds);
+										} else {
+											await onAddTag(tag.id, articleIds);
+										}
+									} catch (error) {
+										setError(
+											error instanceof Error
+												? error.message
+												: "Could not update tag.",
+										);
 									}
 								}}
 								className="flex w-full min-w-0 items-center justify-between gap-2 overflow-hidden rounded px-2 py-1.5 text-sm hover:bg-accent"
@@ -99,16 +109,31 @@ export function TagPicker({
 						);
 					})}
 
+					{error && (
+						<p role="alert" className="px-2 text-sm text-destructive">
+							{error}
+						</p>
+					)}
 					{canCreate && (
 						<button
 							type="button"
 							disabled={creating}
 							onClick={async () => {
 								setCreating(true);
-								const tag = await onCreateTag(search.trim());
-								onAddTag(tag.id, articleIds);
-								setSearch("");
-								setCreating(false);
+								setError(null);
+								try {
+									const tag = await onCreateTag(search.trim());
+									await onAddTag(tag.id, articleIds);
+									setSearch("");
+								} catch (error) {
+									setError(
+										error instanceof Error
+											? error.message
+											: "Could not create tag. Please try again.",
+									);
+								} finally {
+									setCreating(false);
+								}
 							}}
 							className="flex w-full min-w-0 items-center gap-1 overflow-hidden rounded px-2 py-1.5 text-sm text-muted-foreground hover:bg-accent"
 						>

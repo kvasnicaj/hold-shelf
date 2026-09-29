@@ -134,4 +134,39 @@ describe("TagPicker", () => {
 		expect(onAddTag).toHaveBeenCalledTimes(2);
 		expect(onParentClick).not.toHaveBeenCalled();
 	});
+	it("recovers after failed creation and waits for the new tag assignment", async () => {
+		const user = userEvent.setup();
+		const create = vi
+			.fn()
+			.mockRejectedValueOnce(new Error("Network unavailable"))
+			.mockResolvedValue({ id: "new", name: "Research", color: null });
+		const add = vi.fn().mockResolvedValue(undefined);
+		renderWithProviders(
+			<TagPicker
+				availableTags={[]}
+				selectedTagIds={[]}
+				onAddTag={add}
+				onRemoveTag={vi.fn()}
+				onCreateTag={create}
+				articleIds={["a1"]}
+			/>,
+		);
+		await user.click(screen.getByRole("button", { name: /manage tags/i }));
+		await user.type(
+			screen.getByPlaceholderText(/search or create tag/i),
+			"Research",
+		);
+		await user.click(screen.getByRole("button", { name: 'Create "Research"' }));
+		expect(await screen.findByRole("alert")).toHaveTextContent(
+			"Network unavailable",
+		);
+		expect(
+			screen.getByRole("button", { name: 'Create "Research"' }),
+		).toBeEnabled();
+		await user.click(screen.getByRole("button", { name: 'Create "Research"' }));
+		await waitFor(() => expect(add).toHaveBeenCalledWith("new", ["a1"]));
+		expect(screen.getByPlaceholderText(/search or create tag/i)).toHaveValue(
+			"",
+		);
+	});
 });

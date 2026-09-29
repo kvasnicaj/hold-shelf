@@ -1,81 +1,126 @@
-import { type QueryKey, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
+import { toast } from "sonner";
+import { chunks } from "#/lib/helpers";
 import { deleteArticles, updateArticle } from "#/server/articles";
+import { finishReading, restoreArticles } from "#/server/library";
 import {
 	addTagToArticles,
 	createTag,
 	removeTagFromArticles,
 } from "#/server/tags";
 
-type UseArticleMutationsOptions = {
-	onSelectionClear?: () => void;
-	extraInvalidationKeys?: QueryKey[];
-	invalidateRouter?: boolean;
-};
-
+type UseArticleMutationsOptions = { onSelectionClear?: () => void };
 export function useArticleMutations({
 	onSelectionClear,
-	extraInvalidationKeys = [],
-	invalidateRouter = true,
 }: UseArticleMutationsOptions = {}) {
-	const queryClient = useQueryClient();
+	const client = useQueryClient();
 	const router = useRouter();
-
-	async function invalidateAll() {
-		const invalidations = [
-			queryClient.invalidateQueries({ queryKey: ["articles"] }),
-			queryClient.invalidateQueries({ queryKey: ["tags"] }),
-			...extraInvalidationKeys.map((queryKey) =>
-				queryClient.invalidateQueries({ queryKey }),
+	const mutation = useMutation({
+		mutationKey: ["library-edit"],
+		mutationFn: (run: () => Promise<void>) => run(),
+		onError: (error) =>
+			toast.error(
+				error instanceof Error
+					? error.message
+					: "Could not save the change. Please try again.",
 			),
-		];
-
-		if (invalidateRouter) {
-			invalidations.push(router.invalidate());
+		onSettled: async () => {
+			await Promise.all([
+				...[
+					"articles",
+					"tags",
+					"article-reader",
+					"trash",
+					"continue-reading",
+					"reading-progress",
+				].map((key) => client.invalidateQueries({ queryKey: [key] })),
+				router.invalidate(),
+			]);
+		},
+	});
+	// Click handlers resolve after displaying errors, avoiding unhandled rejections.
+	async function run(action: () => Promise<void>) {
+		try {
+			await mutation.mutateAsync(action);
+		} catch {
+			/* onError displays the failure */
 		}
-
-		await Promise.all(invalidations);
+	}
+	async function handleFinishReading(id: string) {
+		await run(async () => {
+			await finishReading({ data: { id } });
+		});
 	}
 
 	async function handleToggleRead(id: string, isRead: boolean) {
-		await updateArticle({ data: { id, isRead } });
-		await invalidateAll();
+		await run(async () => {
+			await updateArticle({ data: { id, isRead } });
+		});
 	}
-
 	async function handleToggleFavorite(id: string, isFavorite: boolean) {
-		await updateArticle({ data: { id, isFavorite } });
-		await invalidateAll();
+		await run(async () => {
+			await updateArticle({ data: { id, isFavorite } });
+		});
 	}
-
 	async function handleDelete(ids: string[]) {
-		await deleteArticles({ data: { ids } });
-		onSelectionClear?.();
-		await invalidateAll();
+		await run(async () => {
+			for (const batch of chunks(ids, 100))
+				await deleteArticles({ data: { ids: batch } });
+			onSelectionClear?.();
+			toast.success("Moved to Trash", {
+				action: {
+					label: "Undo",
+					onClick: () => {
+						void run(async () => {
+							for (const batch of chunks(ids, 100))
+								await restoreArticles({ data: { ids: batch } });
+						});
+					},
+				},
+			});
+		});
 	}
-
 	async function handleBulkToggleRead(ids: string[], isRead: boolean) {
-		await Promise.all(ids.map((id) => updateArticle({ data: { id, isRead } })));
-		onSelectionClear?.();
-		await invalidateAll();
+		await run(async () => {
+			let failures = 0;
+			for (const batch of chunks(ids, 5)) {
+				const results = await Promise.allSettled(
+					batch.map((id) => updateArticle({ data: { id, isRead } })),
+				);
+				failures += results.filter(
+					(result) => result.status === "rejected",
+				).length;
+			}
+			if (failures)
+				throw new Error(
+					`${failures} articles could not be updated. Your successful changes have been saved; please retry.`,
+				);
+			onSelectionClear?.();
+		});
 	}
-
 	async function handleAddTag(tagId: string, articleIds: string[]) {
-		await addTagToArticles({ data: { tagId, articleIds } });
-		await invalidateAll();
+		await mutation.mutateAsync(async () => {
+			for (const batch of chunks(articleIds, 100))
+				await addTagToArticles({ data: { tagId, articleIds: batch } });
+		});
 	}
-
 	async function handleRemoveTag(tagId: string, articleIds: string[]) {
-		await removeTagFromArticles({ data: { tagId, articleIds } });
-		await invalidateAll();
+		await mutation.mutateAsync(async () => {
+			for (const batch of chunks(articleIds, 100))
+				await removeTagFromArticles({ data: { tagId, articleIds: batch } });
+		});
 	}
-
 	async function handleCreateTag(name: string) {
-		const tag = await createTag({ data: { name } });
-		await invalidateAll();
-		return { id: tag.id, name: tag.name, color: tag.color };
+		let result: Awaited<ReturnType<typeof createTag>> | undefined;
+		await mutation.mutateAsync(async () => {
+			result = await createTag({ data: { name } });
+		});
+		if (!result) throw new Error("Could not create tag.");
+		return result;
 	}
-
 	return {
+		handleFinishReading,
 		handleToggleRead,
 		handleToggleFavorite,
 		handleDelete,
@@ -83,5 +128,6 @@ export function useArticleMutations({
 		handleAddTag,
 		handleRemoveTag,
 		handleCreateTag,
+		isPending: mutation.isPending,
 	};
 }
