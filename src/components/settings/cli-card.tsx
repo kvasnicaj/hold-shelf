@@ -14,8 +14,8 @@ export function CliCard() {
 			<CardContent className="space-y-4">
 				<p className="text-sm text-muted-foreground">
 					Save links, search your library, and read articles from your terminal.
-					The CLI currently requires access to the private repository; a public
-					installation is not available yet. The guide covers setup and usage.
+					Install the CLI from our public GitHub repository, then connect it to
+					your account with an API token. The guide covers setup and usage.
 				</p>
 				<Button asChild variant="outline">
 					<a href="/cli-docs">Read CLI documentation</a>

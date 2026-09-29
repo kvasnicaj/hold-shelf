@@ -55,11 +55,16 @@ Hold Shelf service; they do not grant access to its Cloudflare account.
 
 ## CLI
 
-The repository includes a private TypeScript CLI workspace that calls the same
+The repository includes a TypeScript CLI workspace that calls the same
 application domains through `/api/v1`. It supports article browsing, search,
 reader text, save and management actions, tags, favorites, and dashboard stats.
 
-For local development:
+Anyone can build the CLI from this public repository; no GitHub access approval
+is required. It is not published to npm yet. See the
+[CLI setup and usage guide](./docs/cli-guide.md) for installation and everyday
+commands.
+
+After installing the repository dependencies:
 
 ```bash
 pnpm --filter @hold-shelf/cli build
@@ -69,8 +74,6 @@ node packages/cli/dist/bin.js --help
 CLI login uses the account's personal access token from Settings -> API access.
 The token is validated through `GET /api/v1/me` and stored in the operating
 system credential store; CI can provide `HOLD_SHELF_TOKEN` without persistence.
-The package remains private until an installation and release workflow is
-chosen.
 
 ## Documentation
 

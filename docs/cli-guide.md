@@ -1,11 +1,11 @@
 ## Install from source
 
-The CLI is currently available only to collaborators with access to the private
-[Hold Shelf repository](https://github.com/kvasnicaj/hold-shelf). It is not published
-to npm, so there is no public installation yet. If you do not have repository access,
-you can use the [REST API](/api-docs) directly with your personal access token.
+The CLI is available to everyone from the public
+[Hold Shelf repository](https://github.com/kvasnicaj/hold-shelf). Install it from
+source using the steps below. It is not published to npm yet.
 
-With repository access, you need Git, Node.js 22 or later, and pnpm 10.32.1:
+You need Git, Node.js 22 or later, and pnpm 10.32.1. No GitHub account or repository
+access approval is required to clone the source:
 
 ```sh
 git clone https://github.com/kvasnicaj/hold-shelf.git
