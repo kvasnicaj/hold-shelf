@@ -8,6 +8,7 @@ import {
 	getSearchPreviewText,
 } from "#/components/layout/helpers";
 import { ToolBox, ToolBoxInput } from "#/components/layout/tool-box";
+import { useDebouncedValue } from "#/hooks/use-debounced-value";
 import { getArticles } from "#/server/articles";
 
 export function AppSearch() {
@@ -16,17 +17,18 @@ export function AppSearch() {
 	const navigate = useNavigate();
 	const { handleOpenArticle } = useAutoMarkReadOnOpen();
 	const trimmedSearch = search.trim();
+	const debouncedSearch = useDebouncedValue(trimmedSearch);
 	const showResults = focused && trimmedSearch.length >= 2;
 	const { data } = useQuery({
-		queryKey: ["articles", "top-search", trimmedSearch],
+		queryKey: ["articles", "top-search", debouncedSearch],
 		queryFn: () =>
 			getArticles({
 				data: {
-					search: trimmedSearch,
+					search: debouncedSearch,
 					limit: 6,
 				},
 			}),
-		enabled: showResults,
+		enabled: showResults && debouncedSearch.length >= 2,
 	});
 
 	function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -49,17 +51,27 @@ export function AppSearch() {
 	}
 
 	return (
-		<form onSubmit={handleSubmit} className="relative min-w-0 w-full max-w-2xl">
+		<form
+			onSubmit={handleSubmit}
+			onBlur={(event) => {
+				if (!event.currentTarget.contains(event.relatedTarget))
+					setFocused(false);
+			}}
+			onKeyDown={(event) => {
+				if (event.key === "Escape") setFocused(false);
+			}}
+			className="relative min-w-0 w-full max-w-2xl"
+		>
 			<ToolBox className="h-9 min-w-0 w-full gap-2 bg-muted/45 px-3">
 				<Search className="h-4 w-4 shrink-0 text-muted-foreground" />
 				<ToolBoxInput
 					type="search"
 					className="min-w-0"
-					placeholder="Search saved articles..."
+					aria-label="Search all saved articles"
+					placeholder="Search all saved articles..."
 					value={search}
 					onChange={(event) => setSearch(event.target.value)}
 					onFocus={() => setFocused(true)}
-					onBlur={() => window.setTimeout(() => setFocused(false), 120)}
 				/>
 			</ToolBox>
 

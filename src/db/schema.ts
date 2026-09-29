@@ -54,6 +54,7 @@ export const account = sqliteTable("account", {
 		mode: "timestamp",
 	}),
 	scope: text(),
+	password: text(),
 	createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
 	updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
 });
@@ -198,3 +199,22 @@ export const rateLimits = sqliteTable(
 		index("rate_limits_reset_at_idx").on(table.resetAt),
 	],
 );
+
+export const articleTrash = sqliteTable("article_trash", {
+	articleId: text("article_id")
+		.primaryKey()
+		.references(() => articles.id, { onDelete: "cascade" }),
+	deletedAt: integer("deleted_at", { mode: "timestamp" })
+		.notNull()
+		.default(sql`(unixepoch())`),
+});
+
+export const readingProgress = sqliteTable("reading_progress", {
+	articleId: text("article_id")
+		.primaryKey()
+		.references(() => articles.id, { onDelete: "cascade" }),
+	progress: integer().notNull().default(0),
+	updatedAt: integer("updated_at", { mode: "timestamp" })
+		.notNull()
+		.default(sql`(unixepoch())`),
+});

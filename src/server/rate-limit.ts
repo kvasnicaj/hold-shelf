@@ -1,83 +1,32 @@
-import { and, eq, lt, sql } from "drizzle-orm";
+import { lt, sql } from "drizzle-orm";
 import { getDb } from "#/db/index";
 import { rateLimits } from "#/db/schema";
 
-type RateLimitConfig = {
-	name: string;
-	windowMs: number;
-	max: number;
-};
-
-type RateLimitEntry = {
-	count: number;
-	resetAt: number;
-};
-
+type RateLimitConfig = { name: string; windowMs: number; max: number };
 export type RateLimitStore = {
-	deleteExpired: (now: number) => Promise<void>;
-	getEntry: (args: {
-		name: string;
-		key: string;
-	}) => Promise<RateLimitEntry | null>;
-	upsertEntry: (args: {
-		name: string;
-		key: string;
-		count: number;
-		resetAt: number;
-	}) => Promise<void>;
-	updateCount: (args: {
-		name: string;
-		key: string;
-		count: number;
-	}) => Promise<void>;
+	consume: (
+		args: RateLimitConfig & { key: string; now: number },
+	) => Promise<{ count: number; resetAt: number }>;
 };
 
-function createRateLimitStore(): RateLimitStore {
+export function createRateLimitStore(): RateLimitStore {
 	const db = getDb();
-
 	return {
-		deleteExpired: async (now) => {
-			await db.delete(rateLimits).where(lt(rateLimits.resetAt, now));
-		},
-		getEntry: async ({ name, key }) => {
-			const [existing] = await db
-				.select({
-					count: rateLimits.count,
-					resetAt: rateLimits.resetAt,
-				})
-				.from(rateLimits)
-				.where(and(eq(rateLimits.name, name), eq(rateLimits.key, key)))
-				.limit(1);
-
-			return existing ?? null;
-		},
-		upsertEntry: async ({ name, key, count, resetAt }) => {
-			await db
+		consume: async ({ name, key, now, windowMs, max }) => {
+			const [entry] = await db
 				.insert(rateLimits)
-				.values({
-					name,
-					key,
-					count,
-					resetAt,
-					updatedAt: sql`(unixepoch())`,
-				})
+				.values({ name, key, count: 1, resetAt: now + windowMs })
 				.onConflictDoUpdate({
 					target: [rateLimits.name, rateLimits.key],
 					set: {
-						count,
-						resetAt,
-						updatedAt: sql`(unixepoch())`,
+						count: sql`CASE WHEN ${rateLimits.resetAt} <= ${now} THEN 1 ELSE MIN(${rateLimits.count} + 1, ${max + 1}) END`,
+						resetAt: sql`CASE WHEN ${rateLimits.resetAt} <= ${now} THEN ${now + windowMs} ELSE ${rateLimits.resetAt} END`,
+						updatedAt: sql`unixepoch()`,
 					},
-				});
-		},
-		updateCount: async ({ name, key, count }) => {
-			await db
-				.update(rateLimits)
-				.set({
-					count,
-					updatedAt: sql`(unixepoch())`,
 				})
-				.where(and(eq(rateLimits.name, name), eq(rateLimits.key, key)));
+				.returning({ count: rateLimits.count, resetAt: rateLimits.resetAt });
+			if (!entry) throw new Error("Could not check request limit.");
+			return entry;
 		},
 	};
 }
@@ -85,52 +34,23 @@ function createRateLimitStore(): RateLimitStore {
 export async function checkRateLimitWithStore(
 	config: RateLimitConfig,
 	key: string,
-	{
-		store,
-		now = Date.now(),
-	}: {
-		store: RateLimitStore;
-		now?: number;
-	},
-): Promise<{ allowed: boolean; retryAfterMs: number }> {
-	const windowEnd = now + config.windowMs;
-
-	await store.deleteExpired(now);
-	const existing = await store.getEntry({ name: config.name, key });
-
-	if (!existing || now > existing.resetAt) {
-		await store.upsertEntry({
-			name: config.name,
-			key,
-			count: 1,
-			resetAt: windowEnd,
-		});
-
-		return { allowed: true, retryAfterMs: 0 };
-	}
-
-	if (existing.count >= config.max) {
-		return {
-			allowed: false,
-			retryAfterMs: Math.max(0, existing.resetAt - now),
-		};
-	}
-
-	await store.updateCount({
-		name: config.name,
-		key,
-		count: existing.count + 1,
-	});
-
-	return { allowed: true, retryAfterMs: 0 };
+	{ store, now = Date.now() }: { store: RateLimitStore; now?: number },
+) {
+	const entry = await store.consume({ ...config, key, now });
+	const allowed = entry.count <= config.max;
+	return {
+		allowed,
+		retryAfterMs: allowed ? 0 : Math.max(0, entry.resetAt - now),
+	};
 }
-
-export async function checkRateLimit(
-	config: RateLimitConfig,
-	key: string,
-): Promise<{ allowed: boolean; retryAfterMs: number }> {
+export async function checkRateLimit(config: RateLimitConfig, key: string) {
 	return checkRateLimitWithStore(config, key, {
 		store: createRateLimitStore(),
-		now: Date.now(),
 	});
+}
+
+export async function cleanupRateLimits() {
+	await getDb()
+		.delete(rateLimits)
+		.where(lt(rateLimits.resetAt, Date.now() - 86400000));
 }

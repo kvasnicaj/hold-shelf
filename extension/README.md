@@ -1,6 +1,6 @@
 # Hold Shelf Chrome Extension
 
-This is a minimal Manifest V3 scaffold for saving pages into Hold Shelf.
+This Manifest V3 extension saves pages into Hold Shelf.
 
 ## Load it locally
 
@@ -39,3 +39,20 @@ const APP_ORIGIN = "https://hold-shelf.com";
 To test locally, temporarily change `APP_ORIGIN` to `http://localhost:3000` in
 `background.js` and add `http://localhost:3000/*` to `host_permissions` in
 `manifest.json`, then reload the extension.
+
+## Package for distribution
+
+Build a fresh archive from source rather than committing generated ZIP files.
+From the repository root on macOS or Linux (with `zip` installed):
+
+```sh
+mkdir -p dist
+rm -f dist/hold-shelf-extension.zip
+(cd extension && zip -X -r ../dist/hold-shelf-extension.zip manifest.json background.js icons)
+zip -j dist/hold-shelf-extension.zip LICENSE
+```
+
+The explicit file list excludes local files and macOS metadata. Keep
+`icons/LICENSE` in the archive: the icons use Lucide artwork. See the repository's
+[third-party notices](../THIRD_PARTY_NOTICES.md) for attribution.
+The root `LICENSE` covers the extension's original code under MIT.

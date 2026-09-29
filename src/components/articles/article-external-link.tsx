@@ -28,7 +28,14 @@ export function ArticleExternalLink({
 	function handleClick(event: React.MouseEvent<HTMLAnchorElement>) {
 		onClick?.(event);
 
-		if (event.defaultPrevented || event.button !== 0) {
+		if (
+			event.defaultPrevented ||
+			event.button !== 0 ||
+			event.metaKey ||
+			event.ctrlKey ||
+			event.shiftKey ||
+			event.altKey
+		) {
 			return;
 		}
 
@@ -39,14 +46,6 @@ export function ArticleExternalLink({
 
 	function handleAuxClick(event: React.MouseEvent<HTMLAnchorElement>) {
 		onAuxClick?.(event);
-
-		if (event.defaultPrevented || event.button !== 1) {
-			return;
-		}
-
-		event.preventDefault();
-		event.stopPropagation();
-		triggerOpen();
 	}
 
 	return (

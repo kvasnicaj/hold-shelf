@@ -1,6 +1,7 @@
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { getDb } from "#/db/index";
 import { articles, articleTags, tags } from "#/db/schema";
+import { activeArticle, chunks } from "#/server/db-helpers";
 import type { TagsRepository } from "#/server/tags-service";
 
 export function createTagsRepository(): TagsRepository {
@@ -23,6 +24,7 @@ export function createTagsRepository(): TagsRepository {
 					and(
 						eq(articles.id, articleTags.articleId),
 						eq(articles.userId, userId),
+						activeArticle(),
 					),
 				)
 				.where(eq(tags.userId, userId))
@@ -64,35 +66,53 @@ export function createTagsRepository(): TagsRepository {
 			return !!ownedTag;
 		},
 		countOwnedArticles: async ({ userId, articleIds }) => {
-			const ownedArticles = await db
-				.select({ id: articles.id })
-				.from(articles)
-				.where(
-					and(eq(articles.userId, userId), inArray(articles.id, articleIds)),
-				);
+			const ownedArticles = (
+				await Promise.all(
+					chunks(articleIds, 90).map((batch) =>
+						db
+							.select({ id: articles.id })
+							.from(articles)
+							.where(
+								and(
+									eq(articles.userId, userId),
+									activeArticle(),
+									inArray(articles.id, batch),
+								),
+							),
+					),
+				)
+			).flat();
 
 			return ownedArticles.length;
 		},
 		addTagToArticles: async ({ tagId, articleIds }) => {
-			await db
-				.insert(articleTags)
-				.values(
-					articleIds.map((articleId) => ({
-						articleId,
-						tagId,
-					})),
-				)
-				.onConflictDoNothing();
+			const statements = chunks(articleIds).map((batch) =>
+				db
+					.insert(articleTags)
+					.values(
+						batch.map((articleId) => ({
+							articleId,
+							tagId,
+						})),
+					)
+					.onConflictDoNothing(),
+			);
+			if (statements.length)
+				await db.batch([statements[0], ...statements.slice(1)]);
 		},
 		removeTagFromArticles: async ({ tagId, articleIds }) => {
-			await db
-				.delete(articleTags)
-				.where(
-					and(
-						inArray(articleTags.articleId, articleIds),
-						eq(articleTags.tagId, tagId),
+			const statements = chunks(articleIds, 90).map((batch) =>
+				db
+					.delete(articleTags)
+					.where(
+						and(
+							inArray(articleTags.articleId, batch),
+							eq(articleTags.tagId, tagId),
+						),
 					),
-				);
+			);
+			if (statements.length)
+				await db.batch([statements[0], ...statements.slice(1)]);
 		},
 	};
 }

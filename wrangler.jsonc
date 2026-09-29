@@ -5,6 +5,7 @@
 	"compatibility_flags": ["nodejs_compat"],
 	"main": "src/server-entry.ts",
 	"observability": { "enabled": true },
+ "triggers": { "crons": ["0 * * * *"] },
 	"d1_databases": [
 		{
 			"binding": "DB",

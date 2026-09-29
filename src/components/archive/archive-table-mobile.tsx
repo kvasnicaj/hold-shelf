@@ -75,7 +75,10 @@ export function ArchiveTableMobile({
 							className="grid cursor-pointer grid-cols-[minmax(0,1fr)_auto] gap-x-2 py-2"
 							onClick={() => void onOpenArticle(article.id, article.isRead)}
 							onKeyDown={(event) => {
-								if (event.key === "Enter") {
+								if (
+									event.key === "Enter" &&
+									event.target === event.currentTarget
+								) {
 									void onOpenArticle(article.id, article.isRead);
 								}
 							}}
@@ -86,6 +89,7 @@ export function ArchiveTableMobile({
 								<div className="flex min-w-0 items-start gap-1.5">
 									{hasSelection || isSelected ? (
 										<Checkbox
+											aria-label={`Select ${article.title ?? article.url}`}
 											checked={isSelected}
 											onCheckedChange={(value) =>
 												toggleRow(article.id, !!value)

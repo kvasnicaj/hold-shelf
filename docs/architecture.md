@@ -44,6 +44,7 @@ High-level CLI flow:
 |- /                          -> LandingPage
 |- /about                     -> AboutPage
 |- /api-docs                  -> ApiDocsPage
+|- /cli-docs                  -> CliDocsPage (user guide from docs/cli-guide.md)
 |- /api-docs/agents           -> Agent-friendly Markdown API docs export
 |- /login                     -> LoginPage
 |- /privacy                   -> PrivacyPage
@@ -64,6 +65,7 @@ High-level CLI flow:
    |- /app/tags               -> TagsPage
    |- /app/archive            -> ArchivePage
    |- /app/settings           -> SettingsPage
+   |- /app/trash              -> TrashPage
 ```
 
 ## Global app shell
@@ -79,7 +81,8 @@ Responsibilities:
 
 ### `/app` layout
 
-`src/routes/app.tsx` is the authenticated shell.
+`src/routes/app.tsx` authenticates and loads the user; the shell lives in
+`src/components/layout/app-layout.tsx` and `top-bar.tsx`.
 
 Component tree:
 
@@ -197,6 +200,8 @@ Component tree:
 
 ```text
 ApiDocsPage
+|- DocumentationLayout (shared with CliDocsPage: header, navigation, width, theme)
+|- DocumentationSection (shared section typography and spacing)
 |- API overview panel
 |- agent Markdown export link -> /api-docs/agents
 |- Personal REST API endpoint cards for articles, tags, stats, and auth checks
@@ -373,9 +378,7 @@ Component tree:
 ```text
 HomePage
 |- page header
-|- mobile stats card
-|- desktop stat card grid
-|  |- StatCard x4
+|- ContinueReadingSection
 |- recent content grid
 |  |- recently saved card
 |  |  |- ArticleLink* + TagPicker*
@@ -383,6 +386,7 @@ HomePage
 |  |  |- ArticleLink*
 |  |- oldest unread card
 |     |- ArticleLink*
+|- compact reading statistics
 |- empty state CTA -> /app/articles
 ```
 
@@ -514,7 +518,7 @@ Core functionality:
   sharing dialog
 - reuse `ArticleList` to manage article state and tag assignment
 
-### Archive
+### Library
 
 Route: `/app/archive`
 
@@ -577,7 +581,9 @@ SettingsPage
 |- ReadingSettingsCard
 |- Browser extension card
 |  |- CTA button -> Chrome Web Store
+|- LibraryBackupCard
 |- AccountSummaryCard
+|- CliCard -> /cli-docs
 |- ApiTokenCard
 |  |- API documentation link -> /api-docs
 |- DeleteAccountCard
@@ -663,10 +669,10 @@ Responsibilities:
 - create articles from a URL
 - prevent duplicate URLs per user
 - enforce create-article rate limiting
-- load reader content from the lazy Markdown cache or extract and cache it on
+- load reader content from the Markdown cache or extract and cache it on
   first open
 - update read/favorite state
-- delete articles in bulk
+- move articles to Trash in bulk, preserving tags, saved content, and progress
 
 The route-facing runtime validates input and obtains the current web-session
 user, the service owns user-scoped behavior, and the repository is the only
@@ -738,8 +744,9 @@ Flow when opening an article in the reader:
 2. load tags and check `article_content_cache`
 3. return cached Markdown immediately when it is current
 4. otherwise fetch the source URL with the same external HTML guards
-5. extract readable blocks, convert them to Markdown/plain text, and upsert the
-   cache
+5. parse HTML with rehype, resolve relative URLs against the final source URL,
+   preserve code/whitespace/images/tables/lists, convert to Markdown/plain text,
+   and upsert the `markdown-v3` cache
 6. cache temporary extraction failures as `unavailable` and retry stale failures
    later
 
@@ -812,7 +819,9 @@ File: `src/server/rate-limit.ts`
 Responsibilities:
 
 - stores per-user rate-limit counters in D1
-- currently used on article creation to protect metadata fetches
+- atomically consume or reset a window in one D1 statement
+- protect article creation, personal API requests, and content refresh
+- remove long-expired counters through the hourly Worker scheduled handler
 
 ## Data model
 
@@ -820,8 +829,9 @@ Core tables in `src/db/schema.ts`:
 
 - `user`, `session`, `account`, `verification`: Better Auth tables
 - `articles`: saved URLs and extracted metadata
-- `article_content_cache`: lazily extracted reader Markdown and plain text for
-  opened articles
+- `article_content_cache`: captured reader Markdown and plain text
+- `article_trash`: deletion markers; articles remain recoverable until account deletion
+- `reading_progress`: reading position (0–10,000) and last-read time per article
 - `tags`: user-defined labels
 - `tag_shares`: one optional active public sharing token per tag
 - `article_tags`: many-to-many join between articles and tags
@@ -877,3 +887,66 @@ hold-shelf command
 -> serialized JSON response
 -> human table/text or JSON-only stdout
 ```
+
+## Library recovery, continuity, and capture
+
+`src/server/library.ts` exposes authenticated server functions for Trash restoration,
+reading progress, continuing recently read articles, saved-content refresh, and
+paginated backup export/import. Import validation lives in `library-schemas.ts`;
+`library-import.ts` writes each article and its related state in one D1 batch.
+Bulk SQL statements are chunked to stay within D1's 100-binding limit.
+
+Every successful new URL save (web, extension, or API) starts best-effort background
+capture through the request's Worker execution context. The reader still handles
+missing content on demand. Capture follows the existing guarded external-fetch
+limits; sites requiring login or client-side rendering may remain unavailable.
+Refresh saved content keeps the previous ready copy if fetching fails. Legacy cache
+versions are regenerated on access. Rendering generates heading IDs before
+sanitization to retain DOM-clobbering protection.
+
+Delete moves articles into Trash and offers Undo. `/app/trash` lists removed articles
+and restores them with tags/content/progress intact. Trash is excluded from lists,
+counts, public tag shares, and reader access. Re-saving a trashed URL restores it.
+Trash offers per-article permanent deletion and Empty Trash, each behind a
+confirmation dialog. Permanent deletion checks both ownership and current Trash
+membership in the database and cascades content, progress, and tag assignments.
+There is no automatic purge; deleting the account also removes all its data. REST/CLI DELETE has the same recoverable behavior.
+
+The reader uses `#article=<id>` in the current app URL for reload and browser history.
+Below 1536px it is a Radix modal with focus trapping, Escape, and focus return; wider
+screens use a non-modal side column. The reader saves scroll position after an
+800ms pause and flushes on close/page hide, then updates Continue reading. A page
+shutdown can still interrupt an in-flight request. Text size is a local browser preference; line width is fixed at 70ch, bounded by
+the reader viewport; progress is stored with the user's article in D1.
+
+Settings includes a JSON backup workflow with articles, tags, flags, saved content,
+reading progress, and Trash. Import accepts version 1 Hold Shelf backups up to
+10,000 articles / 50 MB, validates the whole file before writing, skips existing
+URLs, and can safely resume by importing the same file again after a failure.
+Credentials, API tokens, and public sharing links are excluded. Export reads in
+25-article pages; avoid editing the library while a large export is running.
+
+Library keeps the existing `/app/archive` URL. Search includes cached article text
+as well as metadata, with owner and status filters applied. This uses SQLite text
+matching, not a relevance-ranked full-text index. Global search is hidden when the
+current page supplies its own search. Mobile account navigation directly exposes
+Settings and Trash; desktop/mobile menus share `AccountMenuItems`.
+
+Collection loaders and components share React Query options. Mutation settlement
+refreshes article lists, tags, reader, Trash, Continue reading, and router-backed
+Home data, including after partially failed bulk work. Collection pages reconcile
+out-of-range pagination after their result totals shrink.
+
+The app shell centers every authenticated page in a shared `max-w-6xl` content
+container, with consistent padding. Reader and navigation columns remain separate.
+Toasts inherit app CSS theme colors, including a contrasting Undo button; mobile
+toasts sit above bottom navigation. Continue reading's Mark as read action atomically
+marks the article read and completes its progress, removing it from that section.
+The public CLI guide is linked from Settings and documents source installation for
+collaborators with private-repository access, authentication, commands, recovery,
+and automation. It explicitly explains that public installation is not available.
+`CliDocsPage` uses the same `DocumentationLayout` and `DocumentationSection` as the
+API page, with matching cards and code blocks. Its content comes from
+`docs/cli-guide.md`; Markdown heading positions define sections without treating
+headings inside command examples as new sections. Both pages link to each other
+and back to Settings.

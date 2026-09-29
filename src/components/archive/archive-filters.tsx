@@ -68,8 +68,8 @@ export function ArchiveFilters({
 			<div className="flex w-full flex-wrap gap-2 lg:w-auto lg:justify-end">
 				<PageSearchField
 					value={q ?? ""}
-					placeholder="Search archive..."
-					ariaLabel="Search archive"
+					placeholder="Search library..."
+					ariaLabel="Search library"
 					onSearch={onSearch}
 					className="w-full md:w-64"
 				/>
@@ -81,7 +81,7 @@ export function ArchiveFilters({
 				<ArticleSortSelect
 					value={sort}
 					onChange={onSortChange}
-					ariaLabel="Sort archive articles"
+					ariaLabel="Sort library articles"
 					className="w-full md:w-40"
 				/>
 			</div>

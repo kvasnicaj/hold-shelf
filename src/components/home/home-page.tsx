@@ -1,6 +1,7 @@
 import { getRouteApi } from "@tanstack/react-router";
 import { useArticleMutations } from "#/components/articles/use-article-mutations";
 import { useAutoMarkReadOnOpen } from "#/components/articles/use-auto-mark-read-on-open";
+import { ContinueReadingSection } from "#/components/home/continue-reading-section";
 import { EmptyLibraryCta } from "#/components/home/empty-library-cta";
 import { HomeStatsSection } from "#/components/home/home-stats-section";
 import { RecentArticlesSection } from "#/components/home/recent-articles-section";
@@ -17,12 +18,14 @@ export function HomePage() {
 		<div className="w-full space-y-6">
 			<div className="rise-in space-y-1">
 				<h1 className="display-title text-3xl font-bold">
-					Welcome to Hold Shelf
+					Make time for a good read
 				</h1>
-				<p className="text-muted-foreground">Your reading list, organized.</p>
+				<p className="text-muted-foreground">
+					Pick up where you left off, or find your next read.
+				</p>
 			</div>
 
-			<HomeStatsSection stats={stats} />
+			<ContinueReadingSection />
 			<RecentArticlesSection
 				recentlySaved={recent.recentlySaved}
 				recentlyFavorite={recent.recentlyFavorite}
@@ -35,6 +38,7 @@ export function HomePage() {
 			/>
 
 			{stats.total === 0 && <EmptyLibraryCta />}
+			<HomeStatsSection stats={stats} />
 		</div>
 	);
 }

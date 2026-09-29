@@ -19,8 +19,8 @@ export function renderMarkdownToHtml(markdown: string): string {
 			.use(remarkParse)
 			.use(remarkGfm)
 			.use(remarkRehype)
-			.use(rehypeSanitize)
 			.use(rehypeSlug)
+			.use(rehypeSanitize)
 			.use(rehypeStringify)
 			.processSync(markdown),
 	);
@@ -57,6 +57,7 @@ export function renderMarkdownToReact(markdown: string): ReactNode {
 				return createElement("img", {
 					...domNode.attribs,
 					loading: "lazy",
+					referrerPolicy: "no-referrer",
 					alt: domNode.attribs.alt ?? "",
 				});
 			}

@@ -1,3 +1,4 @@
+import { useIsMutating } from "@tanstack/react-query";
 import { BookOpen, Check, Star, Trash2 } from "lucide-react";
 import { TagPicker } from "#/components/tags/tag-picker";
 import type { Tag } from "#/components/tags/types";
@@ -35,6 +36,7 @@ export function ArticleCardActions({
 	onRemoveTag,
 	onCreateTag,
 }: ArticleCardActionsProps) {
+	const pending = useIsMutating({ mutationKey: ["library-edit"] }) > 0;
 	const iconClassName =
 		iconSize === "mobile" ? "h-5 w-5" : "h-[1.125rem] w-[1.125rem]";
 
@@ -43,7 +45,7 @@ export function ArticleCardActions({
 			className={
 				persistent
 					? "flex shrink-0 items-center gap-1"
-					: "flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100"
+					: "flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
 			}
 		>
 			{availableTags && onAddTag && onRemoveTag && onCreateTag && (
@@ -57,8 +59,9 @@ export function ArticleCardActions({
 				/>
 			)}
 			<Button
+				disabled={pending}
 				variant="ghost"
-				size="icon-xs"
+				size={iconSize === "mobile" ? "icon" : "icon-xs"}
 				onClick={(event) => {
 					event.stopPropagation();
 					onToggleFavorite(articleId, !isFavorite);
@@ -71,8 +74,9 @@ export function ArticleCardActions({
 				<Star className={cn(iconClassName, isFavorite && "fill-current")} />
 			</Button>
 			<Button
+				disabled={pending}
 				variant="ghost"
-				size="icon-xs"
+				size={iconSize === "mobile" ? "icon" : "icon-xs"}
 				onClick={(event) => {
 					event.stopPropagation();
 					onToggleRead(articleId, !isRead);
@@ -86,8 +90,9 @@ export function ArticleCardActions({
 				)}
 			</Button>
 			<Button
+				disabled={pending}
 				variant="ghost"
-				size="icon-xs"
+				size={iconSize === "mobile" ? "icon" : "icon-xs"}
 				onClick={(event) => {
 					event.stopPropagation();
 					onDelete(articleId);

@@ -1,0 +1,29 @@
+title = "Hold Shelf secret scanning"
+
+[extend]
+useDefault = true
+
+# Exact, deliberately invalid test values; do not exempt test files wholesale.
+[[rules]]
+id = "generic-api-key"
+
+[[rules.allowlists]]
+description = "Synthetic token display fixtures"
+condition = "AND"
+paths = [
+  '''(^|/)src/components/settings/api-token-card\.test\.tsx$''',
+  '''(^|/)src/server/api-tokens-service\.test\.ts$''',
+]
+regexTarget = "secret"
+regexes = ['''^hs_abc123456(secret)?$''']
+
+# Historical documentation examples use a literal placeholder, not a credential.
+[[rules]]
+id = "curl-auth-header"
+
+[[rules.allowlists]]
+description = "Literal bearer-token placeholder in API examples"
+condition = "AND"
+paths = ['''(^|/)src/components/api-docs/helpers\.ts$''']
+regexTarget = "match"
+regexes = ['''Authorization: Bearer hs_your_token''']

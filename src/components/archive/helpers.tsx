@@ -54,6 +54,7 @@ export function createArchiveColumns({
 			id: "select",
 			header: ({ table }) => (
 				<Checkbox
+					aria-label="Select all articles on this page"
 					checked={table.getIsAllRowsSelected()}
 					onCheckedChange={(value) => table.toggleAllRowsSelected(!!value)}
 					onClick={(event) => event.stopPropagation()}
@@ -61,6 +62,7 @@ export function createArchiveColumns({
 			),
 			cell: ({ row }) => (
 				<Checkbox
+					aria-label={`Select ${row.original.title ?? row.original.url}`}
 					checked={row.getIsSelected()}
 					onCheckedChange={(value) => row.toggleSelected(!!value)}
 					onClick={(event) => event.stopPropagation()}

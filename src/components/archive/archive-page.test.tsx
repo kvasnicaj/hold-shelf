@@ -176,7 +176,7 @@ describe("ArchivePage", () => {
 		const user = userEvent.setup();
 		renderWithProviders(<ArchivePage />);
 
-		await user.type(screen.getByLabelText("Search archive"), "design");
+		await user.type(screen.getByLabelText("Search library"), "design");
 
 		await user.click(screen.getByRole("button", { name: "Tag filters" }));
 		await user.click(screen.getByRole("button", { name: "Clear tags" }));
@@ -186,7 +186,7 @@ describe("ArchivePage", () => {
 		);
 
 		await user.click(
-			screen.getByRole("combobox", { name: "Sort archive articles" }),
+			screen.getByRole("combobox", { name: "Sort library articles" }),
 		);
 		await user.click(screen.getByRole("option", { name: "Title A-Z" }));
 

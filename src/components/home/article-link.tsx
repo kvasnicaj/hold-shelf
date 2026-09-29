@@ -47,7 +47,7 @@ export function ArticleLink({
 						}}
 					/>
 				)}
-				<span className="min-w-0 flex-1 truncate">
+				<span className="min-w-0 flex-1 line-clamp-2">
 					{article.title ?? article.hostname}
 				</span>
 			</div>

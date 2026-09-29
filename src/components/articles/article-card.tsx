@@ -25,7 +25,7 @@ export function ArticleCard({
 			className="group flex cursor-pointer items-start gap-3 rounded-lg border p-4 transition-colors hover:bg-accent/50"
 			onClick={() => void onOpenArticle(article.id, article.isRead)}
 			onKeyDown={(event) => {
-				if (event.key === "Enter") {
+				if (event.key === "Enter" && event.target === event.currentTarget) {
 					void onOpenArticle(article.id, article.isRead);
 				}
 			}}
@@ -33,6 +33,7 @@ export function ArticleCard({
 			tabIndex={0}
 		>
 			<Checkbox
+				aria-label={`Select ${article.title ?? article.url}`}
 				checked={selected}
 				onCheckedChange={(checked) => onSelect(article.id, !!checked)}
 				onClick={(event) => event.stopPropagation()}

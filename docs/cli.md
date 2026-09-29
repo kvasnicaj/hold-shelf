@@ -135,7 +135,7 @@ missing transport adapters:
 | `POST` | `/api/v1/articles` | save an article URL |
 | `GET` | `/api/v1/articles/:id` | fetch metadata and cached/extracted text |
 | `PATCH` | `/api/v1/articles/:id` | change read or favorite state |
-| `DELETE` | `/api/v1/articles/:id` | delete one article |
+| `DELETE` | `/api/v1/articles/:id` | move one article to Trash (restore in the web app) |
 | `PUT` | `/api/v1/articles/:id/tags/:tagId` | assign a tag idempotently |
 | `DELETE` | `/api/v1/articles/:id/tags/:tagId` | remove a tag idempotently |
 | `GET` | `/api/v1/tags` | list tags and article counts |
@@ -269,3 +269,7 @@ blindly retry destructive mutations.
 4. Add local integration coverage, install documentation, shell completions,
    and the release workflow.
 5. Revisit multiple tokens and OAuth Device Authorization based on real usage.
+
+The user-facing guide is maintained in `docs/cli-guide.md`, rendered at `/cli-docs`,
+and linked from Settings. CLI delete moves articles to Trash; permanent deletion is
+available in the web app.

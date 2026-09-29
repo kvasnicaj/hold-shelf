@@ -1,6 +1,7 @@
 import { and, desc, eq, sql } from "drizzle-orm";
 import { getDb } from "#/db/index";
 import { articles, articleTags, tagShares, tags, user } from "#/db/schema";
+import { activeArticle } from "#/server/db-helpers";
 import type { TagSharesRepository } from "#/server/tag-shares-service";
 
 export function createTagSharesRepository(): TagSharesRepository {
@@ -63,6 +64,7 @@ export function createTagSharesRepository(): TagSharesRepository {
 			const conditions = and(
 				eq(articleTags.tagId, share.tagId),
 				eq(articles.userId, share.ownerId),
+				activeArticle(),
 			);
 			const [items, countRows] = await Promise.all([
 				db

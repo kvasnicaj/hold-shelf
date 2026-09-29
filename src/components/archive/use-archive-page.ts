@@ -1,11 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { getRouteApi, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import {
+	articleListOptions,
+	tagListOptions,
+} from "#/components/articles/query-options";
 import type { ArticleSort } from "#/components/articles/types";
 import { useArticleMutations } from "#/components/articles/use-article-mutations";
 import { useAutoMarkReadOnOpen } from "#/components/articles/use-auto-mark-read-on-open";
-import { getArticles } from "#/server/articles";
-import { getTags } from "#/server/tags";
 
 const route = getRouteApi("/app/archive");
 
@@ -33,29 +35,35 @@ export function useArchivePage() {
 		filter === "read" ? true : filter === "unread" ? false : undefined;
 
 	const { data: result } = useQuery({
-		queryKey: ["articles", "archive", q, filter, sort, selectedTagIds, page],
-		queryFn: () =>
-			getArticles({
-				data: {
-					isRead,
-					search: q,
-					sort,
-					tagIds: selectedTagIds,
-					limit: 20,
-					offset: (page - 1) * 20,
-				},
-			}),
+		...articleListOptions({
+			isRead,
+			search: q,
+			sort,
+			tagIds: selectedTagIds,
+			limit: 20,
+			offset: (page - 1) * 20,
+		}),
 		initialData: initialData.articles,
 	});
 	const { data: tagList = [] } = useQuery({
-		queryKey: ["tags"],
-		queryFn: () => getTags(),
+		...tagListOptions(),
 		initialData: initialData.tags,
 	});
 
 	const articles = result?.items ?? [];
 	const total = result?.total ?? 0;
 	const totalPages = Math.ceil(total / 20);
+	useEffect(() => {
+		if (result && page > Math.max(1, totalPages))
+			void navigate({
+				search: (prev) => ({
+					...prev,
+					page: totalPages > 1 ? totalPages : undefined,
+				}),
+				replace: true,
+			});
+	}, [result, page, totalPages, navigate]);
+
 	const selectedIds = Object.keys(rowSelection).filter(
 		(id) => rowSelection[id],
 	);

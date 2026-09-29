@@ -12,12 +12,14 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SaveRouteImport } from './routes/save'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as CliDocsRouteImport } from './routes/cli-docs'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as ApiDocsRouteImport } from './routes/api-docs'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShareTokenRouteImport } from './routes/share/$token'
 import { Route as ExtensionSaveRouteImport } from './routes/extension/save'
+import { Route as AppTrashRouteImport } from './routes/app/trash'
 import { Route as AppTagsRouteImport } from './routes/app/tags'
 import { Route as AppSettingsRouteImport } from './routes/app/settings'
 import { Route as AppHomeRouteImport } from './routes/app/home'
@@ -49,6 +51,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CliDocsRoute = CliDocsRouteImport.update({
+  id: '/cli-docs',
+  path: '/cli-docs',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppRoute = AppRouteImport.update({
   id: '/app',
   path: '/app',
@@ -78,6 +85,11 @@ const ExtensionSaveRoute = ExtensionSaveRouteImport.update({
   id: '/extension/save',
   path: '/extension/save',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppTrashRoute = AppTrashRouteImport.update({
+  id: '/trash',
+  path: '/trash',
+  getParentRoute: () => AppRoute,
 } as any)
 const AppTagsRoute = AppTagsRouteImport.update({
   id: '/tags',
@@ -161,6 +173,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/api-docs': typeof ApiDocsRouteWithChildren
   '/app': typeof AppRouteWithChildren
+  '/cli-docs': typeof CliDocsRoute
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
   '/save': typeof SaveRoute
@@ -171,6 +184,7 @@ export interface FileRoutesByFullPath {
   '/app/home': typeof AppHomeRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/tags': typeof AppTagsRoute
+  '/app/trash': typeof AppTrashRoute
   '/extension/save': typeof ExtensionSaveRoute
   '/share/$token': typeof ShareTokenRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -187,6 +201,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/api-docs': typeof ApiDocsRouteWithChildren
   '/app': typeof AppRouteWithChildren
+  '/cli-docs': typeof CliDocsRoute
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
   '/save': typeof SaveRoute
@@ -197,6 +212,7 @@ export interface FileRoutesByTo {
   '/app/home': typeof AppHomeRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/tags': typeof AppTagsRoute
+  '/app/trash': typeof AppTrashRoute
   '/extension/save': typeof ExtensionSaveRoute
   '/share/$token': typeof ShareTokenRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -214,6 +230,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/api-docs': typeof ApiDocsRouteWithChildren
   '/app': typeof AppRouteWithChildren
+  '/cli-docs': typeof CliDocsRoute
   '/login': typeof LoginRoute
   '/privacy': typeof PrivacyRoute
   '/save': typeof SaveRoute
@@ -224,6 +241,7 @@ export interface FileRoutesById {
   '/app/home': typeof AppHomeRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/tags': typeof AppTagsRoute
+  '/app/trash': typeof AppTrashRoute
   '/extension/save': typeof ExtensionSaveRoute
   '/share/$token': typeof ShareTokenRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -242,6 +260,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/api-docs'
     | '/app'
+    | '/cli-docs'
     | '/login'
     | '/privacy'
     | '/save'
@@ -252,6 +271,7 @@ export interface FileRouteTypes {
     | '/app/home'
     | '/app/settings'
     | '/app/tags'
+    | '/app/trash'
     | '/extension/save'
     | '/share/$token'
     | '/api/auth/$'
@@ -268,6 +288,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/api-docs'
     | '/app'
+    | '/cli-docs'
     | '/login'
     | '/privacy'
     | '/save'
@@ -278,6 +299,7 @@ export interface FileRouteTypes {
     | '/app/home'
     | '/app/settings'
     | '/app/tags'
+    | '/app/trash'
     | '/extension/save'
     | '/share/$token'
     | '/api/auth/$'
@@ -294,6 +316,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/api-docs'
     | '/app'
+    | '/cli-docs'
     | '/login'
     | '/privacy'
     | '/save'
@@ -304,6 +327,7 @@ export interface FileRouteTypes {
     | '/app/home'
     | '/app/settings'
     | '/app/tags'
+    | '/app/trash'
     | '/extension/save'
     | '/share/$token'
     | '/api/auth/$'
@@ -321,6 +345,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   ApiDocsRoute: typeof ApiDocsRouteWithChildren
   AppRoute: typeof AppRouteWithChildren
+  CliDocsRoute: typeof CliDocsRoute
   LoginRoute: typeof LoginRoute
   PrivacyRoute: typeof PrivacyRoute
   SaveRoute: typeof SaveRoute
@@ -355,6 +380,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cli-docs': {
+      id: '/cli-docs'
+      path: '/cli-docs'
+      fullPath: '/cli-docs'
+      preLoaderRoute: typeof CliDocsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app': {
@@ -398,6 +430,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/extension/save'
       preLoaderRoute: typeof ExtensionSaveRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/app/trash': {
+      id: '/app/trash'
+      path: '/trash'
+      fullPath: '/app/trash'
+      preLoaderRoute: typeof AppTrashRouteImport
+      parentRoute: typeof AppRoute
     }
     '/app/tags': {
       id: '/app/tags'
@@ -525,6 +564,7 @@ interface AppRouteChildren {
   AppHomeRoute: typeof AppHomeRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppTagsRoute: typeof AppTagsRoute
+  AppTrashRoute: typeof AppTrashRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -534,6 +574,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppHomeRoute: AppHomeRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppTagsRoute: AppTagsRoute,
+  AppTrashRoute: AppTrashRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
@@ -567,6 +608,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   ApiDocsRoute: ApiDocsRouteWithChildren,
   AppRoute: AppRouteWithChildren,
+  CliDocsRoute: CliDocsRoute,
   LoginRoute: LoginRoute,
   PrivacyRoute: PrivacyRoute,
   SaveRoute: SaveRoute,

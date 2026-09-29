@@ -5,7 +5,7 @@ type ApiDocsCodeBlockProps = {
 
 export function ApiDocsCodeBlock({ label, code }: ApiDocsCodeBlockProps) {
 	return (
-		<div className="space-y-2">
+		<div className="min-w-0 space-y-2">
 			<p className="text-xs font-medium uppercase tracking-normal text-muted-foreground">
 				{label}
 			</p>

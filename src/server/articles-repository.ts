@@ -1,7 +1,20 @@
 import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
 import { getDb } from "#/db/index";
-import { articleContentCache, articles, articleTags, tags } from "#/db/schema";
+import {
+	articleContentCache,
+	articles,
+	articleTags,
+	articleTrash,
+	tags,
+} from "#/db/schema";
+import { extractArticleContent } from "#/server/article-content";
 import type { ArticlesRepository } from "#/server/articles-service";
+import {
+	ArticleAlreadyExistsError,
+	getCachedArticleContent,
+} from "#/server/articles-service";
+import { scheduleBackground } from "#/server/background";
+import { activeArticle, chunks } from "#/server/db-helpers";
 
 export function createArticlesRepository(): ArticlesRepository {
 	const db = getDb();
@@ -18,7 +31,7 @@ export function createArticlesRepository(): ArticlesRepository {
 			limit,
 			offset,
 		}) => {
-			const conditions = [eq(articles.userId, userId)];
+			const conditions = [eq(articles.userId, userId), activeArticle()];
 
 			if (isRead !== undefined) {
 				conditions.push(eq(articles.isRead, isRead));
@@ -42,7 +55,7 @@ export function createArticlesRepository(): ArticlesRepository {
 			if (search?.trim()) {
 				const term = `%${search.trim()}%`;
 				conditions.push(
-					sql`(${articles.title} LIKE ${term} OR ${articles.description} LIKE ${term} OR ${articles.url} LIKE ${term} OR ${articles.hostname} LIKE ${term})`,
+					sql`(${articles.title} LIKE ${term} OR ${articles.description} LIKE ${term} OR ${articles.url} LIKE ${term} OR ${articles.hostname} LIKE ${term} OR EXISTS (SELECT 1 FROM article_content_cache WHERE article_content_cache.article_id = ${articles.id} AND article_content_cache.plain_text LIKE ${term}))`,
 				);
 			}
 
@@ -59,7 +72,7 @@ export function createArticlesRepository(): ArticlesRepository {
 					.select()
 					.from(articles)
 					.where(where)
-					.orderBy(orderBy)
+					.orderBy(orderBy, asc(articles.id))
 					.limit(limit)
 					.offset(offset),
 				db.select({ count: sql<number>`count(*)` }).from(articles).where(where),
@@ -90,7 +103,13 @@ export function createArticlesRepository(): ArticlesRepository {
 			const [article] = await db
 				.select()
 				.from(articles)
-				.where(and(eq(articles.userId, userId), eq(articles.id, id)))
+				.where(
+					and(
+						eq(articles.userId, userId),
+						eq(articles.id, id),
+						activeArticle(),
+					),
+				)
 				.limit(1);
 
 			return article ?? null;
@@ -99,7 +118,13 @@ export function createArticlesRepository(): ArticlesRepository {
 			const [existing] = await db
 				.select({ id: articles.id })
 				.from(articles)
-				.where(and(eq(articles.userId, userId), eq(articles.url, url)))
+				.where(
+					and(
+						eq(articles.userId, userId),
+						eq(articles.url, url),
+						activeArticle(),
+					),
+				)
 				.limit(1);
 
 			return existing ?? null;
@@ -115,8 +140,34 @@ export function createArticlesRepository(): ArticlesRepository {
 					hostname: metadata.hostname,
 					faviconUrl: metadata.faviconUrl,
 				})
+				.onConflictDoNothing()
 				.returning();
 
+			if (!article) {
+				const [existing] = await db
+					.select()
+					.from(articles)
+					.where(and(eq(articles.userId, userId), eq(articles.url, url)))
+					.limit(1);
+				if (existing) {
+					const restored = await db
+						.delete(articleTrash)
+						.where(eq(articleTrash.articleId, existing.id))
+						.returning();
+					if (restored.length) return existing;
+					throw new ArticleAlreadyExistsError({ articleId: existing.id, url });
+				}
+				throw new Error("Could not save article.");
+			}
+			scheduleBackground(() =>
+				getCachedArticleContent({
+					repo: createArticlesRepository(),
+					articleId: article.id,
+					sourceUrl: article.url,
+					extractArticleContentFn: extractArticleContent,
+					now: () => new Date(),
+				}),
+			);
 			return article;
 		},
 		getArticleContentCache: async (articleId) => {
@@ -161,9 +212,26 @@ export function createArticlesRepository(): ArticlesRepository {
 				.where(and(eq(articles.id, id), eq(articles.userId, userId)));
 		},
 		deleteArticles: async ({ userId, ids }) => {
-			await db
-				.delete(articles)
-				.where(and(inArray(articles.id, ids), eq(articles.userId, userId)));
+			const owned = (
+				await Promise.all(
+					chunks(ids, 90).map((batch) =>
+						db
+							.select({ id: articles.id })
+							.from(articles)
+							.where(
+								and(inArray(articles.id, batch), eq(articles.userId, userId)),
+							),
+					),
+				)
+			).flat();
+			const statements = chunks(owned).map((batch) =>
+				db
+					.insert(articleTrash)
+					.values(batch.map(({ id }) => ({ articleId: id })))
+					.onConflictDoNothing(),
+			);
+			if (statements.length)
+				await db.batch([statements[0], ...statements.slice(1)]);
 		},
 	};
 }

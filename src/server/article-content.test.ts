@@ -52,24 +52,11 @@ describe("extractArticleContent", () => {
 
 		expect(result.status).toBe("ready");
 		if (result.status !== "ready") return;
-		expect(result.blocks).toEqual(
-			expect.arrayContaining([
-				expect.objectContaining({ type: "heading", level: 2 }),
-				expect.objectContaining({ type: "paragraph" }),
-				expect.objectContaining({ type: "blockquote" }),
-				expect.objectContaining({ type: "list" }),
-				expect.objectContaining({ type: "code", text: "const answer = 42;" }),
-			]),
-		);
-		const paragraph = result.blocks.find((block) => block.type === "paragraph");
-		expect(paragraph).toEqual(
-			expect.objectContaining({
-				children: expect.arrayContaining([
-					expect.objectContaining({ text: "bold text", bold: true }),
-					expect.objectContaining({ text: "inlineCode()", code: true }),
-				]),
-			}),
-		);
+		expect(result.markdown).toContain("## Useful heading");
+		expect(result.markdown).toContain("**bold text**");
+		expect(result.markdown).toContain("`inlineCode()`");
+		expect(result.markdown).toContain("> A short quoted idea");
+		expect(result.markdown).toContain("const answer = 42;");
 		expect(result.wordCount).toBeGreaterThan(10);
 	});
 

@@ -168,7 +168,7 @@ describe("HomePage", () => {
 	it("renders the stats and recent sections from loader data", () => {
 		renderWithProviders(<HomePage />);
 
-		expect(screen.getByText("Welcome to Hold Shelf")).toBeInTheDocument();
+		expect(screen.getByText("Make time for a good read")).toBeInTheDocument();
 		expect(screen.getAllByText("Unread")).not.toHaveLength(0);
 		expect(screen.getAllByText("Total")).not.toHaveLength(0);
 		expect(screen.getByText("Recently saved")).toBeInTheDocument();

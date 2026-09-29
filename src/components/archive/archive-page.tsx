@@ -39,7 +39,7 @@ export function ArchivePage() {
 		<div className="w-full space-y-4">
 			<h1 className="display-title flex items-center gap-2 text-2xl font-bold">
 				<Archive className="h-6 w-6 text-muted-foreground" />
-				<span>Archive</span>
+				<span>Library</span>
 			</h1>
 
 			{selectedIds.length > 0 && (

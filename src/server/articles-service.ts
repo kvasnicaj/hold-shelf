@@ -8,7 +8,7 @@ import { extractedArticleToMarkdown } from "#/server/article-markdown";
 type ArticleRecord = typeof articles.$inferSelect;
 type ArticleContentCacheRecord = typeof articleContentCache.$inferSelect;
 
-const ARTICLE_CONTENT_EXTRACTION_VERSION = "markdown-v2";
+const ARTICLE_CONTENT_EXTRACTION_VERSION = "markdown-v3";
 const ARTICLE_CONTENT_UNAVAILABLE_RETRY_MS = 86_400_000;
 
 type ArticleTagRecord = {
@@ -181,10 +181,12 @@ export async function getArticleReaderForUser({
 	id,
 	extractArticleContentFn,
 	now = () => new Date(),
+	forceRefresh = false,
 }: {
 	repo: ArticlesRepository;
 	userId: string;
 	id: string;
+	forceRefresh?: boolean;
 	extractArticleContentFn: typeof extractArticleContent;
 	now?: () => Date;
 }): Promise<ArticleReaderRecord> {
@@ -193,18 +195,21 @@ export async function getArticleReaderForUser({
 		throw new Error("Article not found.");
 	}
 
-	const tagRows = await repo.listArticleTags([article.id]);
 	const content = await getCachedArticleContent({
 		repo,
 		articleId: article.id,
 		sourceUrl: article.url,
 		extractArticleContentFn,
 		now,
+		forceRefresh,
 	});
+	const latest = await repo.getArticleById({ userId, id });
+	const tagRows = await repo.listArticleTags([article.id]);
+	if (!latest) throw new Error("Article not found.");
 
 	return {
 		article: {
-			...article,
+			...latest,
 			tags: tagRows.map((tag) => ({
 				id: tag.id,
 				name: tag.name,
@@ -215,13 +220,15 @@ export async function getArticleReaderForUser({
 	};
 }
 
-async function getCachedArticleContent({
+export async function getCachedArticleContent({
 	repo,
 	articleId,
 	sourceUrl,
 	extractArticleContentFn,
 	now,
+	forceRefresh = false,
 }: {
+	forceRefresh?: boolean;
 	repo: ArticlesRepository;
 	articleId: string;
 	sourceUrl: string;
@@ -230,12 +237,17 @@ async function getCachedArticleContent({
 }): Promise<ArticleReaderContent> {
 	const cached = await getArticleContentCacheSafely(repo, articleId);
 
-	if (cached && isUsableArticleContentCache(cached, now())) {
+	if (!forceRefresh && cached && isUsableArticleContentCache(cached, now())) {
 		return cacheRecordToReaderContent(cached);
 	}
 
 	const fetchedAt = now();
 	const extracted = await extractArticleContentFn(sourceUrl);
+	if (cached?.status === "ready" && extracted.status === "unavailable")
+		return {
+			...cacheRecordToReaderContent(cached),
+			refreshError: extracted.reason,
+		};
 	const cacheData = createArticleContentCacheUpsert({
 		articleId,
 		sourceUrl,
@@ -246,7 +258,7 @@ async function getCachedArticleContent({
 	const cacheRecord = await upsertArticleContentCacheSafely(repo, cacheData);
 	return cacheRecord
 		? cacheRecordToReaderContent(cacheRecord)
-		: cacheUpsertToReaderContent(cacheData);
+		: cacheRecordToReaderContent(cacheData);
 }
 
 async function getArticleContentCacheSafely(
@@ -341,30 +353,6 @@ function isUsableArticleContentCache(
 }
 
 function cacheRecordToReaderContent(
-	cache: ArticleContentCacheRecord,
-): ArticleReaderContent {
-	if (
-		cache.status === "ready" &&
-		cache.markdown &&
-		cache.plainText &&
-		cache.wordCount
-	) {
-		return {
-			status: "ready",
-			markdown: cache.markdown,
-			plainText: cache.plainText,
-			wordCount: cache.wordCount,
-			fetchedAt: cache.fetchedAt,
-		};
-	}
-
-	return {
-		status: "unavailable",
-		reason: cache.failureReason ?? "The article could not be loaded.",
-	};
-}
-
-function cacheUpsertToReaderContent(
 	cache: ArticleContentCacheUpsert,
 ): ArticleReaderContent {
 	if (

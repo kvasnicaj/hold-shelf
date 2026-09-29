@@ -36,7 +36,7 @@ export function ArticleCardContent({
 				>
 					{article.title ?? article.hostname ?? article.url}
 				</ArticleExternalLink>
-				<ExternalLink className="h-3 w-3 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+				<ExternalLink className="h-3 w-3 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100" />
 			</div>
 
 			{article.description && (
