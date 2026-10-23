@@ -290,7 +290,7 @@ Defined in `wrangler.jsonc`:
 - `BETTER_AUTH_URL`
 - `TRUST_PROXY_HEADERS`
 
-Current production base URL:
+The repository targets this base URL:
 
 - `https://hold-shelf.com`
 
@@ -303,73 +303,31 @@ The Vite development build (`import.meta.env.DEV`) is explicitly separate:
 `.dev.vars` must set `BETTER_AUTH_URL=http://localhost:3000` (or another HTTP
 loopback origin on `localhost`, `127.0.0.1` or `[::1]`). Development uses
 non-Secure HTTP cookies and does not trust production origins. A production
-build never enables local HTTP authentication merely because `NODE_ENV` is
-missing or an attacker supplies a localhost Host header.
+build uses explicit production protocol and origin settings.
 
 ### Trusted client identity
 
-Auth POST and personal REST API pre-auth limits share `client-key.ts`.
-With `TRUST_PROXY_HEADERS=true`, only a valid single `CF-Connecting-IP` is
-accepted. Arbitrary `X-Forwarded-For`, `X-Real-IP` and User-Agent values cannot
-rotate the limiter bucket. Without a trusted identity, all requests share the
-conservative `ip:unknown` bucket; this avoids an attacker-controlled fallback
-but may cause shared throttling if ingress is misconfigured. Better Auth's
-own IP resolver likewise uses only `CF-Connecting-IP` in production.
+Auth and API rate limits use the shared client-identity helper. Enable
+`TRUST_PROXY_HEADERS` only when requests arrive through trusted Cloudflare ingress.
+A directly reachable origin must establish its own proxy trust boundary. Keep
+application throttling and edge abuse controls consistent with that boundary.
 
-This trust is appropriate only for Cloudflare-managed ingress that supplies
-the header, not a directly reachable Node origin accepting client-supplied
-Cloudflare headers. Verify custom domains, alternate Worker hostnames and any
-same-zone Worker subrequests; restrict untrusted Worker code with permission
-to alter `X-Real-IP`/client identity. Never enable this trust flag on a public
-origin that clients can reach without the trusted proxy. Keep coarse Cloudflare
-edge rate limits as a separate deployment control; these application changes
-do not configure them.
+### Cookie policy
 
-### Secure-cookie rollout
+Production session and OAuth cookies use Secure, HttpOnly and SameSite=Lax, with
+host-only scope. Development cookies are configured separately for HTTP loopback
+origins. Cookie and session-policy changes require compatibility testing of
+sign-in, sign-out, state binding and extension handoffs.
 
-Production cookies now use Better Auth's `__Secure-better-auth.*` names with
-`Secure; HttpOnly; SameSite=Lax; Path=/` and no cross-subdomain `Domain`.
-Both OAuth state-cookie strategies inherit this policy.
+### GitHub identity data
 
-Existing unprefixed session cookies are deliberately **not migrated or accepted**.
-Users with those cookies must sign in with GitHub again; an in-flight OAuth flow
-started before deployment must be restarted. Auth endpoint responses expire
-known old unprefixed session/state/cache cookie names when present, including
-cache chunks. The browser's existing cookies are not cleaned before it first
-reaches an auth endpoint, so the HTTPS redirect and HSTS rollout still matter.
+GitHub is used to establish account identity, not as a persistent API integration.
+Account adapter hooks retain the linked provider identity without retaining
+provider access, refresh or ID tokens. Personal API tokens have their own
+independent lifecycle.
 
-This does not delete sessions from D1 or revoke sessions in other clients. Old
-session rows expire under Better Auth's normal expiry policy. Rejecting the old
-cookie name is **not cryptographic revocation**: a previously stolen signed
-session token could still be replayed under the new cookie name until revoked
-or expired. Decide whether to revoke all existing sessions during the reviewed
-rollout; if exposure is suspected, revoke affected sessions as an explicit
-incident-response action. Neither revocation is done automatically by this
-change. Rolling back to the insecure cookie policy is not a safe recovery plan.
-
-### Provider-token cleanup migration
-
-Migration `0011_clear_unused_oauth_tokens.sql` sets the GitHub account fields
-`access_token`, `refresh_token`, `id_token`, `access_token_expires_at` and
-`refresh_token_expires_at` to NULL. It preserves account/provider/user IDs,
-profile metadata, web sessions and app-owned personal access tokens. New and
-returning OAuth logins discard the same fields through Better Auth adapter
-hooks; provider data is not placed in an account cookie.
-
-This is intentional data minimization, **not** enabling encryption over legacy
-plaintext in place. The app uses GitHub only to establish identity and does not
-call GitHub on a user's behalf after sign-in. Future provider-API integration
-requires an intentional retention, encryption and secret-rotation design;
-Better Auth's provider access-token/refresh API is not supported by this app.
-
-Apply the migration through the normal reviewed D1 migration process after
-recording a Time Travel bookmark and validating backups. It has only been tested
-against disposable local data; this change does not execute a remote migration.
-Deleting these fields is irreversible through a code rollback and does not revoke
-the provider grant or invalidate old backup copies. No token extraction or
-plaintext copy is needed for this migration; restrict and age out old backups
-under the deployment retention policy. GitHub sign-in can establish fresh
-identity exchanges without restoring the removed tokens.
+Review data migrations before applying them and validate backups; rolling back
+application code does not reverse data changes. See [deployment](deployment.md).
 
 ## Database model
 
