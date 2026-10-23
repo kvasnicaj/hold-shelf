@@ -5,20 +5,10 @@ import {
 
 const SERVICE_NAME = "hold-shelf-cli";
 
-type KeyringEntry = {
-	getPassword: () => string;
-	setPassword: (token: string) => void;
-	deletePassword: () => boolean;
-};
-
-type KeyringModule = {
-	Entry: new (service: string, account: string) => KeyringEntry;
-};
-
 export async function createSystemCredentialStore(): Promise<CredentialStore> {
-	let module: KeyringModule;
+	let module: typeof import("@napi-rs/keyring");
 	try {
-		module = (await import("@napi-rs/keyring")) as KeyringModule;
+		module = await import("@napi-rs/keyring");
 		if (typeof module.Entry !== "function") {
 			throw new Error("Entry export is missing");
 		}

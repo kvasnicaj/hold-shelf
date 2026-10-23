@@ -1,6 +1,7 @@
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type * as React from "react";
+import { useState } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ArchiveTable } from "#/components/archive/archive-table";
 import type { ArticleWithTags } from "#/components/articles/types";
@@ -56,24 +57,59 @@ function buildArticle(
 	};
 }
 
+function buildArchiveTableProps(
+	props: Partial<React.ComponentProps<typeof ArchiveTable>> = {},
+): React.ComponentProps<typeof ArchiveTable> {
+	return {
+		articles: [buildArticle()],
+		rowSelection: {},
+		onRowSelectionChange: vi.fn(),
+		availableTags,
+		onAddTag: vi.fn().mockResolvedValue(undefined),
+		onRemoveTag: vi.fn().mockResolvedValue(undefined),
+		onCreateTag: vi.fn().mockResolvedValue(availableTags[0]),
+		onOpenArticle: vi.fn().mockResolvedValue(undefined),
+		onToggleRead: vi.fn().mockResolvedValue(undefined),
+		onToggleFavorite: vi.fn().mockResolvedValue(undefined),
+		onDelete: vi.fn().mockResolvedValue(undefined),
+		...props,
+	};
+}
+
 function renderArchiveTable(
 	props: Partial<React.ComponentProps<typeof ArchiveTable>> = {},
 ) {
 	return renderWithProviders(
-		<ArchiveTable
-			articles={[buildArticle()]}
-			rowSelection={{}}
-			onRowSelectionChange={vi.fn()}
-			availableTags={availableTags}
-			onAddTag={vi.fn().mockResolvedValue(undefined)}
-			onRemoveTag={vi.fn().mockResolvedValue(undefined)}
-			onCreateTag={vi.fn().mockResolvedValue(availableTags[0])}
-			onOpenArticle={vi.fn().mockResolvedValue(undefined)}
-			onToggleRead={vi.fn().mockResolvedValue(undefined)}
-			onToggleFavorite={vi.fn().mockResolvedValue(undefined)}
-			onDelete={vi.fn().mockResolvedValue(undefined)}
-			{...props}
-		/>,
+		<ArchiveTable {...buildArchiveTableProps(props)} />,
+	);
+}
+
+function ControlledArchiveTable({
+	initialProps: props,
+}: {
+	initialProps: React.ComponentProps<typeof ArchiveTable>;
+}) {
+	const [articles, setArticles] = useState(props.articles);
+	const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({
+		a1: false,
+	});
+	return (
+		<>
+			<button
+				type="button"
+				onClick={() =>
+					setArticles([buildArticle({ id: "a2", title: "Next article" })])
+				}
+			>
+				Load next page
+			</button>
+			<ArchiveTable
+				{...props}
+				articles={articles}
+				rowSelection={rowSelection}
+				onRowSelectionChange={setRowSelection}
+			/>
+		</>
 	);
 }
 
@@ -133,6 +169,42 @@ describe("ArchiveTable", () => {
 		expect(onDelete).toHaveBeenCalledWith(["a1"]);
 		expect(onOpenArticle).not.toHaveBeenCalled();
 		expect(archiveTableMobileMock).not.toHaveBeenCalled();
+	});
+
+	it("keeps controlled selection in sync when selecting rows and replacing data", async () => {
+		const user = userEvent.setup();
+		const props = buildArchiveTableProps();
+
+		renderWithProviders(<ControlledArchiveTable initialProps={props} />);
+		const selectAll = screen.getByRole("checkbox", {
+			name: "Select all articles on this page",
+		});
+		const selectArticle = screen.getByRole("checkbox", {
+			name: "Select Archived article",
+		});
+		expect(selectAll).not.toBeChecked();
+		expect(selectArticle).not.toBeChecked();
+
+		await user.click(selectArticle);
+		expect(selectArticle).toBeChecked();
+		expect(selectAll).toBeChecked();
+
+		await user.click(screen.getByRole("button", { name: "Load next page" }));
+		expect(
+			screen.queryByRole("checkbox", { name: "Select Archived article" }),
+		).not.toBeInTheDocument();
+		const selectNextArticle = screen.getByRole("checkbox", {
+			name: "Select Next article",
+		});
+		expect(selectNextArticle).not.toBeChecked();
+		expect(selectAll).not.toBeChecked();
+
+		await user.click(selectAll);
+		expect(selectNextArticle).toBeChecked();
+		expect(selectAll).toBeChecked();
+		await user.click(selectAll);
+		expect(selectNextArticle).not.toBeChecked();
+		expect(selectAll).not.toBeChecked();
 	});
 
 	it("delegates to the mobile table when the viewport is mobile", () => {

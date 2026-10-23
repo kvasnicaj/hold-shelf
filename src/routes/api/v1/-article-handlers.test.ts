@@ -185,37 +185,42 @@ describe("v1 article API handlers", () => {
 		["GET", handleV1ArticleGet, "ARTICLE_READ_FAILED"],
 		["PATCH", handleV1ArticlePatch, "UPDATE_FAILED"],
 		["DELETE", handleV1ArticleDelete, "DELETE_FAILED"],
-	] as const)("returns one 404 shape for a missing or unowned article on %s", async (method, handler, dependencyName) => {
-		const articleOperation = vi
-			.fn()
-			.mockRejectedValue(new Error("Article not found."));
-		const dependencies = {
-			...createAuthDependencies(),
-			createArticlesRepositoryFn: () => articlesRepo,
-			extractArticleContentFn: vi.fn(),
-			getArticleReaderForUserFn:
-				dependencyName === "ARTICLE_READ_FAILED" ? articleOperation : undefined,
-			updateArticleForUserFn:
-				dependencyName === "UPDATE_FAILED" ? articleOperation : undefined,
-			deleteArticleForUserFn:
-				dependencyName === "DELETE_FAILED" ? articleOperation : undefined,
-		};
-		const request =
-			method === "PATCH"
-				? createRequest(method, { isRead: true })
-				: createRequest(method);
+	] as const)(
+		"returns one 404 shape for a missing or unowned article on %s",
+		async (method, handler, dependencyName) => {
+			const articleOperation = vi
+				.fn()
+				.mockRejectedValue(new Error("Article not found."));
+			const dependencies = {
+				...createAuthDependencies(),
+				createArticlesRepositoryFn: () => articlesRepo,
+				extractArticleContentFn: vi.fn(),
+				getArticleReaderForUserFn:
+					dependencyName === "ARTICLE_READ_FAILED"
+						? articleOperation
+						: undefined,
+				updateArticleForUserFn:
+					dependencyName === "UPDATE_FAILED" ? articleOperation : undefined,
+				deleteArticleForUserFn:
+					dependencyName === "DELETE_FAILED" ? articleOperation : undefined,
+			};
+			const request =
+				method === "PATCH"
+					? createRequest(method, { isRead: true })
+					: createRequest(method);
 
-		const response = await handler(
-			{ request, params: { id: "unowned-article" } },
-			dependencies,
-		);
+			const response = await handler(
+				{ request, params: { id: "unowned-article" } },
+				dependencies,
+			);
 
-		expect(response.status).toBe(404);
-		await expect(response.json()).resolves.toEqual({
-			code: "ARTICLE_NOT_FOUND",
-			message: "Article not found.",
-		});
-	});
+			expect(response.status).toBe(404);
+			await expect(response.json()).resolves.toEqual({
+				code: "ARTICLE_NOT_FOUND",
+				message: "Article not found.",
+			});
+		},
+	);
 
 	it("rejects an empty patch", async () => {
 		const updateArticleForUserFn = vi.fn();
