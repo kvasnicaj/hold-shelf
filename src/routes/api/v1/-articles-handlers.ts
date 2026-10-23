@@ -1,4 +1,5 @@
 import type { CreateArticleResponse } from "@hold-shelf/api-contracts";
+import { AccountQuotaError } from "#/server/account-quota";
 import {
 	type ApiV1AuthDependencies,
 	authenticateApiV1Request,
@@ -163,6 +164,9 @@ async function getArticlesRepository(deps: V1ArticlesDependencies) {
 }
 
 function createCreateArticleErrorResponse(error: unknown) {
+	if (error instanceof AccountQuotaError) {
+		return createApiErrorResponse("QUOTA_EXCEEDED", error.message, 409);
+	}
 	if (error instanceof ArticleAlreadyExistsError) {
 		const response: CreateArticleResponse = {
 			status: "exists",

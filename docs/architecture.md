@@ -262,7 +262,8 @@ Core functionality:
 - accepts a `url` search param from integrations such as The Digest and the
   Chrome extension
 - redirects signed-out users to `/login?redirectTo=...`
-- calls `createArticle()` once the user has an authenticated session
+- requires an explicit Save article confirmation after authentication; opening a link
+  never mutates the library by itself
 - treats duplicate URLs as a successful handoff state
 - saves only article metadata; article body caching starts when the user opens the
   article in the reader
@@ -758,7 +759,7 @@ Chrome extension flow:
 4. if not authenticated, the API returns a `loginUrl` pointing at
    `/save?url=...`
 5. the site redirects through `/login` and returns to `/save`
-6. the extension handoff page saves the article in the normal web session
+6. the handoff page asks for confirmation before saving in the normal web session
 
 ### Tags domain
 

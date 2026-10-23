@@ -7,6 +7,7 @@ import {
 	articleTrash,
 	tags,
 } from "#/db/schema";
+import { withQuotaErrors } from "#/server/account-quota";
 import { extractArticleContent } from "#/server/article-content";
 import type { ArticlesRepository } from "#/server/articles-service";
 import {
@@ -130,18 +131,20 @@ export function createArticlesRepository(): ArticlesRepository {
 			return existing ?? null;
 		},
 		createArticle: async ({ userId, url, metadata }) => {
-			const [article] = await db
-				.insert(articles)
-				.values({
-					userId,
-					url,
-					title: metadata.title,
-					description: metadata.description,
-					hostname: metadata.hostname,
-					faviconUrl: metadata.faviconUrl,
-				})
-				.onConflictDoNothing()
-				.returning();
+			const [article] = await withQuotaErrors(async () =>
+				db
+					.insert(articles)
+					.values({
+						userId,
+						url,
+						title: metadata.title,
+						description: metadata.description,
+						hostname: metadata.hostname,
+						faviconUrl: metadata.faviconUrl,
+					})
+					.onConflictDoNothing()
+					.returning(),
+			);
 
 			if (!article) {
 				const [existing] = await db
@@ -180,24 +183,26 @@ export function createArticlesRepository(): ArticlesRepository {
 			return cache ?? null;
 		},
 		upsertArticleContentCache: async (data) => {
-			const [cache] = await db
-				.insert(articleContentCache)
-				.values(data)
-				.onConflictDoUpdate({
-					target: articleContentCache.articleId,
-					set: {
-						status: data.status,
-						markdown: data.markdown,
-						plainText: data.plainText,
-						wordCount: data.wordCount,
-						failureReason: data.failureReason,
-						sourceUrl: data.sourceUrl,
-						extractionVersion: data.extractionVersion,
-						fetchedAt: data.fetchedAt,
-						updatedAt: data.updatedAt,
-					},
-				})
-				.returning();
+			const [cache] = await withQuotaErrors(async () =>
+				db
+					.insert(articleContentCache)
+					.values(data)
+					.onConflictDoUpdate({
+						target: articleContentCache.articleId,
+						set: {
+							status: data.status,
+							markdown: data.markdown,
+							plainText: data.plainText,
+							wordCount: data.wordCount,
+							failureReason: data.failureReason,
+							sourceUrl: data.sourceUrl,
+							extractionVersion: data.extractionVersion,
+							fetchedAt: data.fetchedAt,
+							updatedAt: data.updatedAt,
+						},
+					})
+					.returning(),
+			);
 
 			if (!cache) {
 				throw new Error("Failed to store article content cache.");

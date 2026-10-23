@@ -9,6 +9,34 @@ permissions:
   contents: read
 
 jobs:
+  secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Install verified Gitleaks
+        shell: bash
+        run: |
+          curl --fail --silent --show-error --location \
+            https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz \
+            --output "$RUNNER_TEMP/gitleaks.tar.gz"
+          echo "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb  $RUNNER_TEMP/gitleaks.tar.gz" | sha256sum --check
+          tar -xzf "$RUNNER_TEMP/gitleaks.tar.gz" -C "$RUNNER_TEMP" gitleaks
+      - name: Scan history
+        run: >-
+          "$RUNNER_TEMP/gitleaks" git .
+          --config .gitleaks.toml
+          --log-opts="--all --full-history"
+          --redact --no-banner
+      - name: Scan files and archives
+        run: >-
+          "$RUNNER_TEMP/gitleaks" dir .
+          --config .gitleaks.toml
+          --max-archive-depth 3
+          --redact --no-banner
+
   check:
     runs-on: ubuntu-latest
     steps:
@@ -29,7 +57,10 @@ jobs:
 
   deploy:
     if: github.repository == 'kvasnicaj/hold-shelf' && github.ref == 'refs/heads/main' && github.event_name == 'push'
-    needs: check
+    needs: [check, secrets]
+    concurrency:
+      group: production-deployment
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -42,11 +73,27 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
+      - name: Verify release is still current main
+        id: freshness
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CANDIDATE_SHA: ${{ github.sha }}
+        shell: bash
+        run: |
+          current_main="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/heads/main" --jq '.object.sha')"
+          if [ "$current_main" = "$CANDIDATE_SHA" ]; then
+            echo 'current=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'current=false' >> "$GITHUB_OUTPUT"
+            echo 'Skipping stale release; main has advanced.'
+          fi
       - name: Apply database migrations
+        if: steps.freshness.outputs.current == 'true'
         run: pnpm wrangler d1 migrations apply hold-shelf-db --remote
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       - uses: cloudflare/wrangler-action@953926a2e2182532811c01a25e53647d93bf07c0 # v4.1.3
+        if: steps.freshness.outputs.current == 'true'
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           command: deploy

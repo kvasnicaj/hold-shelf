@@ -3,7 +3,7 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { tanstackStartCookies } from "better-auth/tanstack-start";
 import { getDb } from "#/db/index";
-import { getAuthBaseUrlConfig } from "#/lib/auth-base-url";
+import { getAuthSecurityOptions } from "#/lib/auth-security";
 
 export function getAuth() {
 	const githubClientId = env.GITHUB_CLIENT_ID;
@@ -17,7 +17,10 @@ export function getAuth() {
 
 	return betterAuth({
 		secret: env.BETTER_AUTH_SECRET as string,
-		baseURL: getAuthBaseUrlConfig(env.BETTER_AUTH_URL as string),
+		...getAuthSecurityOptions(
+			env.BETTER_AUTH_URL as string,
+			import.meta.env.DEV,
+		),
 		database: drizzleAdapter(getDb(), { provider: "sqlite" }),
 		user: {
 			deleteUser: {

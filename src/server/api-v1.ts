@@ -1,6 +1,8 @@
 import type { ApiError } from "@hold-shelf/api-contracts";
+import { safeErrorDetails } from "#/lib/sentry-privacy";
 import { getUserIdFromBearerToken } from "#/server/api-token-auth";
 import type { ApiTokensRepository } from "#/server/api-tokens-service";
+import { getClientRateLimitKey } from "#/server/client-key";
 import type { checkRateLimit } from "#/server/rate-limit";
 
 const API_AUTH_RATE_LIMIT = {
@@ -131,7 +133,7 @@ export function createApiInternalErrorResponse(
 ) {
 	console.error("API v1 request failed.", {
 		code,
-		error: error instanceof Error ? error.message : String(error),
+		...safeErrorDetails(error),
 	});
 	return createApiErrorResponse(code, message, 500);
 }
@@ -146,16 +148,5 @@ export function createApiRateLimitedResponse(retryAfterMs: number) {
 			message: "Rate limit exceeded. Please try again later.",
 		},
 		{ status: 429, headers },
-	);
-}
-
-function getClientRateLimitKey(request: Request) {
-	const forwardedFor = request.headers.get("x-forwarded-for");
-	const forwardedIp = forwardedFor?.split(",")[0]?.trim();
-	return (
-		request.headers.get("cf-connecting-ip") ??
-		forwardedIp ??
-		request.headers.get("x-real-ip") ??
-		"unknown"
 	);
 }

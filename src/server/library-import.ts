@@ -1,4 +1,4 @@
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { getDb } from "#/db/index";
 import {
@@ -10,12 +10,45 @@ import {
 	tags,
 } from "#/db/schema";
 import { chunks } from "#/lib/helpers";
+import { withQuotaErrors } from "#/server/account-quota";
 import type { BackupArticle } from "#/server/library-schemas";
+import { checkRateLimit } from "#/server/rate-limit";
 
 export async function importBackupArticles(
 	userId: string,
 	records: BackupArticle[],
 ) {
+	const bytes = new TextEncoder().encode(JSON.stringify(records)).byteLength;
+	if (records.length < 1 || records.length > 10 || bytes > 8 * 1024 * 1024)
+		throw new Error(
+			"Import batches must contain 1–10 articles and be smaller than 8 MiB.",
+		);
+	const recordsLimit = await checkRateLimit(
+		{
+			name: "import-records",
+			windowMs: 3_600_000,
+			max: 10_000,
+			cost: records.length,
+		},
+		userId,
+	);
+	if (!recordsLimit.allowed)
+		throw new Error(
+			"Import limit reached (10,000 articles per hour). Wait an hour, then retry the same backup safely.",
+		);
+	const bytesLimit = await checkRateLimit(
+		{
+			name: "import-bytes",
+			windowMs: 3_600_000,
+			max: 100 * 1024 * 1024,
+			cost: bytes,
+		},
+		userId,
+	);
+	if (!bytesLimit.allowed)
+		throw new Error(
+			"Import limit reached (100 MiB per hour). Wait an hour, then retry the same backup safely.",
+		);
 	const db = getDb();
 	let imported = 0;
 	let skipped = 0;
@@ -33,27 +66,6 @@ export async function importBackupArticles(
 		const uniqueTags = [
 			...new Map(record.tags.map((tag) => [tag.name, tag])).values(),
 		];
-		for (const batch of chunks(uniqueTags, 20))
-			await db
-				.insert(tags)
-				.values(batch.map((tag) => ({ userId, ...tag })))
-				.onConflictDoNothing();
-		const tagIds: string[] = [];
-		for (const batch of chunks(uniqueTags, 90)) {
-			const saved = await db
-				.select({ id: tags.id })
-				.from(tags)
-				.where(
-					and(
-						eq(tags.userId, userId),
-						inArray(
-							tags.name,
-							batch.map((tag) => tag.name),
-						),
-					),
-				);
-			tagIds.push(...saved.map((tag) => tag.id));
-		}
 
 		const insert = db.insert(articles).values({
 			id,
@@ -69,10 +81,30 @@ export async function importBackupArticles(
 			readAt: record.readAt ? new Date(record.readAt) : null,
 		});
 		const writes = [
-			...chunks(tagIds, 50).map((batch) =>
+			...chunks(uniqueTags, 20).map((batch) =>
 				db
-					.insert(articleTags)
-					.values(batch.map((tagId) => ({ articleId: id, tagId }))),
+					.insert(tags)
+					.values(batch.map((tag) => ({ userId, ...tag })))
+					.onConflictDoNothing(),
+			),
+			...chunks(uniqueTags, 40).map((batch) =>
+				db.insert(articleTags).select(
+					db
+						.select({
+							articleId: sql<string>`${id}`.as("article_id"),
+							tagId: tags.id,
+						})
+						.from(tags)
+						.where(
+							and(
+								eq(tags.userId, userId),
+								inArray(
+									tags.name,
+									batch.map((tag) => tag.name),
+								),
+							),
+						),
+				),
 			),
 			db
 				.insert(readingProgress)
@@ -94,7 +126,7 @@ export async function importBackupArticles(
 				: []),
 		];
 		try {
-			await db.batch([insert, ...writes]);
+			await withQuotaErrors(() => db.batch([insert, ...writes]));
 			imported++;
 		} catch (error) {
 			const [duplicate] = await db

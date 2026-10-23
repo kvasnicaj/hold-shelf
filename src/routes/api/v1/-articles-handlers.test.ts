@@ -1,4 +1,5 @@
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { AccountQuotaError } from "#/server/account-quota";
 import { ArticleAlreadyExistsError } from "#/server/articles-service";
 
 const {
@@ -25,6 +26,11 @@ vi.mock("#/server/api-tokens-repository", () => ({
 
 vi.mock("#/server/articles-repository", () => ({
 	createArticlesRepository: createArticlesRepositoryMock,
+}));
+
+vi.mock("#/server/config", async (importOriginal) => ({
+	...(await importOriginal<typeof import("#/server/config")>()),
+	securityConfig: { trustProxyHeaders: true },
 }));
 
 let handleV1ArticlesGet: typeof import("#/routes/api/v1/-articles-handlers").handleV1ArticlesGet;
@@ -122,7 +128,7 @@ describe("v1 articles API handlers", () => {
 		expect(response.headers.get("Retry-After")).toBe("12");
 		expect(checkRateLimitMock).toHaveBeenCalledWith(
 			{ name: "api-v1-auth", windowMs: 60_000, max: 60 },
-			"203.0.113.10",
+			"ip:203.0.113.10",
 		);
 		expect(getUserIdFromBearerTokenMock).not.toHaveBeenCalled();
 	});
@@ -365,6 +371,40 @@ describe("v1 articles API handlers", () => {
 		await expect(response.json()).resolves.toEqual({
 			code: "INVALID_URL",
 			message: "Invalid article URL.",
+		});
+	});
+	it("returns an actionable account quota conflict for API saves", async () => {
+		createApiTokensRepositoryMock.mockReturnValue({});
+		createArticlesRepositoryMock.mockReturnValue({});
+		getUserIdFromBearerTokenMock.mockResolvedValue("user-1");
+		createArticleForUserMock.mockRejectedValue(
+			new AccountQuotaError(
+				"Your library has reached 10,000 articles, including Trash.",
+			),
+		);
+		const response = await handleV1ArticlesPost(
+			{
+				request: new Request("https://hold-shelf.com/api/v1/articles", {
+					method: "POST",
+					headers: {
+						authorization: "Bearer hs_token",
+						"content-type": "application/json",
+					},
+					body: JSON.stringify({ url: "https://example.com/article" }),
+				}),
+			},
+			{
+				checkRateLimitFn: checkRateLimitMock,
+				createApiTokensRepositoryFn: createApiTokensRepositoryMock,
+				getUserIdFromBearerTokenFn: getUserIdFromBearerTokenMock,
+				createArticlesRepositoryFn: createArticlesRepositoryMock,
+				createArticleForUserFn: createArticleForUserMock,
+			},
+		);
+		expect(response.status).toBe(409);
+		expect(await response.json()).toEqual({
+			code: "QUOTA_EXCEEDED",
+			message: "Your library has reached 10,000 articles, including Trash.",
 		});
 	});
 });

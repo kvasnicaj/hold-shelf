@@ -66,9 +66,10 @@ export async function importLibraryFile(
 			imported += result.imported;
 			skipped += result.skipped;
 			onProgress(offset + 1, parsed.data.articles.length);
-		} catch {
+		} catch (error) {
+			const reason = error instanceof Error ? ` ${error.message}` : "";
 			throw new Error(
-				`Import stopped after ${imported} new articles (${skipped} already saved). Retry the same file to continue safely.`,
+				`Import stopped after ${imported} new articles (${skipped} already saved).${reason} Retry the same file to continue safely.`,
 			);
 		}
 	}

@@ -37,3 +37,30 @@ it("enforces a shared limit under concurrent D1 requests and resets at the windo
 		await checkRateLimitWithStore(config, "same-user", { store, now: 1100 }),
 	).toEqual({ allowed: true, retryAfterMs: 0 });
 });
+
+it("atomically charges weighted costs and cannot regain budget by retrying", async () => {
+	getDbMock.mockReturnValue(database.db);
+	const store = createRateLimitStore();
+	const config = { name: "weighted", windowMs: 1000, max: 100, cost: 30 };
+	const results = await Promise.all(
+		Array.from({ length: 10 }, () =>
+			checkRateLimitWithStore(config, "same", { store, now: 100 }),
+		),
+	);
+	expect(results.filter(({ allowed }) => allowed)).toHaveLength(3);
+	expect(
+		await checkRateLimitWithStore({ ...config, cost: 1 }, "same", {
+			store,
+			now: 100,
+		}),
+	).toEqual({ allowed: false, retryAfterMs: 1000 });
+	expect(
+		await checkRateLimitWithStore({ ...config, cost: 101 }, "oversized", {
+			store,
+			now: 100,
+		}),
+	).toEqual({ allowed: false, retryAfterMs: 1000 });
+	expect(
+		await checkRateLimitWithStore(config, "same", { store, now: 1100 }),
+	).toEqual({ allowed: true, retryAfterMs: 0 });
+});

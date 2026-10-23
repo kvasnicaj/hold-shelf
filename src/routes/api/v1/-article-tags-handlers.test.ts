@@ -3,6 +3,7 @@ import {
 	handleV1ArticleTagDelete,
 	handleV1ArticleTagPut,
 } from "#/routes/api/v1/-article-tags-handlers";
+import { AccountQuotaError } from "#/server/account-quota";
 import type { TagsRepository } from "#/server/tags-service";
 
 function createAuthDependencies() {
@@ -156,5 +157,24 @@ describe("v1 article tag API handlers", () => {
 			code: "INVALID_TAG_ASSIGNMENT",
 			message: "Invalid tag assignment.",
 		});
+	});
+});
+
+it("returns actionable quota errors instead of internal SQL failures", async () => {
+	const repo = createTagsRepository();
+	vi.mocked(repo.addTagToArticles).mockRejectedValue(
+		new AccountQuotaError("An article can have at most 100 tags."),
+	);
+	const response = await handleV1ArticleTagPut(
+		{
+			request: createRequest("PUT"),
+			params: { id: "article-1", tagId: "tag-1" },
+		},
+		{ ...createAuthDependencies(), createTagsRepositoryFn: () => repo },
+	);
+	expect(response.status).toBe(409);
+	expect(await response.json()).toEqual({
+		code: "QUOTA_EXCEEDED",
+		message: "An article can have at most 100 tags.",
 	});
 });

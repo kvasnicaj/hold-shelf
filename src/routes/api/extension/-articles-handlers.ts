@@ -1,4 +1,5 @@
 import { getAuth } from "#/lib/auth";
+import { AccountQuotaError } from "#/server/account-quota";
 import { createArticlesRepository } from "#/server/articles-repository";
 import { validateCreateArticleInput } from "#/server/articles-runtime";
 import { createArticleForUser } from "#/server/articles-service";
@@ -131,6 +132,12 @@ export async function handleExtensionArticlesPost(
 }
 
 function createCreateArticleErrorResponse(error: unknown) {
+	if (error instanceof AccountQuotaError) {
+		return Response.json(
+			{ code: "QUOTA_EXCEEDED", message: error.message },
+			{ status: 409 },
+		);
+	}
 	if (!(error instanceof Error)) {
 		return Response.json(
 			{
