@@ -1,4 +1,12 @@
-import { createColumnHelper } from "@tanstack/react-table";
+import {
+	columnSizingFeature,
+	columnVisibilityFeature,
+	createColumnHelper,
+	type RowSelectionState,
+	rowSelectionFeature,
+	Subscribe,
+	tableFeatures,
+} from "@tanstack/react-table";
 import {
 	BookOpen,
 	Check,
@@ -22,7 +30,26 @@ import {
 } from "#/components/ui/dropdown-menu";
 import { formatDate } from "#/lib/formatters";
 
-const columnHelper = createColumnHelper<ArticleWithTags>();
+export const archiveTableFeatures = tableFeatures({
+	columnSizingFeature,
+	columnVisibilityFeature,
+	rowSelectionFeature,
+});
+
+const columnHelper = createColumnHelper<
+	typeof archiveTableFeatures,
+	ArticleWithTags
+>();
+
+export function toArchiveRowSelection(
+	selection: Record<string, boolean>,
+): RowSelectionState {
+	const selected: RowSelectionState = {};
+	for (const [id, isSelected] of Object.entries(selection)) {
+		if (isSelected) selected[id] = true;
+	}
+	return selected;
+}
 
 function stopArticleOpen(event: { stopPropagation: () => void }) {
 	event.stopPropagation();
@@ -49,24 +76,38 @@ export function createArchiveColumns({
 	onToggleFavorite,
 	onDelete,
 }: CreateArchiveColumnsOptions) {
-	return [
+	return columnHelper.columns([
 		columnHelper.display({
 			id: "select",
 			header: ({ table }) => (
-				<Checkbox
-					aria-label="Select all articles on this page"
-					checked={table.getIsAllRowsSelected()}
-					onCheckedChange={(value) => table.toggleAllRowsSelected(!!value)}
-					onClick={(event) => event.stopPropagation()}
-				/>
+				<Subscribe
+					source={table.store}
+					selector={() => table.getIsAllRowsSelected()}
+				>
+					{(allSelected) => (
+						<Checkbox
+							aria-label="Select all articles on this page"
+							checked={allSelected}
+							onCheckedChange={(value) => table.toggleAllRowsSelected(!!value)}
+							onClick={(event) => event.stopPropagation()}
+						/>
+					)}
+				</Subscribe>
 			),
-			cell: ({ row }) => (
-				<Checkbox
-					aria-label={`Select ${row.original.title ?? row.original.url}`}
-					checked={row.getIsSelected()}
-					onCheckedChange={(value) => row.toggleSelected(!!value)}
-					onClick={(event) => event.stopPropagation()}
-				/>
+			cell: ({ row, table }) => (
+				<Subscribe
+					source={table.atoms.rowSelection}
+					selector={(selection) => !!selection[row.id]}
+				>
+					{(selected) => (
+						<Checkbox
+							aria-label={`Select ${row.original.title ?? row.original.url}`}
+							checked={selected}
+							onCheckedChange={(value) => row.toggleSelected(!!value)}
+							onClick={(event) => event.stopPropagation()}
+						/>
+					)}
+				</Subscribe>
 			),
 			size: 32,
 		}),
@@ -226,5 +267,5 @@ export function createArchiveColumns({
 			},
 			size: 72,
 		}),
-	];
+	]);
 }

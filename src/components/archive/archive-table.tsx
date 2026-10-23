@@ -1,11 +1,11 @@
-import {
-	flexRender,
-	getCoreRowModel,
-	useReactTable,
-} from "@tanstack/react-table";
-import type * as React from "react";
+import { useTable } from "@tanstack/react-table";
+import { type Dispatch, type SetStateAction, useMemo } from "react";
 import { ArchiveTableMobile } from "#/components/archive/archive-table-mobile";
-import { createArchiveColumns } from "#/components/archive/helpers";
+import {
+	archiveTableFeatures,
+	createArchiveColumns,
+	toArchiveRowSelection,
+} from "#/components/archive/helpers";
 import type { ArticleWithTags } from "#/components/articles/types";
 import type { Tag } from "#/components/tags/types";
 import { useIsMobile } from "#/hooks/use-mobile";
@@ -13,9 +13,7 @@ import { useIsMobile } from "#/hooks/use-mobile";
 type ArchiveTableProps = {
 	articles: ArticleWithTags[];
 	rowSelection: Record<string, boolean>;
-	onRowSelectionChange: React.Dispatch<
-		React.SetStateAction<Record<string, boolean>>
-	>;
+	onRowSelectionChange: Dispatch<SetStateAction<Record<string, boolean>>>;
 	availableTags: Tag[];
 	onAddTag: (tagId: string, articleIds: string[]) => Promise<void>;
 	onRemoveTag: (tagId: string, articleIds: string[]) => Promise<void>;
@@ -40,9 +38,19 @@ export function ArchiveTable({
 	onDelete,
 }: ArchiveTableProps) {
 	const isMobile = useIsMobile();
-	const table = useReactTable({
-		data: articles,
-		columns: createArchiveColumns({
+	const columns = useMemo(
+		() =>
+			createArchiveColumns({
+				availableTags,
+				onAddTag,
+				onRemoveTag,
+				onCreateTag,
+				onOpenArticle,
+				onToggleRead,
+				onToggleFavorite,
+				onDelete,
+			}),
+		[
 			availableTags,
 			onAddTag,
 			onRemoveTag,
@@ -51,10 +59,23 @@ export function ArchiveTable({
 			onToggleRead,
 			onToggleFavorite,
 			onDelete,
-		}),
-		state: { rowSelection },
-		onRowSelectionChange,
-		getCoreRowModel: getCoreRowModel(),
+		],
+	);
+	const selectedRows = useMemo(
+		() => toArchiveRowSelection(rowSelection),
+		[rowSelection],
+	);
+	const table = useTable({
+		features: archiveTableFeatures,
+		data: articles,
+		columns,
+		state: { rowSelection: selectedRows },
+		onRowSelectionChange: (updater) =>
+			onRowSelectionChange((previous) =>
+				typeof updater === "function"
+					? updater(toArchiveRowSelection(previous))
+					: updater,
+			),
 		getRowId: (row) => row.id,
 	});
 
@@ -92,12 +113,9 @@ export function ArchiveTable({
 												header.getSize() !== 150 ? header.getSize() : undefined,
 										}}
 									>
-										{header.isPlaceholder
-											? null
-											: flexRender(
-													header.column.columnDef.header,
-													header.getContext(),
-												)}
+										{header.isPlaceholder ? null : (
+											<table.FlexRender header={header} />
+										)}
 									</th>
 								) : (
 									<th
@@ -108,12 +126,9 @@ export function ArchiveTable({
 												header.getSize() !== 150 ? header.getSize() : undefined,
 										}}
 									>
-										{header.isPlaceholder
-											? null
-											: flexRender(
-													header.column.columnDef.header,
-													header.getContext(),
-												)}
+										{header.isPlaceholder ? null : (
+											<table.FlexRender header={header} />
+										)}
 									</th>
 								),
 							)}
@@ -135,11 +150,11 @@ export function ArchiveTable({
 										key={cell.id}
 										className="hidden overflow-hidden px-2 py-2 md:table-cell"
 									>
-										{flexRender(cell.column.columnDef.cell, cell.getContext())}
+										<table.FlexRender cell={cell} />
 									</td>
 								) : (
 									<td key={cell.id} className="overflow-hidden px-2 py-2">
-										{flexRender(cell.column.columnDef.cell, cell.getContext())}
+										<table.FlexRender cell={cell} />
 									</td>
 								),
 							)}

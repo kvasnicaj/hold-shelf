@@ -9,8 +9,26 @@ allowBuilds:
   sharp: true
   workerd: true
 
-# drizzle-kit's legacy loader otherwise retains an affected esbuild dev server.
+# Exact newly published versions selected for this dependency refresh.
+minimumReleaseAgeExclude:
+  - '@babel/core@8.0.9'
+  - '@babel/helper-string-parser@8.0.8'
+  - '@babel/helpers@8.0.8'
+  - '@babel/parser@8.0.8'
+  - '@babel/types@8.0.8'
+  - '@cloudflare/vite-plugin@1.65.0'
+  - '@sentry/browser-utils@11.9.0'
+  - '@sentry/browser@11.9.0'
+  - '@sentry/cloudflare@11.9.0'
+  - '@sentry/feedback@11.9.0'
+  - '@sentry/opentelemetry@11.9.0'
+  - '@sentry/react@11.9.0'
+  - '@sentry/replay-canvas@11.9.0'
+  - '@sentry/replay@11.9.0'
+  - '@sentry/server-utils@11.9.0'
+
 overrides:
+  # drizzle-kit's legacy loader otherwise retains an affected esbuild dev server.
   '@esbuild-kit/core-utils>esbuild': '0.28.2'
-  # GHSA-3wwx-pv8p-q78v: Miniflare pins an affected WebSocket client.
-  'miniflare>undici': '7.29.1'
+  # GHSA-rj75-hqrm-r3gf: typography still pins the vulnerable parser v6.
+  '@tailwindcss/typography>postcss-selector-parser': '7.1.7'

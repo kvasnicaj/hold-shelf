@@ -13,7 +13,10 @@ A read-it-later web app. Save articles, organize with tags, read when you're rea
 
 ## Getting started
 
-Use Node.js 22 or later and pnpm 10.32.1 (the version pinned in `package.json`).
+Use Node.js 24.22.1 or later and pnpm 12.15.0 (the version pinned in
+`package.json`). The checked-in `.node-version` pins the Node.js 24 LTS security
+release used by CI and deployment; version managers such as mise or fnm can read
+this file for local development.
 Create a GitHub OAuth app for local development with homepage
 `http://localhost:3000` and callback `http://localhost:3000/api/auth/callback/github`.
 GitHub is the only enabled sign-in provider; local email/password login is not
