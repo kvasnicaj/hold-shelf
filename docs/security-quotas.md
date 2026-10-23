@@ -22,13 +22,16 @@ Migration `0010_account_quotas.sql` installs database triggers and backfills `ac
 
 Counters change in the same SQLite statement/transaction as the stored data, so concurrent requests cannot race past the quota. Cache inserts, replacements, metadata/tag edits, and permanent deletes all adjust the counters. Moving articles/tags/cache ownership is deliberately prohibited at the database layer; there is no account-transfer feature. Soft deletion does not release quota. Permanently deleting articles, or deleting tags, does release quota. SQLite cascades are included in the accounting.
 
-Existing accounts are never truncated. An account already above a limit after migration may keep reading, change non-growing data, shrink content, or permanently delete records, but cannot increase the dimension that exceeds its limit. API and extension saves return `409 QUOTA_EXCEEDED` with a safe explanation; web/import errors explain how to make room or when to retry.
+An account above a configured limit may keep reading, change non-growing data, shrink content, or permanently delete records, but cannot increase the dimension that exceeds its limit. API and extension saves return `409 QUOTA_EXCEEDED` with a safe explanation; web/import errors explain how to make room or when to retry.
 
-## Deployment and maintenance
+## Schema maintenance
 
-1. Take/verify a D1 backup or Time Travel restore point.
-2. Apply the reviewed D1 migrations before deploying the new Worker. The migration backfill scans existing content once; plan a quiet period and monitor migration duration on large databases.
-3. Deploy the application and verify create/import/cache-refresh/delete behavior using a disposable account.
-4. Monitor shared D1 database size, read/write volume, request errors, and billing thresholds. Per-account quotas do not replace global capacity alerts or abuse controls.
+Quota counters and their enforcement triggers are versioned database behavior.
+Use reviewed migrations rather than `drizzle-kit push`: the TypeScript schema
+represents the counter table but does not represent custom triggers. A table
+rebuild must preserve triggers and reconcile counters. Keep application constants,
+SQL limits, tests and this document synchronized when changing the policy.
 
-Use migrations, **not `drizzle-kit push`**, to install and preserve the quota triggers. Drizzle's TypeScript schema tracks the counter table but cannot represent custom triggers; a later table rebuild must recreate any dropped triggers and reconcile counters. Keep quota constants, SQL limits, tests, and this document synchronized when changing the policy. Counter rows are internal bookkeeping and must never be exposed for client updates. Rolling back application code does not remove the database quotas.
+Counter rows are internal bookkeeping and must not be writable by clients. Test
+concurrent boundaries, rollback, UTF-8 accounting and delete cascades against a
+disposable database. See [deployment](deployment.md) for migration requirements.

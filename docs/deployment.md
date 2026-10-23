@@ -41,7 +41,7 @@ verifies the Gitleaks download checksum and scans available Git history with
 redacted output. Pull-request jobs receive no Cloudflare deployment token; the
 deployment job runs only for pushes to `main`.
 
-When making the repository public, enable private vulnerability reporting,
+For a public repository, configure private vulnerability reporting,
 secret scanning/push protection, and require the `check` and `secrets` jobs in a
 branch ruleset. Require approval for workflows from outside contributors. These
 are repository settings, not settings applied by the workflow files themselves.
@@ -62,7 +62,7 @@ Responsibilities:
 
 `wrangler.jsonc` defines the Cloudflare deployment target.
 
-Current important settings:
+Repository configuration:
 
 - Worker name: `hold-shelf`
 - compatibility date: `2026-04-03`
@@ -71,7 +71,7 @@ Current important settings:
 - structured console logs enabled; automatic invocation logs and native traces disabled
 - query strings redacted in Cloudflare observability
 
-## Production bindings and vars
+## Bindings and variables
 
 ### D1 database binding
 
@@ -191,11 +191,12 @@ Recommended production order:
 3. apply it to the target database
 4. deploy the app code that depends on it
 
-Migrations `0008` and `0009` add Trash, reading progress, and Better Auth’s nullable
-account password field. Password sign-in remains disabled. Apply both before
-running this version. These changes are additive and compatible with the previous
-application version. A migration failure stops automatic deployment. Manual
-`pnpm deploy` still requires applying remote migrations first.
+Apply all pending migrations before running application code that depends on
+them. Read both schema and data migrations: code rollback does not undo data
+changes. Validate backup recovery and migrations against a disposable database
+before release. Use migrations to preserve custom quota triggers; schema-push
+tools do not represent them. A migration failure stops automatic deployment.
+Manual `pnpm deploy` still requires applying the target migrations first.
 
 ## CI/CD pipeline
 
@@ -282,8 +283,7 @@ Enabled in `wrangler.jsonc`:
 - console logs retained with automatic invocation logs disabled
 - query-string redaction enabled; native Cloudflare traces disabled
 - use application-redacted Sentry errors/spans for diagnosis
-- platform metadata attached to console entries and historical logs still require
-  dashboard access/retention review
+- set observability access and retention policies for your own instance
 
 ## Deployment checklist
 
