@@ -36,8 +36,8 @@ for that setup.
 ## Public contribution safeguards
 
 CI declares read-only repository permissions and does not persist checkout
-credentials. Third-party actions are pinned to commit SHAs. The separate secret
-scan verifies the Gitleaks download checksum and scans available Git history with
+credentials. Third-party actions are pinned to commit SHAs. The CI secret-scan job
+verifies the Gitleaks download checksum and scans available Git history with
 redacted output. Pull-request jobs receive no Cloudflare deployment token; the
 deployment job runs only for pushes to `main`.
 
@@ -68,7 +68,8 @@ Current important settings:
 - compatibility date: `2026-04-03`
 - compatibility flag: `nodejs_compat`
 - main entry: `src/server-entry.ts`
-- observability enabled
+- structured console logs enabled; automatic invocation logs and native traces disabled
+- query strings redacted in Cloudflare observability
 
 ## Production bindings and vars
 
@@ -211,7 +212,7 @@ Runs on `ubuntu-latest` and performs:
 
 1. checkout
 2. pnpm setup
-3. Node 22 setup
+3. Node setup from `.node-version` (24.22.1)
 4. `pnpm install --frozen-lockfile`
 5. `pnpm cf-typegen`
 6. `pnpm check`
@@ -225,17 +226,25 @@ Runs only when:
 
 - event is a push
 - branch is `main`
-- the `check` job passed
+- both `check` and `secrets` jobs passed
+
+Production deploy jobs share a non-cancelling concurrency group so migrations and
+Worker uploads do not run in parallel. GitHub may replace an older pending deployment
+with a newer one; migrations must remain forward-compatible. PR jobs never deploy.
+Inside the serialized job, a GitHub API check compares the candidate SHA with
+current `main` immediately before migrations. Stale runs skip both migration and
+Worker upload; a failed freshness lookup fails closed. An older, slower CI run
+cannot roll production back after a newer release.
 
 Deployment steps:
 
 1. checkout
 2. pnpm setup
-3. Node 22 setup
+3. Node setup from `.node-version` (24.22.1)
 4. `pnpm install --frozen-lockfile`
 5. `pnpm build`
 6. `pnpm wrangler d1 migrations apply hold-shelf-db --remote`
-7. `cloudflare/wrangler-action@v3` with `command: deploy`
+7. SHA-pinned `cloudflare/wrangler-action` with `command: deploy`
 
 Required GitHub secret:
 
@@ -270,7 +279,11 @@ Client-side:
 
 Enabled in `wrangler.jsonc`:
 
-- `"observability": { "enabled": true }`
+- console logs retained with automatic invocation logs disabled
+- query-string redaction enabled; native Cloudflare traces disabled
+- use application-redacted Sentry errors/spans for diagnosis
+- platform metadata attached to console entries and historical logs still require
+  dashboard access/retention review
 
 ## Deployment checklist
 

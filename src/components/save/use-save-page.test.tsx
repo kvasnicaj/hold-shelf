@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useSavePage } from "#/components/save/use-save-page";
 import { createArticle } from "#/server/articles";
@@ -8,9 +8,12 @@ vi.mock("#/server/articles", () => ({
 }));
 
 function TestHarness({ url }: { url?: string }) {
-	const { message, status } = useSavePage(url);
+	const { message, status, save } = useSavePage(url);
 	return (
 		<div>
+			<button type="button" onClick={() => void save()}>
+				Save
+			</button>
 			<div data-testid="status">{status}</div>
 			<div data-testid="message">{message}</div>
 		</div>
@@ -49,12 +52,17 @@ describe("useSavePage", () => {
 		expect(createArticleMock).not.toHaveBeenCalled();
 	});
 
-	it("starts saving immediately and reports success", async () => {
+	it("waits for explicit confirmation and reports success", async () => {
 		const pendingSave =
 			deferredPromise<Awaited<ReturnType<typeof createArticle>>>();
 		createArticleMock.mockReturnValue(pendingSave.promise);
 		render(<TestHarness url="https://example.com/article" />);
 
+		expect(screen.getByTestId("status")).toHaveTextContent("idle");
+		expect(createArticleMock).not.toHaveBeenCalled();
+		fireEvent.click(screen.getByRole("button", { name: "Save" }));
+		fireEvent.click(screen.getByRole("button", { name: "Save" }));
+		expect(createArticleMock).toHaveBeenCalledTimes(1);
 		expect(screen.getByTestId("status")).toHaveTextContent("saving");
 		pendingSave.resolve({
 			id: "article-1",
@@ -87,6 +95,7 @@ describe("useSavePage", () => {
 			new Error("This URL is already in your library."),
 		);
 		render(<TestHarness url="https://example.com/article" />);
+		fireEvent.click(screen.getByRole("button", { name: "Save" }));
 
 		await waitFor(() =>
 			expect(screen.getByTestId("status")).toHaveTextContent("duplicate"),
@@ -99,6 +108,7 @@ describe("useSavePage", () => {
 	it("surfaces unexpected save failures", async () => {
 		createArticleMock.mockRejectedValue(new Error("Network request failed."));
 		render(<TestHarness url="https://example.com/article" />);
+		fireEvent.click(screen.getByRole("button", { name: "Save" }));
 
 		await waitFor(() =>
 			expect(screen.getByTestId("status")).toHaveTextContent("error"),
@@ -111,6 +121,7 @@ describe("useSavePage", () => {
 	it("falls back to a generic message for non-Error failures", async () => {
 		createArticleMock.mockRejectedValue("boom");
 		render(<TestHarness url="https://example.com/article" />);
+		fireEvent.click(screen.getByRole("button", { name: "Save" }));
 
 		await waitFor(() =>
 			expect(screen.getByTestId("status")).toHaveTextContent("error"),

@@ -136,3 +136,11 @@ stored per server. HTTPS is required except for loopback development servers.
 - **Rate limited:** wait for the server's retry window before trying again.
 - **Module not found:** run `pnpm install --frozen-lockfile` and rebuild the CLI from
   the repository root.
+
+## Terminal output safety
+
+Human-readable text and Markdown output remove terminal escape/control and bidi
+formatting characters from remote article metadata, content, and error messages.
+Newlines and tabs remain usable in article text; table fields stay on one line.
+JSON output escapes controls (including C1) and round-trips the original data;
+use `--json` for lossless machine-readable exports.

@@ -22,16 +22,10 @@ export function getClientAddressFromHeaders(
 		return null;
 	}
 
-	const forwarded = headers
-		.get("x-forwarded-for")
-		?.split(",")
-		.map((part) => part.trim())
-		.find(Boolean);
-	const realIp = headers.get("x-real-ip");
-
-	return (
-		normalizeIpCandidate(forwarded) ?? normalizeIpCandidate(realIp) ?? null
-	);
+	// Only trust the single-valued identity supplied by Cloudflare ingress.
+	// X-Forwarded-For can preserve an attacker-supplied prefix; X-Real-IP and
+	// User-Agent are not alternative identities when that header is missing.
+	return normalizeIpCandidate(headers.get("cf-connecting-ip"));
 }
 
 export function getClientRateLimitKey(
@@ -43,6 +37,5 @@ export function getClientRateLimitKey(
 		return `ip:${ip}`;
 	}
 
-	const userAgent = request.headers.get("user-agent")?.trim() || "unknown";
-	return `ua:${userAgent.slice(0, 160)}`;
+	return "ip:unknown";
 }

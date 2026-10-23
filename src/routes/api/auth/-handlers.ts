@@ -1,4 +1,5 @@
 import { getAuth } from "#/lib/auth";
+import { expireLegacyAuthCookies } from "#/lib/auth-security";
 import { getClientRateLimitKey } from "#/server/client-key";
 import { checkRateLimit } from "#/server/rate-limit";
 
@@ -25,11 +26,13 @@ export async function handleAuthPost({ request }: { request: Request }) {
 }
 
 async function handleAuthRequest(request: Request) {
+	let response: Response;
 	try {
-		return await getAuth().handler(request);
+		response = await getAuth().handler(request);
 	} catch (error) {
-		return createAuthErrorResponse(error);
+		response = createAuthErrorResponse(error);
 	}
+	return expireLegacyAuthCookies(request, response, import.meta.env.DEV);
 }
 
 function createAuthErrorResponse(error: unknown) {

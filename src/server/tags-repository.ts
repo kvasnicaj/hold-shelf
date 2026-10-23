@@ -1,6 +1,7 @@
 import { and, eq, inArray, sql } from "drizzle-orm";
 import { getDb } from "#/db/index";
 import { articles, articleTags, tags } from "#/db/schema";
+import { withQuotaErrors } from "#/server/account-quota";
 import { activeArticle, chunks } from "#/server/db-helpers";
 import type { TagsRepository } from "#/server/tags-service";
 
@@ -31,23 +32,27 @@ export function createTagsRepository(): TagsRepository {
 				.groupBy(tags.id, tags.name, tags.color, tags.createdAt)
 				.orderBy(tags.name),
 		createTag: async ({ userId, name, color }) => {
-			const [tag] = await db
-				.insert(tags)
-				.values({
-					userId,
-					name,
-					color: color ?? null,
-				})
-				.returning();
+			const [tag] = await withQuotaErrors(async () =>
+				db
+					.insert(tags)
+					.values({
+						userId,
+						name,
+						color: color ?? null,
+					})
+					.returning(),
+			);
 
 			return tag;
 		},
 		updateTag: async ({ userId, id, name }) => {
-			const [tag] = await db
-				.update(tags)
-				.set({ name })
-				.where(and(eq(tags.id, id), eq(tags.userId, userId)))
-				.returning();
+			const [tag] = await withQuotaErrors(async () =>
+				db
+					.update(tags)
+					.set({ name })
+					.where(and(eq(tags.id, id), eq(tags.userId, userId)))
+					.returning(),
+			);
 
 			return tag;
 		},
@@ -98,7 +103,9 @@ export function createTagsRepository(): TagsRepository {
 					.onConflictDoNothing(),
 			);
 			if (statements.length)
-				await db.batch([statements[0], ...statements.slice(1)]);
+				await withQuotaErrors(() =>
+					db.batch([statements[0], ...statements.slice(1)]),
+				);
 		},
 		removeTagFromArticles: async ({ tagId, articleIds }) => {
 			const statements = chunks(articleIds, 90).map((batch) =>
@@ -112,7 +119,9 @@ export function createTagsRepository(): TagsRepository {
 					),
 			);
 			if (statements.length)
-				await db.batch([statements[0], ...statements.slice(1)]);
+				await withQuotaErrors(() =>
+					db.batch([statements[0], ...statements.slice(1)]),
+				);
 		},
 	};
 }

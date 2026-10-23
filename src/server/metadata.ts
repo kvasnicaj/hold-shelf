@@ -1,3 +1,4 @@
+import { safeErrorDetails } from "#/lib/sentry-privacy";
 import { metadataConfig } from "#/server/config";
 import {
 	fetchHtmlWithGuards,
@@ -71,8 +72,8 @@ export async function extractMetadata(url: string): Promise<ArticleMetadata> {
 		return { title, description, faviconUrl, hostname };
 	} catch (error) {
 		console.warn("Metadata extraction fell back to hostname metadata.", {
-			url,
-			error: error instanceof Error ? error.message : String(error),
+			code: "METADATA_EXTRACTION_FAILED",
+			...safeErrorDetails(error),
 		});
 		return fallback;
 	}

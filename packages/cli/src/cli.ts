@@ -7,6 +7,7 @@ import { registerDashboardCommand } from "./commands/dashboard.js";
 import { registerTagCommands } from "./commands/tags.js";
 import { CliError } from "./errors.js";
 import { positiveInteger, redactSecrets } from "./helpers.js";
+import { safeTerminalText } from "./output/helpers.js";
 import type { RuntimeDependencies } from "./types.js";
 
 export function createDefaultDependencies(): RuntimeDependencies {
@@ -39,8 +40,8 @@ export function createCli(dependencies: RuntimeDependencies): Command {
 		.option("--no-color", "Disable colored output")
 		.showHelpAfterError()
 		.configureOutput({
-			writeOut: (value) => dependencies.stdout.write(value),
-			writeErr: (value) => dependencies.stderr.write(value),
+			writeOut: (value) => dependencies.stdout.write(safeTerminalText(value)),
+			writeErr: (value) => dependencies.stderr.write(safeTerminalText(value)),
 			outputError: (value, write) => write(redactSecrets(value)),
 		})
 		.exitOverride();
@@ -69,11 +70,13 @@ export async function runCli(
 				: 2;
 		}
 		if (error instanceof CliError) {
-			dependencies.stderr.write(`Error: ${redactSecrets(error.message)}\n`);
+			dependencies.stderr.write(
+				`Error: ${safeTerminalText(redactSecrets(error.message))}\n`,
+			);
 			return error.exitCode;
 		}
 		dependencies.stderr.write(
-			`Error: ${redactSecrets(error instanceof Error ? error.message : error)}\n`,
+			`Error: ${safeTerminalText(redactSecrets(error instanceof Error ? error.message : error))}\n`,
 		);
 		return 1;
 	}

@@ -14,7 +14,7 @@ type SavePageProps = {
 };
 
 export function SavePage({ url }: SavePageProps) {
-	const { message, status } = useSavePage(url);
+	const { message, status, save } = useSavePage(url);
 	const isSuccess = status === "saved" || status === "duplicate";
 
 	return (
@@ -24,6 +24,8 @@ export function SavePage({ url }: SavePageProps) {
 					<div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-(--lagoon)/10 ring-1 ring-(--lagoon)/20">
 						{status === "saving" ? (
 							<LoaderCircle className="size-7 animate-spin text-(--lagoon)" />
+						) : status === "idle" ? (
+							<Bookmark className="size-7 text-(--lagoon)" />
 						) : isSuccess ? (
 							<CheckCircle2 className="size-7 text-(--lagoon)" />
 						) : (
@@ -38,11 +40,13 @@ export function SavePage({ url }: SavePageProps) {
 							</span>
 						</div>
 						<CardTitle>
-							{status === "saving"
-								? "Saving article"
-								: isSuccess
-									? "All set"
-									: "We hit a snag"}
+							{status === "idle"
+								? "Save this article?"
+								: status === "saving"
+									? "Saving article"
+									: isSuccess
+										? "All set"
+										: "We hit a snag"}
 						</CardTitle>
 						<p className="text-sm leading-relaxed text-muted-foreground">
 							{message}
@@ -53,6 +57,11 @@ export function SavePage({ url }: SavePageProps) {
 					</div>
 				</CardHeader>
 				<CardContent className="space-y-3">
+					{(status === "idle" || status === "error") && (
+						<Button className="w-full" onClick={() => void save()}>
+							{status === "error" ? "Try saving again" : "Save article"}
+						</Button>
+					)}
 					<Button
 						asChild
 						className="w-full text-primary-foreground! hover:text-primary-foreground!"

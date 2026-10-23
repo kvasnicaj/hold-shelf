@@ -1,3 +1,4 @@
+import { AccountQuotaError } from "#/server/account-quota";
 import {
 	type ApiV1AuthDependencies,
 	authenticateApiV1Request,
@@ -109,6 +110,8 @@ function createTagMutationErrorResponse(
 	error: unknown,
 	operation: "add" | "remove",
 ) {
+	if (error instanceof AccountQuotaError)
+		return createApiErrorResponse("QUOTA_EXCEEDED", error.message, 409);
 	if (error instanceof Error && error.message === "Tag not found.") {
 		return createApiErrorResponse("TAG_NOT_FOUND", "Tag not found.", 404);
 	}

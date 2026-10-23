@@ -2,7 +2,12 @@ import { lt, sql } from "drizzle-orm";
 import { getDb } from "#/db/index";
 import { rateLimits } from "#/db/schema";
 
-type RateLimitConfig = { name: string; windowMs: number; max: number };
+type RateLimitConfig = {
+	name: string;
+	windowMs: number;
+	max: number;
+	cost?: number;
+};
 export type RateLimitStore = {
 	consume: (
 		args: RateLimitConfig & { key: string; now: number },
@@ -12,14 +17,21 @@ export type RateLimitStore = {
 export function createRateLimitStore(): RateLimitStore {
 	const db = getDb();
 	return {
-		consume: async ({ name, key, now, windowMs, max }) => {
+		consume: async ({ name, key, now, windowMs, max, cost = 1 }) => {
+			if (!Number.isSafeInteger(cost) || cost < 1)
+				throw new Error("Invalid rate limit cost.");
 			const [entry] = await db
 				.insert(rateLimits)
-				.values({ name, key, count: 1, resetAt: now + windowMs })
+				.values({
+					name,
+					key,
+					count: Math.min(cost, max + 1),
+					resetAt: now + windowMs,
+				})
 				.onConflictDoUpdate({
 					target: [rateLimits.name, rateLimits.key],
 					set: {
-						count: sql`CASE WHEN ${rateLimits.resetAt} <= ${now} THEN 1 ELSE MIN(${rateLimits.count} + 1, ${max + 1}) END`,
+						count: sql`CASE WHEN ${rateLimits.resetAt} <= ${now} THEN ${Math.min(cost, max + 1)} ELSE MIN(${rateLimits.count} + ${cost}, ${max + 1}) END`,
 						resetAt: sql`CASE WHEN ${rateLimits.resetAt} <= ${now} THEN ${now + windowMs} ELSE ${rateLimits.resetAt} END`,
 						updatedAt: sql`unixepoch()`,
 					},

@@ -218,3 +218,13 @@ export const readingProgress = sqliteTable("reading_progress", {
 		.notNull()
 		.default(sql`(unixepoch())`),
 });
+
+// Counters are maintained atomically by migration-installed SQLite triggers.
+export const accountUsage = sqliteTable("account_usage", {
+	userId: text("user_id")
+		.primaryKey()
+		.references(() => user.id, { onDelete: "cascade" }),
+	articleCount: integer("article_count").notNull().default(0),
+	tagCount: integer("tag_count").notNull().default(0),
+	storageBytes: integer("storage_bytes").notNull().default(0),
+});

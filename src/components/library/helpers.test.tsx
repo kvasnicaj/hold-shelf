@@ -58,3 +58,12 @@ it("reports partial progress and supports retrying a failed import without dupli
 		skipped: 1,
 	});
 });
+
+it("keeps quota and retry guidance visible alongside partial import progress", async () => {
+	vi.mocked(importLibraryBatch).mockRejectedValue(
+		new Error("Import limit reached (100 MiB per hour). Wait an hour."),
+	);
+	await expect(importLibraryFile(file([article]), vi.fn())).rejects.toThrow(
+		"0 new articles (0 already saved). Import limit reached (100 MiB per hour). Wait an hour. Retry the same file to continue safely.",
+	);
+});

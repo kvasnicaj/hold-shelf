@@ -1,7 +1,9 @@
-import { withSentry } from "@sentry/cloudflare";
+import { captureException, withSentry } from "@sentry/cloudflare";
 import handler from "@tanstack/react-start/server-entry";
 import { isProductionSentryUrl } from "#/lib/sentry-environment";
+import { getSentryPrivacyOptions } from "#/lib/sentry-privacy";
 import { withBackgroundContext } from "#/server/background";
+import { boundRequestBody, withSecurityHeaders } from "#/server/http-security";
 
 function getSentryOptions(env: Record<string, unknown>) {
 	const dsn = typeof env.SENTRY_DSN === "string" ? env.SENTRY_DSN : undefined;
@@ -10,6 +12,7 @@ function getSentryOptions(env: Record<string, unknown>) {
 	const isProduction = isProductionSentryUrl(authUrl);
 
 	return {
+		...getSentryPrivacyOptions(),
 		dsn,
 		enabled: Boolean(dsn) && isProduction,
 		environment: isProduction ? "production" : "development",
@@ -29,8 +32,27 @@ const workerHandler = {
 			),
 		);
 	},
-	fetch(request: Request, _env: Cloudflare.Env, ctx: ExecutionContext) {
-		return withBackgroundContext(ctx, () => handler.fetch(request));
+	async fetch(request: Request, _env: Cloudflare.Env, ctx: ExecutionContext) {
+		try {
+			const bounded = await boundRequestBody(request);
+			const response =
+				bounded instanceof Response
+					? bounded
+					: await withBackgroundContext(ctx, () => handler.fetch(bounded));
+			return withSecurityHeaders(response, request);
+		} catch (error) {
+			captureException(error);
+			return withSecurityHeaders(
+				Response.json(
+					{
+						code: "INTERNAL_ERROR",
+						message: "Something went wrong. Please try again later.",
+					},
+					{ status: 500 },
+				),
+				request,
+			);
+		}
 	},
 };
 

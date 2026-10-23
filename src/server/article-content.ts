@@ -1,3 +1,4 @@
+import { safeErrorDetails } from "#/lib/sentry-privacy";
 import { metadataConfig } from "#/server/config";
 import {
 	fetchHtmlWithGuards,
@@ -116,8 +117,8 @@ export async function extractArticleContent(
 		};
 	} catch (error) {
 		console.warn("Article content extraction failed.", {
-			url,
-			error: error instanceof Error ? error.message : String(error),
+			code: "ARTICLE_CONTENT_EXTRACTION_FAILED",
+			...safeErrorDetails(error),
 		});
 		return {
 			status: "unavailable",

@@ -1,4 +1,5 @@
 import type { articleContentCache, articles } from "#/db/schema";
+import { safeErrorDetails } from "#/lib/sentry-privacy";
 import type {
 	ArticleReaderContent,
 	extractArticleContent,
@@ -269,8 +270,8 @@ async function getArticleContentCacheSafely(
 		return await repo.getArticleContentCache(articleId);
 	} catch (error) {
 		console.warn("Article content cache lookup failed.", {
-			articleId,
-			error: error instanceof Error ? error.message : String(error),
+			code: "ARTICLE_CACHE_LOOKUP_FAILED",
+			...safeErrorDetails(error),
 		});
 		return null;
 	}
@@ -284,8 +285,8 @@ async function upsertArticleContentCacheSafely(
 		return await repo.upsertArticleContentCache(data);
 	} catch (error) {
 		console.warn("Article content cache write failed.", {
-			articleId: data.articleId,
-			error: error instanceof Error ? error.message : String(error),
+			code: "ARTICLE_CACHE_WRITE_FAILED",
+			...safeErrorDetails(error),
 		});
 		return null;
 	}

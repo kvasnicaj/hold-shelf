@@ -3,6 +3,7 @@ import {
 	handleExtensionArticlesOptions,
 	handleExtensionArticlesPost,
 } from "#/routes/api/extension/-articles-handlers";
+import { AccountQuotaError } from "#/server/account-quota";
 
 const {
 	checkRateLimitMock,
@@ -201,5 +202,33 @@ describe("extension article handlers", () => {
 		expect(response.headers.get("Access-Control-Allow-Methods")).toBe(
 			"OPTIONS, POST",
 		);
+	});
+	it("returns an actionable account quota conflict for extension saves", async () => {
+		getSessionMock.mockResolvedValue({ user: { id: "user-1" } });
+		createRepositoryMock.mockReturnValue({});
+		createArticleForUserMock.mockRejectedValue(
+			new AccountQuotaError(
+				"Your library has reached its 250 MiB storage limit.",
+			),
+		);
+		const response = await handleExtensionArticlesPost(
+			{
+				request: new Request("https://hold-shelf.com/api/extension/articles", {
+					method: "POST",
+					headers: { "content-type": "application/json" },
+					body: JSON.stringify({ url: "https://example.com/article" }),
+				}),
+			},
+			{
+				getSessionFn: getSessionMock,
+				createRepository: createRepositoryMock,
+				createArticleForUserFn: createArticleForUserMock,
+			},
+		);
+		expect(response.status).toBe(409);
+		expect(await response.json()).toEqual({
+			code: "QUOTA_EXCEEDED",
+			message: "Your library has reached its 250 MiB storage limit.",
+		});
 	});
 });

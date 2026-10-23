@@ -6,13 +6,14 @@ import type {
 	TagsResponse,
 } from "@hold-shelf/api-contracts";
 import type { Writer } from "../types.js";
+import { safeTerminalText, terminalSafeJson } from "./helpers.js";
 
 export function writeJson(writer: Writer, value: unknown): void {
-	writer.write(`${JSON.stringify(value, null, 2)}\n`);
+	writer.write(`${terminalSafeJson(value)}\n`);
 }
 
 export function writeLine(writer: Writer, value = ""): void {
-	writer.write(`${value}\n`);
+	writer.write(`${safeTerminalText(value)}\n`);
 }
 
 export function renderArticleList(
@@ -115,6 +116,9 @@ function renderTable(
 		rows: string[][];
 	},
 ): void {
+	rows = rows.map((row) =>
+		row.map((value) => safeTerminalText(value).replace(/[\n\t]/g, " ")),
+	);
 	const widths = headers.map((header, index) =>
 		Math.max(
 			header.length,
@@ -145,8 +149,8 @@ function displayWidth(value: string): number {
 }
 
 function truncate(value: string, maximum: number): string {
-	const characters = [...value];
+	const characters = [...safeTerminalText(value)];
 	return characters.length <= maximum
-		? value
+		? characters.join("")
 		: `${characters.slice(0, maximum - 1).join("")}…`;
 }

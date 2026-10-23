@@ -71,6 +71,20 @@
       "when": 1790621712040,
       "tag": "0009_shiny_nitro",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1792791304602,
+      "tag": "0010_account_quotas",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "6",
+      "when": 1792791600000,
+      "tag": "0011_clear_unused_oauth_tokens",
+      "breakpoints": true
     }
   ]
 }
