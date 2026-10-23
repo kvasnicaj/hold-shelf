@@ -17,6 +17,13 @@ paths = [
 regexTarget = "secret"
 regexes = ['''^hs_abc123456(secret)?$''']
 
+[[rules.allowlists]]
+description = "Exact synthetic OAuth regression signing secret; never a deployed credential"
+condition = "AND"
+paths = ['''(^|/)src/lib/auth-security\.test\.ts$''']
+regexTarget = "secret"
+regexes = ['''^synthetic-test-secret-at-least-32-characters-long$''']
+
 # Historical documentation examples use a literal placeholder, not a credential.
 [[rules]]
 id = "curl-auth-header"
