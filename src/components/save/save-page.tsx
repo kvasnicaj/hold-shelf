@@ -1,10 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import {
-	Bookmark,
-	CheckCircle2,
-	CircleAlert,
-	LoaderCircle,
-} from "lucide-react";
+import { CheckCircle2, CircleAlert, LoaderCircle } from "lucide-react";
+import { BrandLogo } from "#/components/brand/brand-logo";
 import { useSavePage } from "#/components/save/use-save-page";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
@@ -34,10 +30,7 @@ export function SavePage({ url }: SavePageProps) {
 					</div>
 					<div className="space-y-2">
 						<div className="mx-auto flex items-center justify-center gap-2">
-							<Bookmark className="h-6 w-6 text-(--lagoon)" />
-							<span className="display-title text-xl font-bold">
-								Hold Shelf
-							</span>
+							<BrandLogo className="h-7" />
 						</div>
 						<CardTitle>
 							{status === "idle"

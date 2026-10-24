@@ -6,7 +6,8 @@ export const LANDING_PAGE_DESCRIPTION =
 
 export const LANDING_PAGE_CANONICAL_URL = "https://hold-shelf.com/";
 
-export const LANDING_PAGE_OG_IMAGE_URL = "https://hold-shelf.com/logo512.png";
+export const LANDING_PAGE_OG_IMAGE_URL =
+	"https://hold-shelf.com/brand/social-card.png";
 
 export const CHROME_EXTENSION_URL =
 	"https://chromewebstore.google.com/detail/hold-shelf/pbadpcgedkohkechgiciabdafiddhjkj";

@@ -3,11 +3,11 @@ import type { QueryClient } from "@tanstack/react-query";
 import {
 	createRootRouteWithContext,
 	HeadContent,
-	Link,
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { AppToaster } from "#/components/layout/app-toaster";
+import { NotFoundPage } from "#/components/layout/not-found-page";
 import { initSentry } from "#/lib/sentry";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import appCss from "../styles.css?url";
@@ -21,7 +21,7 @@ interface MyRouterContext {
 const THEME_INIT_SCRIPT = `(function(){try{var stored=window.localStorage.getItem('theme');var mode=(stored==='light'||stored==='dark'||stored==='auto')?stored:'auto';var prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;var resolved=mode==='auto'?(prefersDark?'dark':'light'):mode;var root=document.documentElement;root.classList.remove('light','dark');root.classList.add(resolved);if(mode==='auto'){root.removeAttribute('data-theme')}else{root.setAttribute('data-theme',mode)}root.style.colorScheme=resolved;}catch(e){}})();`;
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
-	notFoundComponent: NotFound,
+	notFoundComponent: NotFoundPage,
 	head: () => ({
 		meta: [
 			{ charSet: "utf-8" },
@@ -54,21 +54,6 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 	shellComponent: RootDocument,
 });
 
-function NotFound() {
-	return (
-		<div className="flex min-h-screen flex-col items-center justify-center gap-4 text-center">
-			<h1 className="display-title text-6xl font-bold text-foreground">404</h1>
-			<p className="text-lg text-muted-foreground">This page doesn't exist.</p>
-			<Link
-				to="/app/home"
-				className="mt-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground no-underline hover:bg-primary/90"
-			>
-				Go home
-			</Link>
-		</div>
-	);
-}
-
 function RootDocument({ children }: { children: React.ReactNode }) {
 	return (
 		<html lang="en" suppressHydrationWarning>
@@ -81,7 +66,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				{children}
 				<AppToaster />
 				<TanStackDevtools
-					config={{ position: "bottom-right" }}
+					config={{ position: "bottom-right", triggerMode: "fixed" }}
 					plugins={[
 						{
 							name: "Tanstack Router",

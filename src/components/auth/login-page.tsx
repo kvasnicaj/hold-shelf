@@ -1,5 +1,6 @@
-import { Bookmark, GitBranch } from "lucide-react";
+import { GitBranch } from "lucide-react";
 import { useLoginPage } from "#/components/auth/use-login-page";
+import { BrandLogo } from "#/components/brand/brand-logo";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 
@@ -22,8 +23,7 @@ export function LoginPage({
 			<Card className="w-full max-w-sm">
 				<CardHeader className="space-y-4 text-center">
 					<div className="mx-auto flex items-center gap-2">
-						<Bookmark className="h-7 w-7 text-(--lagoon)" />
-						<span className="display-title text-2xl font-bold">Hold Shelf</span>
+						<BrandLogo className="h-9" />
 					</div>
 					<div className="space-y-2">
 						<CardTitle>Continue with GitHub</CardTitle>

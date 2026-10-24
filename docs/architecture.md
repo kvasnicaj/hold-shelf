@@ -40,6 +40,7 @@ High-level CLI flow:
 |  |- RootDocument
 |  |- HeadContent / Scripts
 |  |- TanStack Devtools
+|  |- NotFoundPage -> BrandLogo
 |
 |- /                          -> LandingPage
 |- /about                     -> AboutPage
@@ -90,12 +91,12 @@ Component tree:
 AppLayout
 |- ToolbarActionsProvider
 |  |- desktop sidebar column
-|  |  |- AppSidebar
+|  |  |- AppSidebar -> BrandLogo (horizontal)
 |  |
 |  |- main content
 |  |  |- TopBar
 |  |  |  |- ColumnNavbar
-|  |  |  |  |- mobile brand mark
+|  |  |  |  |- AppBrandMark -> BrandLogo (symbol)
 |  |  |  |  |- global article search
 |  |  |  |  |- route-provided toolbar center/actions
 |  |  |  |  |- add article and account actions
@@ -121,6 +122,15 @@ Responsibilities:
   center, and right action arrays and collapses side tools into a mobile
   overflow menu
 
+### Brand identity
+
+`src/components/brand/brand-logo.tsx` renders the Reading Shelf symbol and outlined
+Source Serif 4 wordmark from `artwork.json`. The same master feeds the asset
+generator for favicons, native app icons, extension icons, and social previews.
+The component supports horizontal, stacked, symbol, and wordmark layouts; theme
+colors come from `--brand-mark` and `--sea-ink`. It supplies an accessible name
+unless explicitly decorative. See [brand usage](./branding.md).
+
 ### Toolbar action system
 
 `src/components/layout/toolbar-actions.tsx` lets page components push content
@@ -143,8 +153,8 @@ Component tree:
 
 ```text
 LandingPage
-|- hero icon
-|- app title / tagline
+|- BrandLogo (stacked) / accessible app title
+|- tagline
 |- CTA button -> /login
 |- secondary extension link -> Chrome Web Store
 |- footer links -> /about, /privacy
@@ -200,7 +210,7 @@ Component tree:
 
 ```text
 ApiDocsPage
-|- DocumentationLayout (shared with CliDocsPage: header, navigation, width, theme)
+|- DocumentationLayout (shared with CliDocsPage: BrandLogo home link, header, navigation, width, theme)
 |- DocumentationSection (shared section typography and spacing)
 |- API overview panel
 |- agent Markdown export link -> /api-docs/agents

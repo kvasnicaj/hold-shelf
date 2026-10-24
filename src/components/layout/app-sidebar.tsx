@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Bookmark } from "lucide-react";
+import { BrandLogo } from "#/components/brand/brand-logo";
 import {
 	desktopLibraryNavItems,
 	homeNavItem,
@@ -33,10 +33,7 @@ export function AppSidebar() {
 				to="/app/home"
 				className="mb-6 flex h-9 shrink-0 items-center gap-2 px-2 no-underline"
 			>
-				<Bookmark className="h-7 w-7 text-(--lagoon)" />
-				<span className="display-title text-xl font-bold text-foreground">
-					Hold Shelf
-				</span>
+				<BrandLogo className="h-7" />
 			</Link>
 
 			<div className="min-h-0 flex-1 overflow-y-auto pr-3 [scrollbar-gutter:stable]">

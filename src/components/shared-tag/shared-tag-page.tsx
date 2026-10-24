@@ -1,5 +1,6 @@
 import { getRouteApi, Link, useNavigate } from "@tanstack/react-router";
-import { Bookmark, Tag } from "lucide-react";
+import { Tag } from "lucide-react";
+import { BrandLogo } from "#/components/brand/brand-logo";
 import { AppPagination } from "#/components/pagination/app-pagination";
 import { SharedArticleList } from "#/components/shared-tag/shared-article-list";
 import { Button } from "#/components/ui/button";
@@ -35,10 +36,7 @@ export function SharedTagPage() {
 						to="/"
 						className="inline-flex items-center gap-2 font-medium text-foreground no-underline"
 					>
-						<span className="flex size-10 items-center justify-center rounded-xl bg-(--lagoon)/10 ring-1 ring-(--lagoon)/20">
-							<Bookmark className="size-5 text-(--lagoon)" />
-						</span>
-						Hold Shelf
+						<BrandLogo className="h-7" />
 					</Link>
 
 					<div className="space-y-3">
