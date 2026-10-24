@@ -1,14 +1,24 @@
 import { useRouter } from "@tanstack/react-router";
-import { LogOut, Settings, Trash2 } from "lucide-react";
+import { Cookie, LogOut, Settings, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import ThemeToggle from "#/components/theme-toggle";
 import { DropdownMenuItem } from "#/components/ui/dropdown-menu";
 import { authClient } from "#/lib/auth-client";
+import { showCookiePreferences } from "#/lib/cookie-consent";
 export function AccountMenuItems() {
 	const router = useRouter();
 	return (
 		<>
 			<ThemeToggle variant="menu-item" />
+			<DropdownMenuItem
+				onSelect={() => {
+					// Let the account menu release its focus trap first.
+					setTimeout(() => void showCookiePreferences(), 0);
+				}}
+			>
+				<Cookie className="mr-2 size-4" />
+				Cookie preferences
+			</DropdownMenuItem>
 			<DropdownMenuItem
 				onClick={() => {
 					void router.navigate({ to: "/app/settings" });
