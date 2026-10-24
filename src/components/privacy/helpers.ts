@@ -1,6 +1,6 @@
 export const PRIVACY_PAGE_TITLE = "Privacy Policy | Hold Shelf";
 
 export const PRIVACY_PAGE_DESCRIPTION =
-	"Learn what Hold Shelf collects, how saved URLs are processed, and how the Chrome extension uses data.";
+	"Learn how Hold Shelf handles saved content, cookies, optional diagnostics, and Chrome extension data.";
 
 export const PRIVACY_PAGE_CANONICAL_URL = "https://hold-shelf.com/privacy";

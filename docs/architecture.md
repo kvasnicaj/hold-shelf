@@ -77,8 +77,31 @@ Responsibilities:
 
 - defines the HTML shell
 - injects the theme boot script to prevent flash
-- initializes Sentry
+- mounts CookieConsent after hydration on every page; browser Sentry is loaded
+  only after optional monitoring consent
 - mounts router/query devtools
+
+### Privacy choices
+
+`src/lib/cookie-consent.ts` configures Orest Bida's `vanilla-cookieconsent` in
+opt-in mode. Essential authentication/security and requested interface preferences
+remain available; optional browser error/performance monitoring defaults off.
+The host-only `cc_cookie` stores the choice for 182 days (Secure on HTTPS,
+SameSite=Lax). Increment the consent revision when the purposes change.
+
+Cookie preferences can be reopened on the home, sign-in, and privacy pages and
+in the shared desktop/mobile account menu. Rejecting optional monitoring does
+not sign users out. Withdrawing a previously enabled choice reloads the page to
+remove SDK instrumentation; a consent-aware transport blocks new Sentry sends
+immediately, including span batches. The SDK is dynamically imported and checks
+consent again after loading. Other tabs re-read their choice when focused;
+exports also check the persisted choice so revoked/expired consent fails closed.
+Previously sent reports are not erased by withdrawal.
+
+`/privacy` describes storage, optional browser diagnostics, and separate server
+operational monitoring. Fonts and consent assets are bundled locally rather than
+loaded from third-party CDNs. The browser choice does not gate server-side
+operational reporting or Cloudflare security controls.
 
 ### `/app` layout
 

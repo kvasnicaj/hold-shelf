@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
 import { BrandLogo } from "#/components/brand/brand-logo";
+import { CookiePreferencesButton } from "#/components/privacy/cookie-preferences-button";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 
@@ -39,14 +40,93 @@ export function PrivacyPage() {
 					</CardHeader>
 					<CardContent className="space-y-4 text-sm leading-7 text-muted-foreground">
 						<p>
-							Hold Shelf collects only the information needed to provide the
-							save-for-later service.
+							Hold Shelf processes account information and saved content to
+							provide the save-for-later service. Optional browser diagnostics
+							are described separately below.
 						</p>
 						<p>
 							When you save a page or link, Hold Shelf stores the selected URL
 							in your account. Hold Shelf may also retrieve metadata for that
 							URL, such as the page title, description, favicon, and hostname,
 							so the saved item can be displayed clearly in your library.
+						</p>
+					</CardContent>
+				</Card>
+
+				<Card>
+					<CardHeader>
+						<CardTitle>Cookies and local storage</CardTitle>
+					</CardHeader>
+					<CardContent className="space-y-4 text-sm leading-7 text-muted-foreground">
+						<p>
+							Essential sign-in and security cookies keep you authenticated and
+							protect the GitHub sign-in flow. These include
+							<code> __Secure-better-auth.session_token</code> and temporary
+							state cookies. They expire with the session or sign-in flow.
+							Cloudflare may also set security cookies when its protections are
+							used.
+						</p>
+						<p>
+							The <code>cc_cookie</code> cookie stores your consent choice for
+							182 days. You can reject optional monitoring and still sign in and
+							use Hold Shelf. We ask again when this choice expires or the
+							consent policy changes.
+						</p>
+						<p>
+							Interface settings are remembered on your device: the
+							<code> sidebar_state</code> cookie lasts seven days when used;
+							<code> theme</code> and <code>reader-preferences</code> are stored
+							in localStorage until you clear them. These preferences are not
+							used for advertising. Fonts are served by Hold Shelf, not Google
+							Fonts.
+						</p>
+						<CookiePreferencesButton />
+					</CardContent>
+				</Card>
+
+				<Card>
+					<CardHeader>
+						<CardTitle>Optional browser diagnostics</CardTitle>
+					</CardHeader>
+					<CardContent className="space-y-4 text-sm leading-7 text-muted-foreground">
+						<p>
+							Only after you accept optional monitoring do we load Sentry in
+							your browser. It sends error reports and sampled performance
+							diagnostics to help us find problems. Reports can contain
+							technical browser and device information, stack locations, and
+							timing data. Requests to Sentry also expose your IP address to the
+							provider. We filter private content, credentials, and URL
+							parameters from diagnostic reports; we do not claim these reports
+							are anonymous.
+						</p>
+						<p>
+							We do not enable session replay or advertising analytics. You can
+							withdraw browser-monitoring consent using Cookie preferences on
+							this page, the home page, sign-in page, or your account menu.
+							Withdrawing consent reloads the page to remove browser monitoring
+							without signing you out. It stops future reporting, but does not
+							delete reports already sent. Learn more about the provider in
+							Sentry&apos;s{" "}
+							<a className="underline" href="https://sentry.io/privacy/">
+								privacy policy
+							</a>
+							.
+						</p>
+					</CardContent>
+				</Card>
+
+				<Card>
+					<CardHeader>
+						<CardTitle>Hosting and operational diagnostics</CardTitle>
+					</CardHeader>
+					<CardContent className="space-y-4 text-sm leading-7 text-muted-foreground">
+						<p>
+							Cloudflare hosts Hold Shelf and processes requests to deliver and
+							protect the service. Server-side Sentry diagnostics help us
+							operate the service independently of optional browser monitoring.
+							The browser-monitoring choice does not disable server-side error
+							reporting or security controls. We filter sensitive content from
+							server diagnostic reports as well.
 						</p>
 					</CardContent>
 				</Card>

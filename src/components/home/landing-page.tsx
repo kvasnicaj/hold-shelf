@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { BrandLogo } from "#/components/brand/brand-logo";
 import { AddToChromeButton } from "#/components/extension/add-to-chrome-button";
+import { CookiePreferencesButton } from "#/components/privacy/cookie-preferences-button";
 import { Button } from "#/components/ui/button";
 
 export function LandingPage() {
@@ -56,6 +57,8 @@ export function LandingPage() {
 					>
 						Privacy Policy
 					</Link>
+					<span className="px-2">|</span>
+					<CookiePreferencesButton />
 				</p>
 			</footer>
 		</div>

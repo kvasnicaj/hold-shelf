@@ -8,11 +8,9 @@ import {
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { AppToaster } from "#/components/layout/app-toaster";
 import { NotFoundPage } from "#/components/layout/not-found-page";
-import { initSentry } from "#/lib/sentry";
+import { CookieConsent } from "#/components/privacy/cookie-consent";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 import appCss from "../styles.css?url";
-
-initSentry();
 
 interface MyRouterContext {
 	queryClient: QueryClient;
@@ -65,6 +63,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			<body className="font-sans antialiased wrap-anywhere">
 				{children}
 				<AppToaster />
+				<CookieConsent />
 				<TanStackDevtools
 					config={{ position: "bottom-right", triggerMode: "fixed" }}
 					plugins={[

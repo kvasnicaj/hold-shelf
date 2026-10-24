@@ -1,6 +1,7 @@
 import { GitBranch } from "lucide-react";
 import { useLoginPage } from "#/components/auth/use-login-page";
 import { BrandLogo } from "#/components/brand/brand-logo";
+import { CookiePreferencesButton } from "#/components/privacy/cookie-preferences-button";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 
@@ -49,6 +50,9 @@ export function LoginPage({
 							your GitHub account to create your profile and sign you in.
 						</p>
 						{error && <p className="text-sm text-destructive">{error}</p>}
+						<div className="text-center text-muted-foreground">
+							<CookiePreferencesButton />
+						</div>
 					</div>
 				</CardContent>
 			</Card>
