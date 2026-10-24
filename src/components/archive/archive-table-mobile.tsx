@@ -6,9 +6,10 @@ import {
 	Star,
 	Trash2,
 } from "lucide-react";
+import type { ArchiveActions } from "#/components/archive/types";
 import { ArticleExternalLink } from "#/components/articles/article-external-link";
 import type { ArticleWithTags } from "#/components/articles/types";
-import type { Tag } from "#/components/tags/types";
+import { TagPicker } from "#/components/tags/tag-picker";
 import { Badge } from "#/components/ui/badge";
 import { Button } from "#/components/ui/button";
 import { Checkbox } from "#/components/ui/checkbox";
@@ -19,20 +20,12 @@ import {
 	DropdownMenuTrigger,
 } from "#/components/ui/dropdown-menu";
 
-type ArchiveTableMobileProps = {
+type ArchiveTableMobileProps = ArchiveActions & {
 	articles: ArticleWithTags[];
 	rowSelection: Record<string, boolean>;
 	onRowSelectionChange: React.Dispatch<
 		React.SetStateAction<Record<string, boolean>>
 	>;
-	availableTags: Tag[];
-	onAddTag: (tagId: string, articleIds: string[]) => Promise<void>;
-	onRemoveTag: (tagId: string, articleIds: string[]) => Promise<void>;
-	onCreateTag: (name: string) => Promise<Tag>;
-	onOpenArticle: (id: string, isRead: boolean) => Promise<void>;
-	onToggleRead: (id: string, isRead: boolean) => Promise<void>;
-	onToggleFavorite: (id: string, isFavorite: boolean) => Promise<void>;
-	onDelete: (ids: string[]) => Promise<void>;
 };
 
 function stopArticleOpen(event: { stopPropagation: () => void }) {
@@ -43,6 +36,10 @@ export function ArchiveTableMobile({
 	articles,
 	rowSelection,
 	onRowSelectionChange,
+	availableTags,
+	onAddTag,
+	onRemoveTag,
+	onCreateTag,
 	onOpenArticle,
 	onToggleRead,
 	onToggleFavorite,
@@ -136,6 +133,14 @@ export function ArchiveTableMobile({
 							</div>
 
 							<div className="flex items-start justify-end pt-0.5">
+								<TagPicker
+									availableTags={availableTags}
+									selectedTagIds={article.tags.map((tag) => tag.id)}
+									articleIds={[article.id]}
+									onAddTag={onAddTag}
+									onRemoveTag={onRemoveTag}
+									onCreateTag={onCreateTag}
+								/>
 								<DropdownMenu>
 									<DropdownMenuTrigger asChild>
 										<Button

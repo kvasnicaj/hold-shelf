@@ -63,6 +63,7 @@ export function ArticlesHeader({
 
 					<div className="col-span-full flex flex-col gap-2 @min-[34rem]:flex-row @min-[34rem]:items-center @min-[48rem]:col-span-1 @min-[48rem]:col-start-3 @min-[48rem]:row-start-1 @min-[48rem]:justify-self-end">
 						<PageSearchField
+							debounceMs={250}
 							value={searchValue}
 							placeholder={searchPlaceholder}
 							ariaLabel={searchPlaceholder}

@@ -201,7 +201,12 @@ describe("ArticlesPage", () => {
 		expect(screen.getByText("Article two")).toBeInTheDocument();
 
 		await user.type(screen.getByLabelText("Search articles..."), "design");
-		expect(navigateMock).toHaveBeenCalled();
+		expect(screen.getByRole("searchbox")).toHaveValue("design");
+		await waitFor(() => expect(navigateMock).toHaveBeenCalledTimes(1));
+		expect(navigateMock.mock.calls[0][0].search({ page: 2 })).toMatchObject({
+			q: "design",
+			page: undefined,
+		});
 
 		await user.click(screen.getByRole("combobox", { name: "Sort articles" }));
 		await user.click(screen.getByRole("option", { name: "Title A-Z" }));

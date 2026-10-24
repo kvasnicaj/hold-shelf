@@ -1,4 +1,4 @@
-import { screen } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ArticleCollectionLoaderData } from "#/components/articles/types";
@@ -181,7 +181,12 @@ describe("FavoritesPage", () => {
 
 		expect(screen.getByText("Favorite article")).toBeInTheDocument();
 		await user.type(screen.getByLabelText("Search favorites..."), "design");
-		expect(navigateMock).toHaveBeenCalled();
+		expect(screen.getByRole("searchbox")).toHaveValue("design");
+		await waitFor(() => expect(navigateMock).toHaveBeenCalledTimes(1));
+		expect(navigateMock.mock.calls[0][0].search({ page: 2 })).toMatchObject({
+			q: "design",
+			page: undefined,
+		});
 
 		await user.click(screen.getByRole("combobox", { name: "Sort articles" }));
 		await user.click(screen.getByRole("option", { name: "Title A-Z" }));

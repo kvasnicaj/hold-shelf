@@ -581,7 +581,7 @@ ArchivePage
 |  |  |- title column
 |  |  |- tags column
 |  |  |- saved date column
-|  |  |- row actions
+|  |  |- ArchiveActionsCell (stable across table updates)
 |  |     |- TagPicker
 |  |     |- toggle read button
 |  |     |- delete button
@@ -601,6 +601,7 @@ Core functionality:
 - keeps tag-picker portal interactions inside the picker so assigning one or
   several tags never opens the article reader
 - uses a table instead of cards for denser browsing
+- mobile Library rows expose the same `TagPicker` alongside article actions
 
 ### Settings
 
@@ -655,8 +656,22 @@ Core functionality:
 ### Tags route
 
 - `CreateTagDialog`: dedicated tag creation flow
-- `TagPicker`: attach/detach tags and create new ones inline
+- `TagPicker`: attach/detach tags and create new ones inline. All article surfaces,
+  including mobile Library, use the same editor with checked selections and a
+  selected count. The editor stays open while adding, removing, or creating tags;
+  Done, Escape, or an outside click closes it. Pending changes update the selection
+  immediately, block duplicate writes, and roll back with an inline error on failure.
 - `ShareTagDialog`: creates, copies, and revokes a selected tag's public link
+
+### Collection search and Library actions
+
+- Library desktop actions use a stable `ArchiveActionsCell` with current callbacks
+  supplied through `ArchiveActionsContext`, preserving the editor across table and
+  query refreshes.
+- Collection search fields keep an immediate local draft and wait for a 250ms typing
+  pause before updating the URL and loading results. Older completed searches do
+  not overwrite newer typing; external URL changes still restore the search field.
+  Local tag-list filtering remains immediate.
 
 ### Shared tags
 

@@ -1,7 +1,6 @@
-import { Plus, Tags, X } from "lucide-react";
-import { useState } from "react";
+import { Check, Loader2, Plus, Tags } from "lucide-react";
 import type { Tag } from "#/components/tags/types";
-import { Badge } from "#/components/ui/badge";
+import { useTagPicker } from "#/components/tags/use-tag-picker";
 import { Button } from "#/components/ui/button";
 import { Input } from "#/components/ui/input";
 import {
@@ -9,6 +8,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "#/components/ui/popover";
+import { cn } from "#/lib/utils";
 
 type TagPickerProps = {
 	availableTags: Tag[];
@@ -20,37 +20,17 @@ type TagPickerProps = {
 	triggerClassName?: string;
 };
 
-export function TagPicker({
-	availableTags,
-	selectedTagIds,
-	onAddTag,
-	onRemoveTag,
-	onCreateTag,
-	articleIds,
-	triggerClassName,
-}: TagPickerProps) {
-	const [open, setOpen] = useState(false);
-	const [search, setSearch] = useState("");
-	const [creating, setCreating] = useState(false);
-	const [error, setError] = useState<string | null>(null);
-
-	const filtered = availableTags.filter((tag) =>
-		tag.name.toLowerCase().includes(search.toLowerCase()),
-	);
-
-	const canCreate =
-		search.trim() &&
-		!availableTags.some(
-			(t) => t.name.toLowerCase() === search.trim().toLowerCase(),
-		);
-
+export function TagPicker({ triggerClassName, ...props }: TagPickerProps) {
+	const picker = useTagPicker(props);
 	return (
-		<Popover open={open} onOpenChange={setOpen}>
+		<Popover open={picker.open} onOpenChange={picker.changeOpen}>
 			<PopoverTrigger asChild>
 				<Button
+					type="button"
 					variant="ghost"
 					size="icon-xs"
 					title="Manage tags"
+					aria-label="Manage tags"
 					className={triggerClassName}
 					onClick={(event) => event.stopPropagation()}
 				>
@@ -58,89 +38,107 @@ export function TagPicker({
 				</Button>
 			</PopoverTrigger>
 			<PopoverContent
-				className="w-56 p-2"
+				className="w-72 p-2"
 				align="start"
+				aria-label="Article tags"
 				onClick={(event) => event.stopPropagation()}
 				onKeyDown={(event) => event.stopPropagation()}
 			>
+				<div className="mb-2 flex items-center justify-between px-2 py-1 text-sm">
+					<span className="font-medium">Article tags</span>
+					<span className="text-xs text-muted-foreground" aria-live="polite">
+						{picker.selectedIds.length} selected
+					</span>
+				</div>
 				<Input
 					maxLength={64}
 					placeholder="Search or create tag..."
-					value={search}
-					onChange={(e) => setSearch(e.target.value)}
+					aria-label="Search or create tag"
+					value={picker.search}
+					onChange={(event) => picker.setSearch(event.target.value)}
 					className="mb-2 h-8"
 				/>
-
-				<div className="max-h-40 space-y-1 overflow-x-hidden overflow-y-auto">
-					{filtered.map((tag) => {
-						const isSelected = selectedTagIds.includes(tag.id);
+				<div
+					className="max-h-56 space-y-1 overflow-x-hidden overflow-y-auto"
+					aria-busy={picker.busy}
+				>
+					{picker.filteredTags.map((tag) => {
+						const selected = picker.selectedIds.includes(tag.id);
 						return (
-							<button
-								type="button"
+							<label
 								key={tag.id}
-								onClick={async () => {
-									try {
-										if (isSelected) {
-											await onRemoveTag(tag.id, articleIds);
-										} else {
-											await onAddTag(tag.id, articleIds);
-										}
-									} catch (error) {
-										setError(
-											error instanceof Error
-												? error.message
-												: "Could not update tag.",
-										);
-									}
-								}}
-								className="flex w-full min-w-0 items-center justify-between gap-2 overflow-hidden rounded px-2 py-1.5 text-sm hover:bg-accent"
-							>
-								<Badge
-									variant="secondary"
-									className="min-w-0 shrink truncate"
-									title={tag.name}
-								>
-									{tag.name}
-								</Badge>
-								{isSelected && (
-									<X className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+								className={cn(
+									"flex w-full min-w-0 items-center gap-2 overflow-hidden rounded px-2 py-2 text-left text-sm hover:bg-accent focus-within:outline-2 focus-within:outline-ring",
+									selected && "bg-accent font-medium",
 								)}
-							</button>
+							>
+								<input
+									type="checkbox"
+									className="sr-only"
+									aria-label={tag.name}
+									checked={selected}
+									disabled={picker.busy}
+									onChange={() => void picker.toggleTag(tag.id)}
+								/>
+								<span
+									aria-hidden="true"
+									className={cn(
+										"grid size-4 shrink-0 place-items-center rounded-sm border",
+										selected
+											? "border-primary bg-primary text-primary-foreground"
+											: "border-input",
+									)}
+								>
+									{picker.pending === tag.id ? (
+										<Loader2 className="size-3 animate-spin" />
+									) : (
+										selected && <Check className="size-3" />
+									)}
+								</span>
+								<span className="min-w-0 shrink truncate" title={tag.name}>
+									{tag.name}
+								</span>
+							</label>
 						);
 					})}
-
-					{error && (
-						<p role="alert" className="px-2 text-sm text-destructive">
-							{error}
+					{picker.filteredTags.length === 0 && (
+						<p className="px-2 py-3 text-sm text-muted-foreground">
+							{picker.search.trim()
+								? "No tags match."
+								: "No tags yet. Search to create one."}
 						</p>
 					)}
-					{canCreate && (
+					{picker.canCreate && (
 						<button
 							type="button"
-							disabled={creating}
-							onClick={async () => {
-								setCreating(true);
-								setError(null);
-								try {
-									const tag = await onCreateTag(search.trim());
-									await onAddTag(tag.id, articleIds);
-									setSearch("");
-								} catch (error) {
-									setError(
-										error instanceof Error
-											? error.message
-											: "Could not create tag. Please try again.",
-									);
-								} finally {
-									setCreating(false);
-								}
-							}}
-							className="flex w-full min-w-0 items-center gap-1 overflow-hidden rounded px-2 py-1.5 text-sm text-muted-foreground hover:bg-accent"
+							disabled={picker.busy}
+							onClick={() => void picker.createAndAssignTag()}
+							className="flex w-full min-w-0 items-center gap-2 overflow-hidden rounded px-2 py-2 text-left text-sm hover:bg-accent disabled:opacity-50"
 						>
-							<Plus className="h-3.5 w-3.5 shrink-0" />
-							<span className="truncate">Create "{search.trim()}"</span>
+							{picker.creating ? (
+								<Loader2 className="size-4 shrink-0 animate-spin" />
+							) : (
+								<Plus className="size-4 shrink-0" />
+							)}
+							<span className="truncate">Create "{picker.search.trim()}"</span>
 						</button>
 					)}
+				</div>
+				{picker.error && (
+					<p role="alert" className="px-2 py-2 text-sm text-destructive">
+						{picker.error}
+					</p>
+				)}
+				<div className="mt-2 border-t pt-2">
+					<Button
+						type="button"
+						variant="secondary"
+						size="sm"
+						className="w-full"
+						onClick={() => picker.changeOpen(false)}
+					>
+						Done
+					</Button>
 				</div>
 			</PopoverContent>
 		</Popover>
