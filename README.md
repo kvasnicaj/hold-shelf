@@ -43,6 +43,7 @@ pnpm deploy       # Build + deploy to Cloudflare Workers
 pnpm test         # Run tests
 pnpm check        # Lint + format (Biome)
 pnpm typecheck    # TypeScript checks
+pnpm brand:generate # Rebuild logos, app icons, and social card
 ```
 
 ## Deployment
@@ -81,6 +82,7 @@ system credential store; CI can provide `HOLD_SHELF_TOKEN` without persistence.
 ## Documentation
 
 - [Architecture and component tree](./docs/architecture.md)
+- [Brand assets and usage](./docs/branding.md)
 - [Authentication](./docs/auth.md)
 - [CLI architecture and command contract](./docs/cli.md)
 - [CLI setup and usage](./docs/cli-guide.md)

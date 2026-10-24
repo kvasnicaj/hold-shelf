@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Bookmark } from "lucide-react";
+import { BrandLogo } from "#/components/brand/brand-logo";
 import { AddToChromeButton } from "#/components/extension/add-to-chrome-button";
 import { Button } from "#/components/ui/button";
 
@@ -10,16 +10,13 @@ export function LandingPage() {
 
 			<div className="flex flex-1 items-center justify-center">
 				<div className="rise-in relative z-10 flex max-w-2xl flex-col items-center text-center">
-					<div className="mb-8 flex size-16 items-center justify-center rounded-2xl bg-(--lagoon)/10 ring-1 ring-(--lagoon)/20">
-						<Bookmark className="size-8 text-(--lagoon)" />
-					</div>
-
-					<h1 className="display-title text-5xl font-bold tracking-tight text-(--sea-ink) sm:text-6xl">
-						Hold Shelf
+					<h1>
+						<BrandLogo variant="stacked" className="w-64 sm:w-80" decorative />
+						<span className="sr-only">Hold Shelf</span>
 					</h1>
 
 					<p className="mt-4 text-lg leading-relaxed text-(--sea-ink-soft) sm:text-xl">
-						A quiet place for the articles you&rsquo;ll actually read.
+						A quiet place for the articles you&rsquo;ll actually read.{" "}
 						<br className="hidden sm:block" />
 						Save now from the web app or straight from Chrome.
 					</p>

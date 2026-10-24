@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, Bookmark } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
+import { BrandLogo } from "#/components/brand/brand-logo";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 
@@ -12,7 +13,7 @@ export function AboutPage() {
 				<div className="flex items-center justify-between gap-4">
 					<div className="flex items-center gap-3">
 						<div className="flex size-12 items-center justify-center rounded-2xl bg-(--lagoon)/10 ring-1 ring-(--lagoon)/20">
-							<Bookmark className="size-6 text-(--lagoon)" />
+							<BrandLogo variant="symbol" className="size-6" decorative />
 						</div>
 						<div>
 							<p className="display-title text-2xl font-bold text-(--sea-ink)">

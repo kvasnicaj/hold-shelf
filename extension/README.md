@@ -53,6 +53,6 @@ zip -j dist/hold-shelf-extension.zip LICENSE
 ```
 
 The explicit file list excludes local files and macOS metadata. Keep
-`icons/LICENSE` in the archive: the icons use Lucide artwork. See the repository's
-[third-party notices](../THIRD_PARTY_NOTICES.md) for attribution.
+`icons/LICENSE` in the archive: the original Reading Shelf symbol uses the MIT
+license. See the [brand guide](../docs/branding.md) for artwork details.
 The root `LICENSE` covers the extension's original code under MIT.

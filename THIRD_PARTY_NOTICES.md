@@ -60,11 +60,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ## Lucide / Feather icons — ISC and MIT
 
-The app uses [Lucide](https://lucide.dev/license). The bookmark artwork in
-`public/favicon.svg`, the raster app icons, and `extension/icons/` is based on
-Lucide's bookmark icon. Preserve the following upstream notice when distributing
-these files. `extension/icons/LICENSE` contains the same notice for extension
-packages.
+The app uses [Lucide](https://lucide.dev/license) for interface icons. Preserve
+the following upstream notice when distributing those icons. The Hold Shelf
+Reading Shelf logo, favicons, and extension icons use original artwork instead.
 
 ISC License
 
@@ -111,6 +109,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 ## Fonts
+
+The Hold Shelf wordmark contains outlines derived from Source Serif 4 Semibold
+(600, optical size 32), by Adobe. The font is licensed under the SIL Open Font
+License 1.1; its full notice is in [licenses/source-serif-4.txt](./licenses/source-serif-4.txt)
+and accompanies the exported brand assets. No Source Serif font download is
+required to render the logo.
+
 
 The app loads Lora and Manrope through Google Fonts. Font binaries are not checked
 into this repository. Both families are distributed under the SIL Open Font
