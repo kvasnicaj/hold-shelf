@@ -1,5 +1,10 @@
 import { Link } from "@tanstack/react-router";
-import { CheckCircle2, CircleAlert, LoaderCircle } from "lucide-react";
+import {
+	Bookmark,
+	CheckCircle2,
+	CircleAlert,
+	LoaderCircle,
+} from "lucide-react";
 import { BrandLogo } from "#/components/brand/brand-logo";
 import { useSavePage } from "#/components/save/use-save-page";
 import { Button } from "#/components/ui/button";
