@@ -7,27 +7,13 @@ import {
 	Subscribe,
 	tableFeatures,
 } from "@tanstack/react-table";
-import {
-	BookOpen,
-	Check,
-	EllipsisVertical,
-	ExternalLink,
-	Star,
-	Trash2,
-} from "lucide-react";
+import { ExternalLink, Star } from "lucide-react";
+import { ArchiveActionsCell } from "#/components/archive/archive-actions-cell";
+import type { ArchiveActions } from "#/components/archive/types";
 import { ArticleExternalLink } from "#/components/articles/article-external-link";
 import type { ArticleWithTags } from "#/components/articles/types";
-import { TagPicker } from "#/components/tags/tag-picker";
-import type { Tag } from "#/components/tags/types";
 import { Badge } from "#/components/ui/badge";
-import { Button } from "#/components/ui/button";
 import { Checkbox } from "#/components/ui/checkbox";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "#/components/ui/dropdown-menu";
 import { formatDate } from "#/lib/formatters";
 
 export const archiveTableFeatures = tableFeatures({
@@ -51,31 +37,9 @@ export function toArchiveRowSelection(
 	return selected;
 }
 
-function stopArticleOpen(event: { stopPropagation: () => void }) {
-	event.stopPropagation();
-}
-
-type CreateArchiveColumnsOptions = {
-	availableTags: Tag[];
-	onAddTag: (tagId: string, articleIds: string[]) => Promise<void>;
-	onRemoveTag: (tagId: string, articleIds: string[]) => Promise<void>;
-	onCreateTag: (name: string) => Promise<Tag>;
-	onOpenArticle: (id: string, isRead: boolean) => Promise<void>;
-	onToggleRead: (id: string, isRead: boolean) => Promise<void>;
-	onToggleFavorite: (id: string, isFavorite: boolean) => Promise<void>;
-	onDelete: (ids: string[]) => Promise<void>;
-};
-
 export function createArchiveColumns({
-	availableTags,
-	onAddTag,
-	onRemoveTag,
-	onCreateTag,
 	onOpenArticle,
-	onToggleRead,
-	onToggleFavorite,
-	onDelete,
-}: CreateArchiveColumnsOptions) {
+}: Pick<ArchiveActions, "onOpenArticle">) {
 	return columnHelper.columns([
 		columnHelper.display({
 			id: "select",
@@ -194,77 +158,7 @@ export function createArchiveColumns({
 		columnHelper.display({
 			id: "actions",
 			header: () => null,
-			cell: ({ row }) => {
-				const article = row.original;
-				return (
-					<div className="flex min-w-[3.75rem] items-center justify-end gap-px whitespace-nowrap opacity-0 group-hover/row:opacity-100">
-						<TagPicker
-							availableTags={availableTags}
-							selectedTagIds={article.tags.map((tag) => tag.id)}
-							onAddTag={onAddTag}
-							onRemoveTag={onRemoveTag}
-							onCreateTag={onCreateTag}
-							articleIds={[article.id]}
-						/>
-						<DropdownMenu>
-							<DropdownMenuTrigger asChild>
-								<Button
-									variant="ghost"
-									size="icon-xs"
-									aria-label={`Article actions for ${article.title ?? article.url}`}
-									title="More actions"
-									onClick={stopArticleOpen}
-									onKeyDown={stopArticleOpen}
-								>
-									<EllipsisVertical className="h-3.5 w-3.5" />
-								</Button>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent align="end">
-								<DropdownMenuItem
-									onClick={(event) => {
-										stopArticleOpen(event);
-										void onToggleFavorite(article.id, !article.isFavorite);
-									}}
-								>
-									<Star
-										className={
-											article.isFavorite
-												? "h-4 w-4 fill-current text-amber-500"
-												: "h-4 w-4"
-										}
-									/>
-									{article.isFavorite
-										? "Remove from favorites"
-										: "Add to favorites"}
-								</DropdownMenuItem>
-								<DropdownMenuItem
-									onClick={(event) => {
-										stopArticleOpen(event);
-										void onToggleRead(article.id, !article.isRead);
-									}}
-								>
-									{article.isRead ? (
-										<BookOpen className="h-4 w-4" />
-									) : (
-										<Check className="h-4 w-4" />
-									)}
-									{article.isRead ? "Mark unread" : "Mark read"}
-								</DropdownMenuItem>
-								<DropdownMenuItem
-									variant="destructive"
-									onClick={(event) => {
-										stopArticleOpen(event);
-										void onDelete([article.id]);
-									}}
-								>
-									<Trash2 className="h-4 w-4" />
-									Delete
-								</DropdownMenuItem>
-							</DropdownMenuContent>
-						</DropdownMenu>
-					</div>
-				);
-			},
+			cell: ArchiveActionsCell,
 			size: 72,
 		}),
 	]);

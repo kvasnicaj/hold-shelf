@@ -67,6 +67,7 @@ export function ArchiveFilters({
 
 			<div className="flex w-full flex-wrap gap-2 lg:w-auto lg:justify-end">
 				<PageSearchField
+					debounceMs={250}
 					value={q ?? ""}
 					placeholder="Search library..."
 					ariaLabel="Search library"
