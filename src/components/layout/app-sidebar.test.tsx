@@ -5,6 +5,7 @@ import { AppSidebar } from "#/components/layout/app-sidebar";
 import { renderWithProviders } from "#/test/render";
 
 const {
+	openQuickSaveMock,
 	routerState,
 	routerInvalidateMock,
 	routerNavigateMock,
@@ -16,6 +17,7 @@ const {
 	signOutMock,
 	useSessionMock,
 } = vi.hoisted(() => ({
+	openQuickSaveMock: vi.fn(),
 	routerState: {
 		location: {
 			pathname: "/app/favorites",
@@ -60,6 +62,10 @@ vi.mock("@tanstack/react-router", async () => {
 		}),
 	};
 });
+
+vi.mock("#/components/quick-save/use-quick-save", () => ({
+	useQuickSave: () => ({ open: openQuickSaveMock }),
+}));
 
 vi.mock("#/server/articles", () => ({
 	getArticles: getArticlesMock,
@@ -148,5 +154,16 @@ describe("AppSidebar", () => {
 
 		await user.click(screen.getByRole("button", { name: /delete research/i }));
 		expect(deleteTagMock).toHaveBeenCalledWith({ data: { id: "t2" } });
+	});
+
+	it("opens Quick save from the Save a link button", async () => {
+		const user = userEvent.setup();
+		renderWithProviders(<AppSidebar />);
+
+		const saveButton = screen.getByRole("button", { name: /save a link/i });
+		expect(saveButton).toHaveAttribute("aria-keyshortcuts", "S");
+		await user.click(saveButton);
+
+		expect(openQuickSaveMock).toHaveBeenCalledTimes(1);
 	});
 });

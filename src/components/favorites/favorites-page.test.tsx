@@ -77,17 +77,6 @@ vi.mock("#/components/articles/use-auto-mark-read-on-open", () => ({
 	}),
 }));
 
-vi.mock("#/components/articles/add-article-dialog", () => ({
-	AddArticleDialog: ({ onAdd }: { onAdd: (url: string) => Promise<void> }) => (
-		<button
-			type="button"
-			onClick={() => void onAdd("https://example.com/favorite")}
-		>
-			Mock add article
-		</button>
-	),
-}));
-
 vi.mock("#/components/articles/article-list", () => ({
 	ArticleList: ({
 		articles,

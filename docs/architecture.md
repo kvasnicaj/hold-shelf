@@ -113,9 +113,11 @@ Component tree:
 ```text
 AppLayout
 |- ToolbarActionsProvider
+|- ArticleReaderProvider
+|- QuickSaveProvider -> QuickSaveDialog (one instance for the whole app)
 |  |- desktop sidebar column (paper ground)
 |  |  |- AppSidebar -> BrandLogo (horizontal)
-|  |  |  |- SaveLinkAction -> AddArticleDialog
+|  |  |  |- SaveLinkAction (opens Quick save)
 |  |  |  |- NavLink (Home, Unread, Favorites, Library)
 |  |  |  |- SidebarTagsSection
 |  |  |  |- SidebarUserMenu -> UserAvatar
@@ -144,7 +146,7 @@ Responsibilities:
 - provides shared desktop/mobile navigation
 - keeps the brand mark in the mobile top bar while the mobile navigation stays route-focused
 - places Save a link at the top of the desktop sidebar and as the center tab of
-  the mobile bottom bar; both open the same `AddArticleDialog`
+  the mobile bottom bar; both open the shared Quick save panel
 - renders a flat mobile bottom bar with four destinations around Save; the
   active tab sits on a short teal line, and Unread shows its count
 - leaves Tags out of the mobile bottom bar; Library's tag row links to tag management
@@ -453,8 +455,6 @@ Component tree:
 
 ```text
 ArticlesPage
-|- ToolbarSlot
-|  |- AddArticleDialog
 |- BulkActionsPanel? (when rows selected)
 |- page title
 |- sort control
@@ -494,8 +494,6 @@ Component tree:
 
 ```text
 FavoritesPage
-|- ToolbarSlot
-|  |- AddArticleDialog
 |- BulkActionsPanel? (when rows selected)
 |- page title
 |- sort control
@@ -646,13 +644,39 @@ Core functionality:
 - links API token users to the public API documentation page
 - provides a guarded account-deletion flow that removes the auth user and cascades app data
 
+### Quick save
+
+Saving a link from inside the app goes through one Quick save panel mounted by
+`QuickSaveProvider` in `AppLayout`.
+
+Ways to open it:
+
+- the Save a link button in the sidebar and the Save tab in the mobile bottom bar
+  (`SaveLinkAction`)
+- the S key when focus is outside text fields and no dialog is open
+- pasting a link anywhere outside text fields, which opens the panel prefilled
+
+Flow:
+
+1. `QuickSaveForm` normalizes the input with `toHttpUrl` (adds `https://` when
+   the scheme is missing, rejects non-web links) and previews the site.
+2. Optional tags are chosen inline before saving.
+3. Enter saves; Shift+Enter (or Save and read) saves and opens the reader.
+4. `useSaveArticle` calls `createArticle`, assigns the chosen tags with
+   `addTagToArticles`, and refreshes article and tag queries.
+5. A plain save shows a "Saved to Unread" toast with Read now. Errors such as
+   an already saved link stay in the panel so the user can correct them.
+
+Desktop shows a panel near the top of the screen; phones show a bottom sheet
+with a Paste from clipboard button.
+
 ## Shared components
 
 ### Layout
 
 - `AppSidebar`: Save a link, desktop navigation, unread counter, dynamic tag links
 - `MobileNavigation`: mobile bottom bar with the Save action
-- `SaveLinkAction`: opens `AddArticleDialog` from any trigger element
+- `SaveLinkAction`: makes any trigger element open Quick save
 - `useUnreadCount`: shared unread total for the sidebar and bottom bar
 - `ColumnNavbar`: shared column header chrome for left, center, and right controls
 - `AppSearch`: global article search with preview results
@@ -661,7 +685,7 @@ Core functionality:
 
 ### Articles
 
-- `AddArticleDialog`: add URL flow
+- `QuickSaveProvider` / `useQuickSave`: app-wide Quick save panel and its shortcuts
 - `ArticleList`: maps article arrays to cards
 - `ArticleCard`: compact article presentation and actions
 - `BulkActionsPanel`: floating multi-select toolbar above the content
@@ -1001,8 +1025,9 @@ out-of-range pagination after their result totals shrink.
 
 The app shell centers every authenticated page in a shared `max-w-6xl` content
 container, with consistent padding. Reader and navigation columns remain separate.
-Toasts inherit app CSS theme colors, including a contrasting Undo button; mobile
-toasts sit above bottom navigation. Continue reading's Mark as read action atomically
+Toasts use the inverse brand colors (ink in light mode, mint in dark) with
+underlined text actions such as Undo and Read now; mobile toasts sit above the
+bottom navigation. Continue reading's Mark as read action atomically
 marks the article read and completes its progress, removing it from that section.
 The public CLI guide is linked from Settings and documents installation from the
 public repository, authentication, commands, recovery, and automation. It explains

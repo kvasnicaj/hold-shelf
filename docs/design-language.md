@@ -125,6 +125,21 @@ The reader is its own mode: everything except the text steps back.
 - On mobile, rows show a two-line title and a meta line, and tags filter
   through a scrolling chip row ending in Manage.
 
+## Quick save
+
+- One panel for saving links, opened by Save a link, the mobile Save tab, the
+  S key, or pasting a link anywhere outside a text field.
+- The link is the whole form: one large field with no label row. The status
+  line under it previews the site ("overreacted.io · Saves to Unread") or
+  explains a problem in plain words.
+- Tags are optional chips chosen before saving.
+- Enter saves, Shift+Enter saves and opens the reader. The footer shows these
+  as `kbd` hints on desktop.
+- Desktop: a sheet-colored panel near the top with `shadow-float`. Phones: a
+  bottom sheet with a serif title and Paste from clipboard.
+- A plain save ends with the inverse toast "Saved to Unread" and a Read now
+  action.
+
 ## shadcn components
 
 Style through tokens first. Change `src/components/ui/` only for defaults and
