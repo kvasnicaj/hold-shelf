@@ -62,7 +62,7 @@ export function AppSearch() {
 			}}
 			className="relative min-w-0 w-full max-w-2xl"
 		>
-			<ToolBox className="h-9 min-w-0 w-full gap-2 bg-muted/45 px-3">
+			<ToolBox className="h-9 min-w-0 w-full gap-2 bg-background px-3">
 				<Search className="h-4 w-4 shrink-0 text-muted-foreground" />
 				<ToolBoxInput
 					type="search"

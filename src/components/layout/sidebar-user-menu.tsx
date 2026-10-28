@@ -1,5 +1,5 @@
-import { User } from "lucide-react";
 import { AccountMenuItems } from "#/components/layout/account-menu-items";
+import { UserAvatar } from "#/components/layout/user-avatar";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -16,9 +16,12 @@ export function SidebarUserMenu() {
 				<DropdownMenuTrigger asChild>
 					<button
 						type="button"
-						className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-sm text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+						className="flex h-9 w-full items-center gap-2.5 rounded-md px-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
 					>
-						<User className="h-4 w-4 shrink-0" />
+						<UserAvatar
+							name={session?.user?.name ?? session?.user?.email}
+							image={session?.user?.image}
+						/>
 						<span className="flex-1 truncate text-left">
 							{session?.user?.name ?? session?.user?.email ?? "Account"}
 						</span>

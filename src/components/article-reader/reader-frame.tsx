@@ -20,7 +20,7 @@ export function ReaderFrame({ open, onClose, children }: ReaderFrameProps) {
 		return open ? (
 			<aside
 				aria-label="Article reader"
-				className="sticky top-0 h-dvh w-[clamp(34rem,38vw,52rem)] shrink-0 border-l bg-background"
+				className="sticky top-2 my-2 mr-2 h-[calc(100dvh-1rem)] w-[clamp(34rem,38vw,52rem)] shrink-0 overflow-hidden rounded-xl border bg-card"
 				onKeyDown={(event) => {
 					if (event.key === "Escape") onClose();
 				}}
@@ -39,7 +39,7 @@ export function ReaderFrame({ open, onClose, children }: ReaderFrameProps) {
 				<Dialog.Overlay className="fixed inset-0 z-50 bg-black/35" />
 				<Dialog.Content
 					aria-describedby={undefined}
-					className="fixed inset-0 z-50 h-dvh bg-background outline-none md:left-56"
+					className="fixed inset-0 z-50 h-dvh bg-card outline-none md:inset-y-2 md:right-2 md:left-56 md:h-auto md:overflow-hidden md:rounded-xl md:border"
 					onOpenAutoFocus={() => {
 						returnFocus.current = document.activeElement as HTMLElement;
 					}}

@@ -38,7 +38,7 @@ export function ColumnNavbar({
 		<nav
 			aria-label={ariaLabel}
 			className={cn(
-				"grid h-13 shrink-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 border-b bg-background px-3 md:grid-cols-[minmax(max-content,1fr)_minmax(12rem,42rem)_minmax(max-content,1fr)] md:gap-3",
+				"grid h-13 shrink-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 border-b px-3 md:grid-cols-[minmax(max-content,1fr)_minmax(12rem,42rem)_minmax(max-content,1fr)] md:gap-3",
 				className,
 			)}
 		>

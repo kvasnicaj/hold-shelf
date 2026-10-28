@@ -1,43 +1,59 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { MobileAddArticleAction } from "#/components/layout/mobile-add-article-action";
-import { mobileNavItems } from "#/components/layout/nav-items";
-import { cn } from "#/lib/utils";
+import { Plus } from "lucide-react";
+import { getMobileTabClassName } from "#/components/layout/helpers";
+import { MobileNavTabContent } from "#/components/layout/mobile-nav-tab-content";
+import { primaryNavItems, unreadNavHref } from "#/components/layout/nav-items";
+import { SaveLinkAction } from "#/components/layout/save-link-action";
+import { useUnreadCount } from "#/components/layout/use-unread-count";
 
 export function MobileNavigation() {
 	const currentPath = useRouterState().location.pathname;
+	const unreadCount = useUnreadCount();
+
+	const tabs = primaryNavItems.map((item) => {
+		const isActive = currentPath === item.href;
+
+		return (
+			<li key={item.href} className="min-w-0">
+				<Link
+					to={item.href}
+					aria-current={isActive ? "page" : undefined}
+					className={getMobileTabClassName(isActive)}
+				>
+					<MobileNavTabContent
+						icon={item.icon}
+						label={item.label}
+						isActive={isActive}
+						badge={
+							item.href === unreadNavHref && unreadCount > 0
+								? unreadCount
+								: undefined
+						}
+					/>
+				</Link>
+			</li>
+		);
+	});
 
 	return (
 		<nav
 			aria-label="Primary"
-			className="fixed inset-x-0 bottom-0 z-40 border-t border-sidebar-border bg-sidebar/95 px-3 pt-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] shadow-[0_-1px_8px_rgba(0,0,0,0.06)] backdrop-blur-md supports-[backdrop-filter]:bg-sidebar/85 md:hidden"
+			className="fixed inset-x-0 bottom-0 z-40 border-t bg-background px-1.5 pt-1 pb-[calc(env(safe-area-inset-bottom)+0.25rem)] md:hidden"
 		>
-			<div className="absolute right-3 -top-12">
-				<MobileAddArticleAction />
-			</div>
-			<ul className="grid grid-cols-5 gap-1">
-				{mobileNavItems.map((item) => {
-					const isActive = currentPath === item.href;
-					const Icon = item.icon;
-
-					return (
-						<li key={item.href} className="min-w-0">
-							<Link
-								to={item.href}
-								aria-label={item.label}
-								aria-current={isActive ? "page" : undefined}
-								className={cn(
-									"flex h-12 min-w-0 flex-col items-center justify-center gap-0.5 rounded-md px-1 text-[0.6875rem] font-medium no-underline transition-colors",
-									isActive
-										? "bg-sidebar-accent text-sidebar-accent-foreground shadow-xs"
-										: "text-sidebar-foreground/70 hover:bg-sidebar-accent/70 hover:text-sidebar-accent-foreground",
-								)}
-							>
-								<Icon className="h-5 w-5 shrink-0" />
-								<span className="max-w-full truncate">{item.label}</span>
-							</Link>
-						</li>
-					);
-				})}
+			<ul className="grid grid-cols-5">
+				{tabs.slice(0, 2)}
+				<li className="min-w-0">
+					<SaveLinkAction>
+						<button
+							type="button"
+							aria-label="Save a link"
+							className={getMobileTabClassName(true)}
+						>
+							<MobileNavTabContent icon={Plus} label="Save" primary />
+						</button>
+					</SaveLinkAction>
+				</li>
+				{tabs.slice(2)}
 			</ul>
 		</nav>
 	);
