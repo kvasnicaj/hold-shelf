@@ -1,22 +1,28 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { ArticleReaderContent } from "#/components/article-reader/article-reader-content";
 import { ArticleReaderFallback } from "#/components/article-reader/article-reader-fallback";
 import { ArticleReaderMetadata } from "#/components/article-reader/article-reader-metadata";
-import { withoutRepeatedTitle } from "#/components/article-reader/helpers";
+import {
+	READER_MEASURES,
+	withoutRepeatedTitle,
+} from "#/components/article-reader/helpers";
+import type { ReaderSettings } from "#/components/article-reader/types";
+import { cn } from "#/lib/utils";
 import type { ArticleReaderRecord } from "#/server/articles-service";
 import { getReadingProgress, saveReadingProgress } from "#/server/library";
 
 type ReaderBodyProps = {
 	data: ArticleReaderRecord;
-	fontSize: number;
+	settings: ReaderSettings;
 };
-export function ReaderBody({ data, fontSize }: ReaderBodyProps) {
+export function ReaderBody({ data, settings }: ReaderBodyProps) {
 	const client = useQueryClient();
 	const saves = useRef(Promise.resolve());
 	const scroll = useRef<HTMLDivElement>(null);
 	const restored = useRef(false);
+	const [readPercent, setReadPercent] = useState(0);
 	const { data: progress } = useQuery({
 		queryKey: ["reading-progress", data.article.id],
 		staleTime: 30_000,
@@ -34,6 +40,7 @@ export function ReaderBody({ data, fontSize }: ReaderBodyProps) {
 			((scroll.current.scrollHeight - scroll.current.clientHeight) * progress) /
 			10000;
 		restored.current = true;
+		setReadPercent(progress / 100);
 	}, [progress, data.content.status]);
 	useEffect(() => {
 		const element = scroll.current;
@@ -65,9 +72,10 @@ export function ReaderBody({ data, fontSize }: ReaderBodyProps) {
 				});
 		};
 		const onScroll = () => {
-			if (!restored.current) return;
 			const range = element.scrollHeight - element.clientHeight;
 			if (range <= 0) return;
+			setReadPercent((element.scrollTop / range) * 100);
+			if (!restored.current) return;
 			pending = Math.max(
 				0,
 				Math.min(10000, Math.round((element.scrollTop / range) * 10000)),
@@ -85,19 +93,28 @@ export function ReaderBody({ data, fontSize }: ReaderBodyProps) {
 		};
 	}, [client, data.article.id]);
 	return (
-		<div
-			ref={scroll}
-			className="min-h-0 flex-1 overflow-y-auto px-5 py-8 sm:px-8"
-		>
+		<div ref={scroll} className="min-h-0 flex-1 overflow-y-auto">
+			<div aria-hidden="true" className="sticky top-0 z-10 h-0.5">
+				<div
+					className="h-full bg-mark transition-[width] duration-150"
+					style={{ width: `${Math.min(100, Math.max(0, readPercent))}%` }}
+				/>
+			</div>
 			<article
-				className="mx-auto w-full"
-				style={{ maxWidth: "70ch", fontSize: `${fontSize}px` }}
+				className={cn(
+					"mx-auto w-full px-5 pt-9 pb-16 sm:px-8",
+					settings.font === "serif" ? "font-serif" : "font-sans",
+				)}
+				style={{
+					maxWidth: `calc(${READER_MEASURES[settings.width]} + 4rem)`,
+					fontSize: `${settings.fontSize}px`,
+				}}
 			>
 				<header className="mb-8 space-y-3">
-					<h1 className="font-serif text-3xl font-semibold leading-tight">
+					<ArticleReaderMetadata payload={data} />
+					<h1 className="text-[2em] leading-[1.12] font-semibold tracking-[-0.01em] text-balance">
 						{data.article.title ?? data.article.url}
 					</h1>
-					<ArticleReaderMetadata payload={data} />
 				</header>
 				{data.content.status === "ready" ? (
 					<ArticleReaderContent

@@ -6,7 +6,7 @@ type ArticleReaderContentProps = {
 
 export function ArticleReaderContent({ markdown }: ArticleReaderContentProps) {
 	return (
-		<div className="prose prose-neutral max-w-none font-serif text-[1em] leading-[1.8] text-foreground/90 prose-a:text-primary prose-blockquote:border-primary/40 prose-blockquote:text-foreground/80 prose-code:font-mono prose-code:text-[0.9em] prose-pre:border prose-pre:bg-muted/40 dark:prose-invert">
+		<div className="prose prose-hold max-w-none text-[1em] leading-[1.65] text-pretty prose-headings:font-semibold prose-headings:text-balance prose-a:underline-offset-[3px] prose-code:font-mono prose-code:text-[0.88em] prose-pre:rounded-lg prose-pre:border">
 			{renderMarkdownToReact(markdown)}
 		</div>
 	);

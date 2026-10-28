@@ -3,7 +3,6 @@ import {
 	getUnreadAgeLabel,
 } from "#/components/article-reader/helpers";
 import type { ArticleReaderPayload } from "#/components/article-reader/types";
-import { Badge } from "#/components/ui/badge";
 import { formatDate } from "#/lib/formatters";
 
 type ArticleReaderMetadataProps = {
@@ -15,19 +14,42 @@ export function ArticleReaderMetadata({ payload }: ArticleReaderMetadataProps) {
 	const unreadAge = getUnreadAgeLabel(article);
 	const readingTime =
 		content.status === "ready" ? getReadingTimeLabel(content.wordCount) : null;
+	const parts = [
+		article.hostname,
+		readingTime,
+		article.createdAt ? `Saved ${formatDate(article.createdAt)}` : null,
+		unreadAge,
+	].filter((part): part is string => Boolean(part));
 
 	return (
-		<div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-			{article.hostname && <span>{article.hostname}</span>}
-			{article.createdAt && <span>Saved {formatDate(article.createdAt)}</span>}
-
-			{unreadAge && <Badge variant="secondary">{unreadAge}</Badge>}
-			{readingTime && <Badge variant="outline">{readingTime}</Badge>}
-			{content.status === "ready" && (
-				<span title={`Captured ${content.fetchedAt.toLocaleString()}`}>
-					Saved content
-				</span>
+		<p
+			className="flex flex-wrap items-center gap-x-2 gap-y-1 font-sans text-[0.8125rem] text-muted-foreground"
+			title={
+				content.status === "ready"
+					? `Saved copy captured ${content.fetchedAt.toLocaleString()}`
+					: undefined
+			}
+		>
+			{article.faviconUrl && (
+				<img
+					src={article.faviconUrl}
+					alt=""
+					className="size-4 rounded-[3px]"
+					onError={(event) => {
+						event.currentTarget.style.display = "none";
+					}}
+				/>
 			)}
-		</div>
+			{parts.map((part, index) => (
+				<span key={part} className="tabular-nums">
+					{index > 0 && (
+						<span aria-hidden="true" className="mr-2">
+							·
+						</span>
+					)}
+					{part}
+				</span>
+			))}
+		</p>
 	);
 }

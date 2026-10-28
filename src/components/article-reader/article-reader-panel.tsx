@@ -1,19 +1,27 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { BookOpen, Check, ExternalLink, RefreshCw, Star } from "lucide-react";
-import { useEffect, useState } from "react";
+import {
+	Bookmark,
+	BookOpen,
+	Check,
+	ExternalLink,
+	RefreshCw,
+} from "lucide-react";
 import { toast } from "sonner";
 import { ReaderBody } from "#/components/article-reader/reader-body";
 import { ReaderCloseButton } from "#/components/article-reader/reader-close-button";
 import { ReaderFrame } from "#/components/article-reader/reader-frame";
 import { ReaderPreferences } from "#/components/article-reader/reader-preferences";
 import { useArticleReader } from "#/components/article-reader/use-article-reader";
+import { useReaderSettings } from "#/components/article-reader/use-reader-settings";
 import { tagListOptions } from "#/components/articles/query-options";
 import { useArticleMutations } from "#/components/articles/use-article-mutations";
 import { ColumnNavbar } from "#/components/layout/column-navbar";
 import { TagPicker } from "#/components/tags/tag-picker";
 import { Button } from "#/components/ui/button";
+import { cn } from "#/lib/utils";
 import { getArticleReader } from "#/server/articles";
 import { refreshArticleContent } from "#/server/library";
+
 export function ArticleReaderPanel() {
 	const { articleId, isOpen, closeArticle } = useArticleReader();
 	const client = useQueryClient();
@@ -24,17 +32,7 @@ export function ArticleReaderPanel() {
 		enabled: Boolean(articleId),
 	});
 	const actions = useArticleMutations();
-	const [fontSize, setFontSize] = useState(18);
-	useEffect(() => {
-		try {
-			const value = JSON.parse(
-				localStorage.getItem("reader-preferences") ?? "null",
-			);
-			if (value) {
-				setFontSize(Math.max(14, Math.min(24, Number(value.fontSize) || 18)));
-			}
-		} catch {}
-	}, []);
+	const { settings, updateSettings } = useReaderSettings();
 	const refresh = useMutation({
 		mutationFn: () => refreshArticleContent({ data: { id: articleId ?? "" } }),
 		onSuccess: (result) => {
@@ -55,24 +53,45 @@ export function ArticleReaderPanel() {
 			<div className="flex h-full min-h-0 flex-col">
 				<ColumnNavbar
 					aria-label="Article reader navigation"
-					right={[
-						...(data
+					left={[<ReaderCloseButton key="close" onClick={closeArticle} />]}
+					right={
+						data
 							? [
-									<TagPicker
-										key="tags"
-										availableTags={tagList}
-										selectedTagIds={data.article.tags.map((tag) => tag.id)}
-										onAddTag={actions.handleAddTag}
-										onRemoveTag={actions.handleRemoveTag}
-										onCreateTag={actions.handleCreateTag}
-										articleIds={[data.article.id]}
-									/>,
+									<Button
+										key="read"
+										variant="ghost"
+										size="icon-sm"
+										disabled={actions.isPending}
+										aria-label={
+											data.article.isRead ? "Mark as unread" : "Mark as read"
+										}
+										title={
+											data.article.isRead ? "Mark as unread" : "Mark as read"
+										}
+										onClick={() =>
+											void actions.handleToggleRead(
+												data.article.id,
+												!data.article.isRead,
+											)
+										}
+									>
+										{data.article.isRead ? (
+											<BookOpen className="size-[1.125rem]" />
+										) : (
+											<Check className="size-[1.125rem]" />
+										)}
+									</Button>,
 									<Button
 										key="favorite"
 										variant="ghost"
 										size="icon-sm"
 										disabled={actions.isPending}
 										aria-label={
+											data.article.isFavorite
+												? "Remove from favorites"
+												: "Add to favorites"
+										}
+										title={
 											data.article.isFavorite
 												? "Remove from favorites"
 												: "Add to favorites"
@@ -84,35 +103,27 @@ export function ArticleReaderPanel() {
 											)
 										}
 									>
-										<Star
-											className={
-												data.article.isFavorite
-													? "size-5 fill-current text-amber-600"
-													: "size-5"
-											}
+										<Bookmark
+											className={cn(
+												"size-[1.125rem]",
+												data.article.isFavorite && "fill-current text-favorite",
+											)}
 										/>
 									</Button>,
-									<Button
-										key="read"
-										variant="ghost"
-										size="icon-sm"
-										disabled={actions.isPending}
-										aria-label={
-											data.article.isRead ? "Mark as unread" : "Mark as read"
-										}
-										onClick={() =>
-											void actions.handleToggleRead(
-												data.article.id,
-												!data.article.isRead,
-											)
-										}
-									>
-										{data.article.isRead ? (
-											<BookOpen className="size-5" />
-										) : (
-											<Check className="size-5" />
-										)}
-									</Button>,
+									<TagPicker
+										key="tags"
+										availableTags={tagList}
+										selectedTagIds={data.article.tags.map((tag) => tag.id)}
+										onAddTag={actions.handleAddTag}
+										onRemoveTag={actions.handleRemoveTag}
+										onCreateTag={actions.handleCreateTag}
+										articleIds={[data.article.id]}
+									/>,
+									<ReaderPreferences
+										key="settings"
+										settings={settings}
+										onChange={updateSettings}
+									/>,
 									<Button
 										key="refresh"
 										variant="ghost"
@@ -123,55 +134,41 @@ export function ArticleReaderPanel() {
 										onClick={() => refresh.mutate()}
 									>
 										<RefreshCw
-											className={
-												refresh.isPending ? "size-5 animate-spin" : "size-5"
-											}
+											className={cn(
+												"size-[1.125rem]",
+												refresh.isPending && "animate-spin",
+											)}
 										/>
 									</Button>,
-									<Button key="original" variant="outline" size="sm" asChild>
+									<Button key="original" variant="ghost" size="icon-sm" asChild>
 										<a
 											href={data.article.url}
 											target="_blank"
 											rel="noopener noreferrer"
+											aria-label="Open original"
+											title="Open original"
 										>
-											<ExternalLink className="size-4" />
-											Original
+											<ExternalLink className="size-[1.125rem]" />
 										</a>
 									</Button>,
 								]
-							: []),
-						<ReaderCloseButton key="close" onClick={closeArticle} />,
-					]}
-					mobileRight={[
-						<ReaderCloseButton key="mobile-close" onClick={closeArticle} />,
-					]}
+							: []
+					}
 					mobileMenuLabel="Reader actions"
 				/>
-				<ReaderPreferences
-					fontSize={fontSize}
-					onChange={(size) => {
-						setFontSize(size);
-						try {
-							localStorage.setItem(
-								"reader-preferences",
-								JSON.stringify({ fontSize: size }),
-							);
-						} catch {}
-					}}
-				/>
 				{isError ? (
-					<div role="alert" className="p-6">
-						Could not load this article.{" "}
+					<div role="alert" className="space-y-3 p-6 text-sm">
+						<p>This article could not be loaded.</p>
 						<Button variant="outline" onClick={() => void refetch()}>
 							Try again
 						</Button>
 					</div>
 				) : isPending ? (
-					<p role="status" className="p-6">
+					<p role="status" className="p-6 text-sm text-muted-foreground">
 						Loading saved article…
 					</p>
 				) : data ? (
-					<ReaderBody key={data.article.id} data={data} fontSize={fontSize} />
+					<ReaderBody key={data.article.id} data={data} settings={settings} />
 				) : null}
 			</div>
 		</ReaderFrame>

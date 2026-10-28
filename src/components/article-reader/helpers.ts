@@ -1,3 +1,51 @@
+import type {
+	ReaderSettings,
+	ReaderWidth,
+} from "#/components/article-reader/types";
+
+export const READER_SETTINGS_KEY = "reader-preferences";
+export const READER_FONT_SIZE_RANGE = { min: 15, max: 24 } as const;
+export const DEFAULT_READER_SETTINGS: ReaderSettings = {
+	fontSize: 19,
+	width: "normal",
+	font: "serif",
+};
+export const READER_MEASURES: Record<ReaderWidth, string> = {
+	narrow: "56ch",
+	normal: "64ch",
+	wide: "76ch",
+};
+
+export function clampReaderFontSize(size: number) {
+	return Math.max(
+		READER_FONT_SIZE_RANGE.min,
+		Math.min(READER_FONT_SIZE_RANGE.max, Math.round(size)),
+	);
+}
+
+/** Reads stored reader settings, keeping defaults for anything missing or invalid. */
+export function parseReaderSettings(raw: string | null): ReaderSettings {
+	try {
+		const value = JSON.parse(raw ?? "null") as Partial<ReaderSettings> | null;
+		if (!value || typeof value !== "object") return DEFAULT_READER_SETTINGS;
+		return {
+			fontSize: Number(value.fontSize)
+				? clampReaderFontSize(Number(value.fontSize))
+				: DEFAULT_READER_SETTINGS.fontSize,
+			width:
+				value.width && value.width in READER_MEASURES
+					? value.width
+					: DEFAULT_READER_SETTINGS.width,
+			font:
+				value.font === "sans" || value.font === "serif"
+					? value.font
+					: DEFAULT_READER_SETTINGS.font,
+		};
+	} catch {
+		return DEFAULT_READER_SETTINGS;
+	}
+}
+
 export function getUnreadAgeLabel(article: {
 	isRead: boolean;
 	createdAt?: Date | null;

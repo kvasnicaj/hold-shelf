@@ -22,7 +22,13 @@ export function ReaderFrame({ open, onClose, children }: ReaderFrameProps) {
 				aria-label="Article reader"
 				className="sticky top-2 my-2 mr-2 h-[calc(100dvh-1rem)] w-[clamp(34rem,38vw,52rem)] shrink-0 overflow-hidden rounded-xl border bg-card"
 				onKeyDown={(event) => {
-					if (event.key === "Escape") onClose();
+					// Menus render in portals; their Escape should close only the menu.
+					if (
+						event.key === "Escape" &&
+						event.currentTarget.contains(event.target as Node)
+					) {
+						onClose();
+					}
 				}}
 			>
 				{children}

@@ -9,6 +9,15 @@ export type ArticleReaderPayload = {
 	content: ArticleReaderContent;
 };
 
+export type ReaderWidth = "narrow" | "normal" | "wide";
+export type ReaderFont = "serif" | "sans";
+
+export type ReaderSettings = {
+	fontSize: number;
+	width: ReaderWidth;
+	font: ReaderFont;
+};
+
 export type ArticleReaderContextValue = {
 	articleId: string | null;
 	isOpen: boolean;
