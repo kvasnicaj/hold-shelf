@@ -1,5 +1,5 @@
+import { Cookie, Gear, SignOut, Trash } from "@phosphor-icons/react";
 import { useRouter } from "@tanstack/react-router";
-import { Cookie, LogOut, Settings, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import ThemeToggle from "#/components/theme-toggle";
 import { DropdownMenuItem } from "#/components/ui/dropdown-menu";
@@ -24,7 +24,7 @@ export function AccountMenuItems() {
 					void router.navigate({ to: "/app/settings" });
 				}}
 			>
-				<Settings className="mr-2 size-4" />
+				<Gear className="mr-2 size-4" />
 				Settings
 			</DropdownMenuItem>
 			<DropdownMenuItem
@@ -32,7 +32,7 @@ export function AccountMenuItems() {
 					void router.navigate({ to: "/app/trash" });
 				}}
 			>
-				<Trash2 className="mr-2 size-4" />
+				<Trash className="mr-2 size-4" />
 				Trash
 			</DropdownMenuItem>
 			<DropdownMenuItem
@@ -46,7 +46,7 @@ export function AccountMenuItems() {
 						.catch(() => toast.error("Could not sign out. Please try again."));
 				}}
 			>
-				<LogOut className="mr-2 size-4" />
+				<SignOut className="mr-2 size-4" />
 				Sign out
 			</DropdownMenuItem>
 		</>

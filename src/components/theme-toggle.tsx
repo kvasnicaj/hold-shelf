@@ -1,4 +1,4 @@
-import { Monitor, Moon, Sun } from "lucide-react";
+import { Monitor, Moon, Sun } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import { SidebarUserMenuItem } from "#/components/layout/sidebar-user-menu-item";
 import { Button } from "#/components/ui/button";

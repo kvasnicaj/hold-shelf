@@ -1,5 +1,5 @@
+import { Globe } from "@phosphor-icons/react";
 import { getRouteApi, useRouter } from "@tanstack/react-router";
-import { Globe } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { AddToChromeButton } from "#/components/extension/add-to-chrome-button";

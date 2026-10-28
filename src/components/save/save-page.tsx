@@ -1,10 +1,10 @@
-import { Link } from "@tanstack/react-router";
 import {
-	Bookmark,
-	CheckCircle2,
-	CircleAlert,
-	LoaderCircle,
-} from "lucide-react";
+	BookmarkSimple,
+	CheckCircle,
+	CircleNotch,
+	WarningCircle,
+} from "@phosphor-icons/react";
+import { Link } from "@tanstack/react-router";
 import { PublicPageLayout } from "#/components/public/public-page-layout";
 import { useSavePage } from "#/components/save/use-save-page";
 import { Button } from "#/components/ui/button";
@@ -26,13 +26,13 @@ export function SavePage({ url }: SavePageProps) {
 				<div className="flex items-start gap-4">
 					<div className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-select">
 						{status === "saving" ? (
-							<LoaderCircle className="size-5 animate-spin text-mark" />
+							<CircleNotch className="size-5 animate-spin text-mark" />
 						) : status === "idle" ? (
-							<Bookmark className="size-5 text-mark" />
+							<BookmarkSimple className="size-5 text-mark" />
 						) : isSuccess ? (
-							<CheckCircle2 className="size-5 text-mark" />
+							<CheckCircle className="size-5 text-mark" />
 						) : (
-							<CircleAlert className="size-5 text-destructive" />
+							<WarningCircle className="size-5 text-destructive" />
 						)}
 					</div>
 					<div className="min-w-0 space-y-1.5">

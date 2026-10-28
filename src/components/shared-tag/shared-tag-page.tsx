@@ -1,5 +1,5 @@
+import { Tag } from "@phosphor-icons/react";
 import { getRouteApi, Link, useNavigate } from "@tanstack/react-router";
-import { Tag } from "lucide-react";
 import { AppPagination } from "#/components/pagination/app-pagination";
 import { PublicPageHeading } from "#/components/public/public-page-heading";
 import { PublicPageLayout } from "#/components/public/public-page-layout";

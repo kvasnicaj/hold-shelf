@@ -1,4 +1,4 @@
-import { ClipboardPaste, Link2 } from "lucide-react";
+import { ClipboardText, LinkSimple } from "@phosphor-icons/react";
 import { useState } from "react";
 import { getDisplayHost, toHttpUrl } from "#/components/quick-save/helpers";
 import type { QuickSaveMode } from "#/components/quick-save/types";
@@ -92,7 +92,7 @@ export function QuickSaveForm({
 						: "h-12 rounded-lg border border-input bg-background px-3.5",
 				)}
 			>
-				<Link2 className="size-5 shrink-0 text-mark" />
+				<LinkSimple className="size-5 shrink-0 text-mark" />
 				<span className="sr-only">Link</span>
 				<input
 					id="quick-save-url"
@@ -164,7 +164,7 @@ export function QuickSaveForm({
 						className="h-11 w-full"
 						onClick={() => void pasteFromClipboard()}
 					>
-						<ClipboardPaste />
+						<ClipboardText />
 						Paste from clipboard
 					</Button>
 				)}

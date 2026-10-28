@@ -1,4 +1,4 @@
-import { ChevronsUpDown, Tags, X } from "lucide-react";
+import { CaretUpDown, Tag as TagIcon, X } from "@phosphor-icons/react";
 import { useState } from "react";
 import type { Tag } from "#/components/tags/types";
 import { Badge } from "#/components/ui/badge";
@@ -54,7 +54,7 @@ export function ArchiveTagsCombobox({
 					aria-label="Tag filters"
 				>
 					<span className="flex min-w-0 items-center gap-2">
-						<Tags className="h-4 w-4 shrink-0 text-muted-foreground" />
+						<TagIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
 						<span
 							className={cn(
 								"truncate",
@@ -64,7 +64,7 @@ export function ArchiveTagsCombobox({
 							{label}
 						</span>
 					</span>
-					<ChevronsUpDown className="h-4 w-4 shrink-0 text-muted-foreground" />
+					<CaretUpDown className="h-4 w-4 shrink-0 text-muted-foreground" />
 				</Button>
 			</PopoverTrigger>
 			<PopoverContent className="w-72 p-2" align="end">

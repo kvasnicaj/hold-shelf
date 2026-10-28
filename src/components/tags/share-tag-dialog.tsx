@@ -1,11 +1,11 @@
 import {
+	ArrowSquareOut,
 	Check,
+	CircleNotch,
 	Copy,
-	ExternalLink,
-	LoaderCircle,
-	Share2,
-	Trash2,
-} from "lucide-react";
+	ShareNetwork,
+	Trash,
+} from "@phosphor-icons/react";
 import { useState } from "react";
 import type { TagShare } from "#/components/tags/types";
 import { useTagShare } from "#/components/tags/use-tag-share";
@@ -73,7 +73,7 @@ export function ShareTagDialog({
 					aria-label={`Share ${tagName}`}
 					title="Share tag"
 				>
-					<Share2 className="h-[1.125rem] w-[1.125rem]" />
+					<ShareNetwork className="h-[1.125rem] w-[1.125rem]" />
 				</Button>
 			</DialogTrigger>
 			<DialogContent className="sm:max-w-md">
@@ -88,7 +88,7 @@ export function ShareTagDialog({
 
 				{loading && !share ? (
 					<div className="flex items-center gap-2 py-4 text-sm text-muted-foreground">
-						<LoaderCircle className="size-4 animate-spin" />
+						<CircleNotch className="size-4 animate-spin" />
 						Loading sharing settings...
 					</div>
 				) : share && shareUrl ? (
@@ -132,7 +132,7 @@ export function ShareTagDialog({
 										disabled={loading}
 										onClick={() => void handleRevoke()}
 									>
-										<Trash2 className="size-4" />
+										<Trash className="size-4" />
 										Stop sharing
 									</Button>
 								</div>
@@ -149,7 +149,7 @@ export function ShareTagDialog({
 								</Button>
 								<Button asChild variant="outline">
 									<a href={shareUrl} target="_blank" rel="noopener noreferrer">
-										<ExternalLink className="size-4" />
+										<ArrowSquareOut className="size-4" />
 										Open link
 									</a>
 								</Button>
@@ -169,9 +169,9 @@ export function ShareTagDialog({
 								onClick={() => void createShare()}
 							>
 								{loading ? (
-									<LoaderCircle className="size-4 animate-spin" />
+									<CircleNotch className="size-4 animate-spin" />
 								) : (
-									<Share2 className="size-4" />
+									<ShareNetwork className="size-4" />
 								)}
 								Create link
 							</Button>

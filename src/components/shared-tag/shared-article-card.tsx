@@ -1,4 +1,4 @@
-import { ExternalLink } from "lucide-react";
+import { ArrowSquareOut } from "@phosphor-icons/react";
 import type { SharedArticle } from "#/components/shared-tag/types";
 import { formatFullDate } from "#/lib/formatters";
 
@@ -33,7 +33,7 @@ export function SharedArticleCard({ article }: SharedArticleCardProps) {
 							<h2 className="min-w-0 flex-1 text-[15px] leading-snug font-semibold text-foreground group-hover:underline">
 								{article.title ?? article.hostname ?? article.url}
 							</h2>
-							<ExternalLink className="mt-1 size-3.5 shrink-0 text-muted-foreground" />
+							<ArrowSquareOut className="mt-1 size-3.5 shrink-0 text-muted-foreground" />
 						</div>
 						{article.description ? (
 							<p className="mt-1 line-clamp-2 text-sm leading-relaxed text-muted-foreground">

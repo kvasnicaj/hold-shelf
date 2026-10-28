@@ -1,11 +1,11 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-	Bookmark,
+	ArrowSquareOut,
+	ArrowsClockwise,
+	BookmarkSimple,
 	BookOpen,
 	Check,
-	ExternalLink,
-	RefreshCw,
-} from "lucide-react";
+} from "@phosphor-icons/react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ReaderBody } from "#/components/article-reader/reader-body";
 import { ReaderCloseButton } from "#/components/article-reader/reader-close-button";
@@ -103,10 +103,11 @@ export function ArticleReaderPanel() {
 											)
 										}
 									>
-										<Bookmark
+										<BookmarkSimple
+											weight={data.article.isFavorite ? "fill" : "regular"}
 											className={cn(
 												"size-[1.125rem]",
-												data.article.isFavorite && "fill-current text-favorite",
+												data.article.isFavorite && "text-favorite",
 											)}
 										/>
 									</Button>,
@@ -133,7 +134,7 @@ export function ArticleReaderPanel() {
 										disabled={refresh.isPending}
 										onClick={() => refresh.mutate()}
 									>
-										<RefreshCw
+										<ArrowsClockwise
 											className={cn(
 												"size-[1.125rem]",
 												refresh.isPending && "animate-spin",
@@ -148,7 +149,7 @@ export function ArticleReaderPanel() {
 											aria-label="Open original"
 											title="Open original"
 										>
-											<ExternalLink className="size-[1.125rem]" />
+											<ArrowSquareOut className="size-[1.125rem]" />
 										</a>
 									</Button>,
 								]

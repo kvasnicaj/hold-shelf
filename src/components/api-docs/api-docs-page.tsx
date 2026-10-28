@@ -1,4 +1,4 @@
-import { Download } from "lucide-react";
+import { DownloadSimple } from "@phosphor-icons/react";
 import { ApiDocsEndpointCard } from "#/components/api-docs/api-docs-endpoint-card";
 import {
 	API_DOCS_AGENT_EXPORT_FILENAME,
@@ -21,7 +21,7 @@ export function ApiDocsPage() {
 						href={API_DOCS_AGENT_EXPORT_PATH}
 						download={API_DOCS_AGENT_EXPORT_FILENAME}
 					>
-						<Download className="size-4" />
+						<DownloadSimple className="size-4" />
 						Export agent docs
 					</a>
 				</Button>

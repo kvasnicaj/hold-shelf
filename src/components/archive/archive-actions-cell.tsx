@@ -1,4 +1,4 @@
-import { EllipsisVertical } from "lucide-react";
+import { DotsThreeVertical } from "@phosphor-icons/react";
 import { useContext } from "react";
 import { ArchiveActionsContext } from "#/components/archive/archive-actions-context";
 import { ArticleActionsMenuItems } from "#/components/archive/article-actions-menu-items";
@@ -46,7 +46,7 @@ export function ArchiveActionsCell({ row }: ArchiveActionsCellProps) {
 						onClick={(event) => event.stopPropagation()}
 						onKeyDown={(event) => event.stopPropagation()}
 					>
-						<EllipsisVertical className="size-3.5" />
+						<DotsThreeVertical className="size-3.5" />
 					</Button>
 				</DropdownMenuTrigger>
 				<DropdownMenuContent align="end">

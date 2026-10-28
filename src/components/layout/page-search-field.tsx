@@ -1,4 +1,4 @@
-import { Search } from "lucide-react";
+import { MagnifyingGlass } from "@phosphor-icons/react";
 import { usePageSearch } from "#/components/layout/use-page-search";
 import { Input } from "#/components/ui/input";
 
@@ -27,7 +27,7 @@ export function PageSearchField({
 	return (
 		<div className={className}>
 			<div className="relative">
-				<Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+				<MagnifyingGlass className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 				<Input
 					type="search"
 					value={draft}

@@ -1,9 +1,9 @@
-import type { LucideIcon } from "lucide-react";
+import type { Icon as PhosphorIcon } from "@phosphor-icons/react";
 import { Button } from "#/components/ui/button";
 import { cn } from "#/lib/utils";
 
 type BulkActionButtonProps = {
-	icon: LucideIcon;
+	icon: PhosphorIcon;
 	label: string;
 	onClick: () => void;
 	/** Show the label next to the icon on wider screens. */

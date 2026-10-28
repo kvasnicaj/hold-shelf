@@ -1,4 +1,9 @@
-import { Check, Loader2, Plus, Tags } from "lucide-react";
+import {
+	Check,
+	CircleNotch,
+	Plus,
+	Tag as TagIcon,
+} from "@phosphor-icons/react";
 import type { Tag } from "#/components/tags/types";
 import { useTagPicker } from "#/components/tags/use-tag-picker";
 import { Button } from "#/components/ui/button";
@@ -34,7 +39,7 @@ export function TagPicker({ triggerClassName, ...props }: TagPickerProps) {
 					className={triggerClassName}
 					onClick={(event) => event.stopPropagation()}
 				>
-					<Tags className="h-[1.125rem] w-[1.125rem]" />
+					<TagIcon className="h-[1.125rem] w-[1.125rem]" />
 				</Button>
 			</PopoverTrigger>
 			<PopoverContent
@@ -90,7 +95,7 @@ export function TagPicker({ triggerClassName, ...props }: TagPickerProps) {
 									)}
 								>
 									{picker.pending === tag.id ? (
-										<Loader2 className="size-3 animate-spin" />
+										<CircleNotch className="size-3 animate-spin" />
 									) : (
 										selected && <Check className="size-3" />
 									)}
@@ -116,7 +121,7 @@ export function TagPicker({ triggerClassName, ...props }: TagPickerProps) {
 							className="flex w-full min-w-0 items-center gap-2 overflow-hidden rounded px-2 py-2 text-left text-sm hover:bg-accent disabled:opacity-50"
 						>
 							{picker.creating ? (
-								<Loader2 className="size-4 shrink-0 animate-spin" />
+								<CircleNotch className="size-4 shrink-0 animate-spin" />
 							) : (
 								<Plus className="size-4 shrink-0" />
 							)}

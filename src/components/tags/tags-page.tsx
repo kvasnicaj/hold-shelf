@@ -1,4 +1,4 @@
-import { Tag } from "lucide-react";
+import { Tag } from "@phosphor-icons/react";
 import { ArticleCollectionPage } from "#/components/articles/article-collection-page";
 import { PageSearchField } from "#/components/layout/page-search-field";
 import { TagHeadingActions } from "#/components/tags/tag-heading-actions";

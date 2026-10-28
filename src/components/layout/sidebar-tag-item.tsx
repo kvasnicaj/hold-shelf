@@ -1,5 +1,5 @@
+import { Hash, Trash } from "@phosphor-icons/react";
 import { Link } from "@tanstack/react-router";
-import { Hash, Trash2 } from "lucide-react";
 import { RenameTagDialog } from "#/components/tags/rename-tag-dialog";
 import { Button } from "#/components/ui/button";
 import { cn } from "#/lib/utils";
@@ -58,7 +58,7 @@ export function SidebarTagItem({
 						title="Delete tag"
 						className="text-muted-foreground hover:bg-sidebar-accent hover:text-foreground"
 					>
-						<Trash2 className="h-3.5 w-3.5" />
+						<Trash className="h-3.5 w-3.5" />
 					</Button>
 				</div>
 			</div>

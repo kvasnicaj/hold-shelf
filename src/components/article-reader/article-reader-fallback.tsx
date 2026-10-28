@@ -1,4 +1,4 @@
-import { ExternalLink } from "lucide-react";
+import { ArrowSquareOut } from "@phosphor-icons/react";
 import { Button } from "#/components/ui/button";
 
 type ArticleReaderFallbackProps = {
@@ -21,7 +21,7 @@ export function ArticleReaderFallback({
 			</p>
 			<Button asChild variant="outline" size="sm" className="mt-4">
 				<a href={url} target="_blank" rel="noopener noreferrer">
-					<ExternalLink />
+					<ArrowSquareOut />
 					Open original
 				</a>
 			</Button>

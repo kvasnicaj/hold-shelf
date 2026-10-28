@@ -1,4 +1,4 @@
-import { Bookmark, BookOpen, Check, Trash2 } from "lucide-react";
+import { BookmarkSimple, BookOpen, Check, Trash } from "@phosphor-icons/react";
 import type { ArchiveActions } from "#/components/archive/types";
 import type { ArticleWithTags } from "#/components/articles/types";
 import { DropdownMenuItem } from "#/components/ui/dropdown-menu";
@@ -25,11 +25,9 @@ export function ArticleActionsMenuItems({
 					void onToggleFavorite(article.id, !article.isFavorite);
 				}}
 			>
-				<Bookmark
-					className={cn(
-						"size-4",
-						article.isFavorite && "fill-current text-favorite",
-					)}
+				<BookmarkSimple
+					weight={article.isFavorite ? "fill" : "regular"}
+					className={cn("size-4", article.isFavorite && "text-favorite")}
 				/>
 				{article.isFavorite ? "Remove from favorites" : "Add to favorites"}
 			</DropdownMenuItem>
@@ -53,7 +51,7 @@ export function ArticleActionsMenuItems({
 					void onDelete([article.id]);
 				}}
 			>
-				<Trash2 className="size-4" />
+				<Trash className="size-4" />
 				Delete
 			</DropdownMenuItem>
 		</>
