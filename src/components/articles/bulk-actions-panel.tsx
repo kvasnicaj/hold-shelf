@@ -1,12 +1,5 @@
-import { BookOpen, Check, ListChecks, Trash2, X } from "lucide-react";
-import { ToolBox } from "#/components/layout/tool-box";
-import { Button } from "#/components/ui/button";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "#/components/ui/dropdown-menu";
+import { BookOpen, Check, Trash2, X } from "lucide-react";
+import { BulkActionButton } from "#/components/articles/bulk-action-button";
 
 type BulkActionsPanelProps = {
 	count: number;
@@ -24,79 +17,28 @@ export function BulkActionsPanel({
 	onClear,
 }: BulkActionsPanelProps) {
 	return (
-		<div className="flex min-w-0 justify-start sm:justify-center">
-			<ToolBox className="hidden sm:inline-flex">
-				<span className="px-2.5 text-sm text-muted-foreground whitespace-nowrap">
+		<div className="pointer-events-none fixed inset-x-0 bottom-[calc(env(safe-area-inset-bottom)+4.75rem)] z-40 flex justify-center px-3 md:bottom-6 md:left-56">
+			<div
+				role="toolbar"
+				aria-label="Bulk actions"
+				className="pointer-events-auto flex max-w-full items-center gap-0.5 rounded-lg bg-inverse py-1 pr-1 pl-3.5 text-sm text-inverse-foreground shadow-float"
+			>
+				<span className="mr-2 font-semibold whitespace-nowrap tabular-nums">
 					{count} selected
 				</span>
-				<Button
-					variant="ghost"
-					size="icon-sm"
-					onClick={onMarkRead}
-					title="Mark read"
-				>
-					<Check className="h-4 w-4" />
-				</Button>
-				<Button
-					variant="ghost"
-					size="icon-sm"
+				<BulkActionButton icon={Check} label="Mark read" onClick={onMarkRead} />
+				<BulkActionButton
+					icon={BookOpen}
+					label="Mark unread"
 					onClick={onMarkUnread}
-					title="Mark unread"
-				>
-					<BookOpen className="h-4 w-4" />
-				</Button>
-				<Button
-					variant="ghost"
-					size="icon-sm"
-					onClick={onDelete}
-					title="Delete"
-				>
-					<Trash2 className="h-4 w-4" />
-				</Button>
-				<Button
-					variant="ghost"
-					size="icon-sm"
+				/>
+				<BulkActionButton icon={Trash2} label="Delete" onClick={onDelete} />
+				<BulkActionButton
+					icon={X}
+					label="Clear selection"
 					onClick={onClear}
-					title="Clear selection"
-				>
-					<X className="h-4 w-4" />
-				</Button>
-			</ToolBox>
-			<div className="sm:hidden">
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<ToolBox asChild>
-							<button
-								type="button"
-								className="flex size-8 items-center justify-center rounded-md hover:bg-accent hover:text-accent-foreground"
-								aria-label="Bulk actions"
-							>
-								<ListChecks className="h-4 w-4" />
-							</button>
-						</ToolBox>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="center">
-						<div className="px-2 py-1.5 text-sm text-muted-foreground">
-							{count} selected
-						</div>
-						<DropdownMenuItem onClick={onMarkRead}>
-							<Check className="mr-2 h-4 w-4" />
-							Mark read
-						</DropdownMenuItem>
-						<DropdownMenuItem onClick={onMarkUnread}>
-							<BookOpen className="mr-2 h-4 w-4" />
-							Mark unread
-						</DropdownMenuItem>
-						<DropdownMenuItem onClick={onDelete}>
-							<Trash2 className="mr-2 h-4 w-4" />
-							Delete
-						</DropdownMenuItem>
-						<DropdownMenuItem onClick={onClear}>
-							<X className="mr-2 h-4 w-4" />
-							Clear selection
-						</DropdownMenuItem>
-					</DropdownMenuContent>
-				</DropdownMenu>
+					showLabel={false}
+				/>
 			</div>
 		</div>
 	);

@@ -72,7 +72,6 @@ vi.mock("#/components/ui/dropdown-menu", () => ({
 			{children}
 		</button>
 	),
-	DropdownMenuSeparator: () => <hr />,
 }));
 
 vi.mock("#/lib/auth-client", () => ({

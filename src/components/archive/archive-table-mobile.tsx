@@ -1,24 +1,8 @@
-import {
-	BookOpen,
-	Check,
-	EllipsisVertical,
-	ExternalLink,
-	Star,
-	Trash2,
-} from "lucide-react";
+import { ArchiveMobileRow } from "#/components/archive/archive-mobile-row";
+import { groupByMonth } from "#/components/archive/helpers";
+import { MonthGroupLabel } from "#/components/archive/month-group-label";
 import type { ArchiveActions } from "#/components/archive/types";
-import { ArticleExternalLink } from "#/components/articles/article-external-link";
 import type { ArticleWithTags } from "#/components/articles/types";
-import { TagPicker } from "#/components/tags/tag-picker";
-import { Badge } from "#/components/ui/badge";
-import { Button } from "#/components/ui/button";
-import { Checkbox } from "#/components/ui/checkbox";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "#/components/ui/dropdown-menu";
 
 type ArchiveTableMobileProps = ArchiveActions & {
 	articles: ArticleWithTags[];
@@ -26,26 +10,20 @@ type ArchiveTableMobileProps = ArchiveActions & {
 	onRowSelectionChange: React.Dispatch<
 		React.SetStateAction<Record<string, boolean>>
 	>;
+	groupedByMonth?: boolean;
 };
-
-function stopArticleOpen(event: { stopPropagation: () => void }) {
-	event.stopPropagation();
-}
 
 export function ArchiveTableMobile({
 	articles,
 	rowSelection,
 	onRowSelectionChange,
-	availableTags,
-	onAddTag,
-	onRemoveTag,
-	onCreateTag,
-	onOpenArticle,
-	onToggleRead,
-	onToggleFavorite,
-	onDelete,
+	groupedByMonth = false,
+	...actions
 }: ArchiveTableMobileProps) {
 	const hasSelection = Object.values(rowSelection).some(Boolean);
+	const groups = groupedByMonth
+		? groupByMonth(articles, (article) => article.createdAt)
+		: [{ key: "all", label: "", items: articles }];
 
 	function toggleRow(articleId: string, isSelected: boolean) {
 		onRowSelectionChange((current) => {
@@ -60,155 +38,30 @@ export function ArchiveTableMobile({
 	}
 
 	return (
-		<div className="md:hidden">
-			<div className="divide-y">
-				{articles.map((article) => {
-					const isSelected = Boolean(rowSelection[article.id]);
-
-					return (
-						// biome-ignore lint/a11y/useSemanticElements: The composite row contains nested controls, so it cannot be a native button.
-						<div
-							key={article.id}
-							className="grid cursor-pointer grid-cols-[minmax(0,1fr)_auto] gap-x-2 py-2"
-							onClick={() => void onOpenArticle(article.id, article.isRead)}
-							onKeyDown={(event) => {
-								if (
-									event.key === "Enter" &&
-									event.target === event.currentTarget
-								) {
-									void onOpenArticle(article.id, article.isRead);
-								}
-							}}
-							role="button"
-							tabIndex={0}
-						>
-							<div className="min-w-0 space-y-2">
-								<div className="flex min-w-0 items-start gap-1.5">
-									{hasSelection || isSelected ? (
-										<Checkbox
-											aria-label={`Select ${article.title ?? article.url}`}
-											checked={isSelected}
-											onCheckedChange={(value) =>
-												toggleRow(article.id, !!value)
-											}
-											className="mt-0.5"
-											onClick={stopArticleOpen}
-											onKeyDown={stopArticleOpen}
-										/>
-									) : null}
-									<ArticleExternalLink
-										articleId={article.id}
-										href={article.url}
-										isRead={article.isRead}
-										onOpenArticle={onOpenArticle}
-										className="min-w-0 flex-1 text-sm font-medium leading-snug no-underline hover:underline"
-									>
-										<span className="line-clamp-1 break-words">
-											{article.title ?? article.url}
-										</span>
-									</ArticleExternalLink>
-									<ExternalLink className="mt-0.5 h-3 w-3 shrink-0 text-muted-foreground" />
-								</div>
-
-								<div className="min-w-0 flex flex-wrap items-center gap-1.5 text-xs text-muted-foreground">
-									<span
-										className={`h-2 w-2 shrink-0 rounded-full ${article.isRead ? "bg-muted-foreground/30" : "bg-primary"}`}
-										role="img"
-										aria-label={article.isRead ? "Read" : "Unread"}
-										title={article.isRead ? "Read" : "Unread"}
-									/>
-									<span className="truncate">
-										{article.hostname ?? article.url}
-									</span>
-									{article.tags.map((tag) => (
-										<Badge
-											key={tag.id}
-											variant="secondary"
-											className="px-1.5 py-0 text-[10px]"
-										>
-											{tag.name}
-										</Badge>
-									))}
-								</div>
-							</div>
-
-							<div className="flex items-start justify-end pt-0.5">
-								<TagPicker
-									availableTags={availableTags}
-									selectedTagIds={article.tags.map((tag) => tag.id)}
-									articleIds={[article.id]}
-									onAddTag={onAddTag}
-									onRemoveTag={onRemoveTag}
-									onCreateTag={onCreateTag}
-								/>
-								<DropdownMenu>
-									<DropdownMenuTrigger asChild>
-										<Button
-											variant="ghost"
-											size="icon-xs"
-											aria-label={`Article actions for ${article.title ?? article.url}`}
-											onClick={stopArticleOpen}
-											onKeyDown={stopArticleOpen}
-										>
-											<EllipsisVertical className="h-[1.125rem] w-[1.125rem]" />
-										</Button>
-									</DropdownMenuTrigger>
-									<DropdownMenuContent align="end">
-										<DropdownMenuItem
-											onClick={(event) => {
-												stopArticleOpen(event);
-												toggleRow(article.id, !isSelected);
-											}}
-										>
-											{isSelected ? "Deselect article" : "Select article"}
-										</DropdownMenuItem>
-										<DropdownMenuItem
-											onClick={(event) => {
-												stopArticleOpen(event);
-												void onToggleRead(article.id, !article.isRead);
-											}}
-										>
-											{article.isRead ? (
-												<BookOpen className="h-4 w-4" />
-											) : (
-												<Check className="h-4 w-4" />
-											)}
-											{article.isRead ? "Mark unread" : "Mark read"}
-										</DropdownMenuItem>
-										<DropdownMenuItem
-											onClick={(event) => {
-												stopArticleOpen(event);
-												void onToggleFavorite(article.id, !article.isFavorite);
-											}}
-										>
-											<Star
-												className={
-													article.isFavorite
-														? "h-4 w-4 fill-current text-amber-500"
-														: "h-4 w-4"
-												}
-											/>
-											{article.isFavorite
-												? "Remove from favorites"
-												: "Add to favorites"}
-										</DropdownMenuItem>
-										<DropdownMenuItem
-											variant="destructive"
-											onClick={(event) => {
-												stopArticleOpen(event);
-												void onDelete([article.id]);
-											}}
-										>
-											<Trash2 className="h-4 w-4" />
-											Delete
-										</DropdownMenuItem>
-									</DropdownMenuContent>
-								</DropdownMenu>
-							</div>
+		<div className="-mx-3 border-t bg-card sm:-mx-6 md:hidden">
+			{groups.map((group) => (
+				<section key={group.key} aria-label={group.label || undefined}>
+					{groupedByMonth && (
+						<div className="border-b px-4 pt-4 pb-1.5">
+							<MonthGroupLabel label={group.label} count={group.items.length} />
 						</div>
-					);
-				})}
-			</div>
+					)}
+					{group.items.map((article) => {
+						const isSelected = Boolean(rowSelection[article.id]);
+
+						return (
+							<ArchiveMobileRow
+								key={article.id}
+								article={article}
+								isSelected={isSelected}
+								showCheckbox={hasSelection || isSelected}
+								onSelectedChange={(value) => toggleRow(article.id, value)}
+								{...actions}
+							/>
+						);
+					})}
+				</section>
+			))}
 		</div>
 	);
 }

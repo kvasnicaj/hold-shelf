@@ -48,6 +48,19 @@ vi.mock("@tanstack/react-router", async () => {
 			useLoaderData: () => routeState.loaderData,
 			useSearch: () => routeState.search,
 		}),
+		Link: ({
+			children,
+			to,
+			className,
+		}: {
+			children: React.ReactNode;
+			to: string;
+			className?: string;
+		}) => (
+			<a href={to} className={className}>
+				{children}
+			</a>
+		),
 		useNavigate: () => navigateMock,
 		useRouter: () => ({
 			invalidate: routerInvalidateMock,

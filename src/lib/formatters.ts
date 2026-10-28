@@ -21,6 +21,14 @@ export function formatDate(date: Date | null): string {
 	}).format(date);
 }
 
+export function formatMonthYear(date: Date): string {
+	return new Intl.DateTimeFormat("en-US", {
+		month: "long",
+		year: "numeric",
+		timeZone: "UTC",
+	}).format(date);
+}
+
 export function formatFullDate(date: Date | null): string {
 	if (!date) return "";
 	return new Intl.DateTimeFormat("en-US", {

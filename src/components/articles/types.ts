@@ -2,6 +2,12 @@ import type { Tag } from "#/components/tags/types";
 
 export type ArticleSort = "newest" | "oldest" | "title";
 
+export type MonthGroup<T> = {
+	key: string;
+	label: string;
+	items: T[];
+};
+
 export type ArticleWithTags = {
 	id: string;
 	url: string;

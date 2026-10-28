@@ -5,7 +5,7 @@ import { BulkActionsPanel } from "#/components/articles/bulk-actions-panel";
 import { renderWithProviders } from "#/test/render";
 
 describe("BulkActionsPanel", () => {
-	it("renders expanded inline actions for wider layouts", async () => {
+	it("runs bulk actions from the toolbar", async () => {
 		const user = userEvent.setup();
 		const onMarkRead = vi.fn();
 
@@ -26,25 +26,24 @@ describe("BulkActionsPanel", () => {
 		expect(onMarkRead).toHaveBeenCalledTimes(1);
 	});
 
-	it("opens the collapsed bulk actions menu from the icon trigger", async () => {
+	it("floats as a labelled toolbar with a clear action", async () => {
 		const user = userEvent.setup();
-		const onMarkRead = vi.fn();
+		const onClear = vi.fn();
 
 		renderWithProviders(
 			<BulkActionsPanel
-				count={2}
-				onMarkRead={onMarkRead}
+				count={3}
+				onMarkRead={vi.fn()}
 				onMarkUnread={vi.fn()}
 				onDelete={vi.fn()}
-				onClear={vi.fn()}
+				onClear={onClear}
 			/>,
 		);
 
-		await user.click(screen.getByRole("button", { name: /bulk actions/i }));
-		await user.click(
-			await screen.findByRole("menuitem", { name: /mark read/i }),
-		);
+		const toolbar = screen.getByRole("toolbar", { name: "Bulk actions" });
+		expect(toolbar).toHaveTextContent("3 selected");
+		await user.click(screen.getByRole("button", { name: "Clear selection" }));
 
-		expect(onMarkRead).toHaveBeenCalledTimes(1);
+		expect(onClear).toHaveBeenCalledTimes(1);
 	});
 });
