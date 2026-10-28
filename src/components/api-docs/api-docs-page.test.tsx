@@ -1,7 +1,29 @@
 import { screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { ApiDocsPage } from "#/components/api-docs/api-docs-page";
 import { renderWithProviders } from "#/test/render";
+
+vi.mock("@tanstack/react-router", async () => {
+	const actual = await vi.importActual<typeof import("@tanstack/react-router")>(
+		"@tanstack/react-router",
+	);
+	return {
+		...actual,
+		Link: ({
+			children,
+			to,
+			className,
+		}: {
+			children: React.ReactNode;
+			to: string;
+			className?: string;
+		}) => (
+			<a href={to} className={className}>
+				{children}
+			</a>
+		),
+	};
+});
 
 describe("ApiDocsPage", () => {
 	it("documents the public API endpoints", () => {

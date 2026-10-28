@@ -20,3 +20,18 @@ export function getHomeSummary(stats: { unread: number; total: number }) {
 	if (stats.unread === 1) return "One article is waiting for you.";
 	return `${stats.unread} articles are waiting for you.`;
 }
+
+export const LANDING_FEATURES = [
+	{
+		title: "Save in one step",
+		text: "Paste a link, press S, or use the Chrome extension. Tags are optional.",
+	},
+	{
+		title: "Read without clutter",
+		text: "Articles open in a calm reader, and their text is saved so they stay readable later.",
+	},
+	{
+		title: "Pick up where you left off",
+		text: "Hold Shelf remembers your place and shows what has waited longest.",
+	},
+] as const;
