@@ -37,7 +37,7 @@ at them, and every neutral is tinted toward the brand ink.
 | Line strong | `border-input` | `#c3cec8` | `#2f565d` | Inputs, dividers that must be seen |
 | Ink | `text-foreground` | `#173a40` | `#dcebe7` | Text |
 | Ink soft | `text-muted-foreground` | `#526d71` | `#93b2ad` | Metadata |
-| Ink faint | `text-faint-foreground` | `#8aa0a2` | `#5f7f80` | Placeholders, counts (never body text) |
+| Ink faint | `text-faint-foreground` | `#8aa0a2` | `#5f7f80` | Placeholders and decorative icons only (below 4.5:1) |
 | Mark | `text-mark`, `ring-ring` | `#328f97` | `#6cc3c4` | Unread spine, focus, progress, active icons |
 | Action | `bg-primary`, `text-primary` | `#23767e` | `#6cc3c4` | Primary buttons, links |
 | Favorite | `text-favorite`, `bg-favorite-fill` | `#8f6210` | `#e0ad55` | Favorite marker, the only warm color |
@@ -85,6 +85,22 @@ Spacing follows a 4 px grid. Control heights are 28 (small), 32 (default) and
 | Spacious | Come back, pick up, browse | Home, landing page, empty states |
 
 The reader is its own mode: everything except the text steps back.
+
+## App shell
+
+- **Desktop:** the sidebar sits on the paper ground. Main content and the
+  reader are sheets (`bg-card`, `rounded-xl`, border) set 8 px into the
+  ground.
+- **Sidebar:** logo, then Save a link as the only primary button, then Home,
+  Unread, Favorites and Library, then Tags, then the account. The active item
+  is a sheet with a hairline ring and a teal icon. Counts use tabular numbers;
+  the unread count is teal.
+- **Mobile bottom bar:** Home, Unread, Save, Favorites, Library on a flat paper
+  bar with one hairline. Save is a filled button in the middle. The active tab
+  has a teal icon and a short teal line under it, echoing the logo's shelf.
+  Labels are always visible.
+- **Mobile top bar:** brand symbol on the left, account avatar on the right.
+  Tags are reached from the account menu.
 
 ## shadcn components
 

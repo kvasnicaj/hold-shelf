@@ -4,12 +4,16 @@ import { describe, expect, it, vi } from "vitest";
 import { AddArticleDialog } from "#/components/articles/add-article-dialog";
 import { renderWithProviders } from "#/test/render";
 
+const trigger = <button type="button">Save a link</button>;
+
 describe("AddArticleDialog", () => {
 	it("shows a validation error for invalid URLs", async () => {
 		const user = userEvent.setup();
-		renderWithProviders(<AddArticleDialog onAdd={vi.fn()} />);
+		renderWithProviders(
+			<AddArticleDialog onAdd={vi.fn()}>{trigger}</AddArticleDialog>,
+		);
 
-		await user.click(screen.getByRole("button", { name: /add article/i }));
+		await user.click(screen.getByRole("button", { name: /save a link/i }));
 		await user.type(screen.getByLabelText("URL"), "not-a-url");
 		const form = screen
 			.getByRole("button", { name: /^save$/i })
@@ -26,9 +30,11 @@ describe("AddArticleDialog", () => {
 	it("submits valid URLs through onAdd", async () => {
 		const user = userEvent.setup();
 		const onAdd = vi.fn().mockResolvedValue(undefined);
-		renderWithProviders(<AddArticleDialog onAdd={onAdd} />);
+		renderWithProviders(
+			<AddArticleDialog onAdd={onAdd}>{trigger}</AddArticleDialog>,
+		);
 
-		await user.click(screen.getByRole("button", { name: /add article/i }));
+		await user.click(screen.getByRole("button", { name: /save a link/i }));
 		await user.type(
 			screen.getByLabelText("URL"),
 			"https://example.com/articles/testing",
@@ -51,9 +57,11 @@ describe("AddArticleDialog", () => {
 					release = resolve;
 				}),
 		);
-		renderWithProviders(<AddArticleDialog onAdd={onAdd} />);
+		renderWithProviders(
+			<AddArticleDialog onAdd={onAdd}>{trigger}</AddArticleDialog>,
+		);
 
-		await user.click(screen.getByRole("button", { name: /add article/i }));
+		await user.click(screen.getByRole("button", { name: /save a link/i }));
 		await user.type(
 			screen.getByLabelText("URL"),
 			"https://example.com/loading",
@@ -71,10 +79,12 @@ describe("AddArticleDialog", () => {
 		const failingOnAdd = vi
 			.fn()
 			.mockRejectedValue(new Error("Metadata fetch failed"));
-		renderWithProviders(<AddArticleDialog onAdd={failingOnAdd} />);
+		renderWithProviders(
+			<AddArticleDialog onAdd={failingOnAdd}>{trigger}</AddArticleDialog>,
+		);
 
 		const addArticleButtons = screen.getAllByRole("button", {
-			name: /add article/i,
+			name: /save a link/i,
 		});
 		const latestAddArticleButton =
 			addArticleButtons[addArticleButtons.length - 1];

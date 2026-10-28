@@ -1,10 +1,9 @@
 import {
-	Archive,
-	BookMarked,
+	Bookmark,
 	BookOpen,
-	Home,
+	House,
+	Library,
 	type LucideIcon,
-	Tags,
 } from "lucide-react";
 
 export type AppNavItem = {
@@ -13,21 +12,13 @@ export type AppNavItem = {
 	label: string;
 };
 
-export const homeNavItem: AppNavItem = {
-	href: "/app/home",
-	icon: Home,
-	label: "Home",
-};
+export const unreadNavHref = "/app/articles";
 
-export const libraryNavItems: AppNavItem[] = [
-	{ href: "/app/articles", icon: BookOpen, label: "Unread" },
-	{ href: "/app/favorites", icon: BookMarked, label: "Favorites" },
-	{ href: "/app/archive", icon: Archive, label: "Library" },
-	{ href: "/app/tags", icon: Tags, label: "Tags" },
+// Shared by the desktop sidebar and the mobile bottom bar. Tags live in the
+// sidebar on desktop and inside Library on mobile.
+export const primaryNavItems: AppNavItem[] = [
+	{ href: "/app/home", icon: House, label: "Home" },
+	{ href: unreadNavHref, icon: BookOpen, label: "Unread" },
+	{ href: "/app/favorites", icon: Bookmark, label: "Favorites" },
+	{ href: "/app/archive", icon: Library, label: "Library" },
 ];
-
-export const desktopLibraryNavItems: AppNavItem[] = libraryNavItems.filter(
-	(item) => item.href !== "/app/tags",
-);
-
-export const mobileNavItems: AppNavItem[] = [homeNavItem, ...libraryNavItems];

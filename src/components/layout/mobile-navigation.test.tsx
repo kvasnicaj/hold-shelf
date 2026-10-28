@@ -4,7 +4,8 @@ import { describe, expect, it, vi } from "vitest";
 import { MobileNavigation } from "#/components/layout/mobile-navigation";
 import { renderWithProviders } from "#/test/render";
 
-const { routerState } = vi.hoisted(() => ({
+const { getArticlesMock, routerState } = vi.hoisted(() => ({
+	getArticlesMock: vi.fn(),
 	routerState: {
 		location: {
 			pathname: "/app/favorites",
@@ -14,6 +15,10 @@ const { routerState } = vi.hoisted(() => ({
 
 vi.mock("#/components/articles/use-save-article", () => ({
 	useSaveArticle: () => ({ handleAdd: vi.fn() }),
+}));
+
+vi.mock("#/server/articles", () => ({
+	getArticles: getArticlesMock,
 }));
 
 vi.mock("@tanstack/react-router", async () => {
@@ -41,8 +46,9 @@ vi.mock("@tanstack/react-router", async () => {
 });
 
 describe("MobileNavigation", () => {
-	it("renders primary navigation and a one-tap Add article action", async () => {
+	it("renders four destinations around a one-tap save action", async () => {
 		const user = userEvent.setup();
+		getArticlesMock.mockResolvedValue({ total: 3 });
 		renderWithProviders(<MobileNavigation />);
 
 		expect(screen.getByRole("navigation", { name: /primary/i })).toBeVisible();
@@ -52,13 +58,13 @@ describe("MobileNavigation", () => {
 		);
 		const favoritesLink = screen.getByRole("link", { name: /favorites/i });
 		expect(favoritesLink).toHaveAttribute("href", "/app/favorites");
-		const addArticleButton = screen.getByRole("button", {
-			name: "Add article",
-		});
-		expect(addArticleButton).toBeVisible();
-		await user.click(addArticleButton);
+		expect(favoritesLink).toHaveAttribute("aria-current", "page");
+		expect(
+			await screen.findByRole("link", { name: /unread\s*3/i }),
+		).toHaveAttribute("href", "/app/articles");
+		expect(screen.getAllByRole("link")).toHaveLength(4);
+
+		await user.click(screen.getByRole("button", { name: "Save a link" }));
 		expect(screen.getByRole("heading", { name: "Save article" })).toBeVisible();
-		await user.keyboard("{Escape}");
-		expect(screen.getAllByRole("link")).toHaveLength(5);
 	});
 });

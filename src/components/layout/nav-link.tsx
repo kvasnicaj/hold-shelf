@@ -1,46 +1,39 @@
 import { Link } from "@tanstack/react-router";
+import type { LucideIcon } from "lucide-react";
+import { cn } from "#/lib/utils";
 
 type NavLinkProps = {
 	href: string;
-	linkProps?: Record<string, unknown>;
-	icon: React.ComponentType<{ className?: string }>;
-	iconClassName?: string;
+	icon: LucideIcon;
 	label: string;
 	isActive: boolean;
 	badge?: number;
-	count?: number;
 };
 
 export function NavLink({
 	href,
-	linkProps,
 	icon: Icon,
-	iconClassName,
 	label,
 	isActive,
 	badge,
-	count,
 }: NavLinkProps) {
-	const props = linkProps ?? { to: href };
 	return (
 		<Link
-			to={props.to as string}
-			{...props}
-			className={`flex items-center gap-2.5 rounded-lg px-2.5 py-1.5 text-sm no-underline transition-colors ${
+			to={href}
+			aria-current={isActive ? "page" : undefined}
+			className={cn(
+				"flex h-8 items-center gap-2.5 rounded-md px-2.5 text-sm no-underline transition-colors",
 				isActive
-					? "bg-sidebar-accent font-medium text-sidebar-accent-foreground"
-					: "text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
-			}`}
+					? "bg-sidebar-accent font-semibold text-sidebar-accent-foreground ring-1 ring-sidebar-border"
+					: "font-medium text-muted-foreground hover:bg-accent hover:text-foreground",
+			)}
 		>
-			<Icon className={iconClassName ?? "h-4 w-4 shrink-0"} />
+			<Icon className={cn("size-4 shrink-0", isActive && "text-mark")} />
 			<span className="flex-1 truncate">{label}</span>
 			{badge !== undefined && (
-				<span className="min-w-5 rounded-full bg-primary px-1.5 py-0.5 text-center text-[10px] font-medium text-primary-foreground">
+				<span className="text-xs font-bold tabular-nums text-primary">
 					{badge}
 				</span>
-			)}
-			{count !== undefined && (
-				<span className="text-xs text-sidebar-foreground/60">{count}</span>
 			)}
 		</Link>
 	);

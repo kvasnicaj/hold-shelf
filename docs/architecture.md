@@ -113,24 +113,29 @@ Component tree:
 ```text
 AppLayout
 |- ToolbarActionsProvider
-|  |- desktop sidebar column
+|  |- desktop sidebar column (paper ground)
 |  |  |- AppSidebar -> BrandLogo (horizontal)
+|  |  |  |- SaveLinkAction -> AddArticleDialog
+|  |  |  |- NavLink (Home, Unread, Favorites, Library)
+|  |  |  |- SidebarTagsSection
+|  |  |  |- SidebarUserMenu -> UserAvatar
 |  |
-|  |- main content
+|  |- main content (sheet inset into the paper ground on desktop)
 |  |  |- TopBar
 |  |  |  |- ColumnNavbar
 |  |  |  |  |- AppBrandMark -> BrandLogo (symbol)
 |  |  |  |  |- global article search
 |  |  |  |  |- route-provided toolbar center/actions
-|  |  |  |  |- add article and account actions
+|  |  |  |  |- AppToolbar (mobile account menu) -> UserAvatar
 |  |  |
 |  |  |- Outlet
 |  |
-|  |- article reader column
+|  |- article reader column (sheet)
 |  |  |- ColumnNavbar
 |  |  |- article content
 |  |
 |  |- MobileNavigation
+|  |  |- Home, Unread, Save (SaveLinkAction), Favorites, Library
 ```
 
 Responsibilities:
@@ -138,8 +143,11 @@ Responsibilities:
 - blocks unauthenticated access with `getSession()`
 - provides shared desktop/mobile navigation
 - keeps the brand mark in the mobile top bar while the mobile navigation stays route-focused
-- renders a full-width mobile bottom navigation strip styled from the sidebar primitives
-- keeps Add article as a persistent one-tap mobile action above the bottom navigation
+- places Save a link at the top of the desktop sidebar and as the center tab of
+  the mobile bottom bar; both open the same `AddArticleDialog`
+- renders a flat mobile bottom bar with four destinations around Save; the
+  active tab sits on a short teal line, and Unread shows its count
+- moves Tags out of the mobile bottom bar into the mobile account menu
 - provides a dynamic toolbar channel via `ToolbarActionsProvider`
 - renders column-owned navbars through `ColumnNavbar`, which accepts left,
   center, and right action arrays and collapses side tools into a mobile
@@ -639,8 +647,10 @@ Core functionality:
 
 ### Layout
 
-- `AppSidebar`: desktop navigation, unread counter, favorites link, dynamic tag links
-- `MobileNavigation`: mobile navigation
+- `AppSidebar`: Save a link, desktop navigation, unread counter, dynamic tag links
+- `MobileNavigation`: mobile bottom bar with the Save action
+- `SaveLinkAction`: opens `AddArticleDialog` from any trigger element
+- `useUnreadCount`: shared unread total for the sidebar and bottom bar
 - `ColumnNavbar`: shared column header chrome for left, center, and right controls
 - `AppSearch`: global article search with preview results
 - `AppToolbar`: compact account menu and sign out
@@ -979,7 +989,7 @@ Library keeps the existing `/app/archive` URL. Search includes cached article te
 as well as metadata, with owner and status filters applied. This uses SQLite text
 matching, not a relevance-ranked full-text index. Global search is hidden when the
 current page supplies its own search. Mobile account navigation directly exposes
-Settings and Trash; desktop/mobile menus share `AccountMenuItems`.
+Tags, Settings and Trash; desktop/mobile menus share `AccountMenuItems`.
 
 Collection loaders and components share React Query options. Mutation settlement
 refreshes article lists, tags, reader, Trash, Continue reading, and router-backed

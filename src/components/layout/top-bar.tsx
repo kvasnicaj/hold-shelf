@@ -4,7 +4,6 @@ import { AppSearch } from "#/components/layout/app-search";
 import { AppToolbar } from "#/components/layout/app-toolbar";
 import { ColumnNavbar } from "#/components/layout/column-navbar";
 import { useToolbarActions } from "#/components/layout/toolbar-actions";
-import { TopAddArticleAction } from "#/components/layout/top-add-article-action";
 
 export function TopBar() {
 	const { actions } = useToolbarActions();
@@ -22,8 +21,8 @@ export function TopBar() {
 			aria-label="Main content navigation"
 			left={[<AppBrandMark key="brand" />]}
 			center={hasPageSearch ? [] : [<AppSearch key="search" />]}
-			right={[
-				...(actions
+			right={
+				actions
 					? [
 							<div
 								key="route-actions"
@@ -32,11 +31,13 @@ export function TopBar() {
 								{actions}
 							</div>,
 						]
-					: []),
-				<TopAddArticleAction key="add-article" />,
-			]}
+					: []
+			}
 			mobileRight={[<AppToolbar key="account" />]}
 			mobileMenuLabel="Main actions"
+			// On desktop the brand mark and account live in the sidebar, so an
+			// otherwise empty bar is hidden.
+			className={hasPageSearch && !actions ? "md:hidden" : undefined}
 		/>
 	);
 }

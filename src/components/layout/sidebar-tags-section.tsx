@@ -63,16 +63,14 @@ export function SidebarTagsSection({
 	}
 
 	return (
-		<section className="mt-4">
+		<section className="mt-6">
 			<div className="mb-2 flex items-center justify-between gap-2 px-2">
-				<p className="text-xs font-semibold uppercase tracking-wider text-sidebar-foreground/60">
-					Tags
-				</p>
+				<p className="text-xs font-semibold text-muted-foreground">Tags</p>
 				<CreateTagDialog
 					onCreate={handleCreateTag}
 					triggerVariant="ghost"
 					triggerSize="icon-xs"
-					triggerClassName="text-sidebar-foreground/70 hover:bg-sidebar-accent [&_span]:sr-only"
+					triggerClassName="text-muted-foreground hover:bg-accent hover:text-foreground [&_span]:sr-only"
 					triggerAriaLabel="Create tag"
 					collapseLabelOnMobile
 				/>
@@ -96,7 +94,7 @@ export function SidebarTagsSection({
 						/>
 					))
 				) : (
-					<p className="px-2 py-3 text-sm text-sidebar-foreground/60">
+					<p className="px-2 py-3 text-sm text-muted-foreground">
 						{filter ? "No tags match." : "No tags yet."}
 					</p>
 				)}

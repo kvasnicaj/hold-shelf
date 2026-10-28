@@ -201,7 +201,7 @@ describe("HomePage", () => {
 
 		expect(screen.getByText("Your library is empty.")).toBeInTheDocument();
 		expect(
-			screen.getByText(/use the add article button in the top bar/i),
+			screen.getByText(/use save a link to save your first article/i),
 		).toBeInTheDocument();
 	});
 

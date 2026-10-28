@@ -1,7 +1,4 @@
-import type { VariantProps } from "class-variance-authority";
-import { BookmarkPlus } from "lucide-react";
-import { useState } from "react";
-import type { buttonVariants } from "#/components/ui/button";
+import { type ReactElement, useState } from "react";
 import { Button } from "#/components/ui/button";
 import {
 	Dialog,
@@ -13,27 +10,14 @@ import {
 } from "#/components/ui/dialog";
 import { Input } from "#/components/ui/input";
 import { Label } from "#/components/ui/label";
-import { cn } from "#/lib/utils";
 
 type AddArticleDialogProps = {
 	onAdd: (url: string) => Promise<void>;
-	triggerVariant?: VariantProps<typeof buttonVariants>["variant"];
-	triggerSize?: VariantProps<typeof buttonVariants>["size"];
-	triggerClassName?: string;
-	triggerLabelClassName?: string;
-	triggerAriaLabel?: string;
-	collapseLabelOnMobile?: boolean;
+	/** The element that opens the dialog. */
+	children: ReactElement;
 };
 
-export function AddArticleDialog({
-	onAdd,
-	triggerVariant = "outline",
-	triggerSize = "sm",
-	triggerClassName,
-	triggerLabelClassName,
-	triggerAriaLabel,
-	collapseLabelOnMobile = false,
-}: AddArticleDialogProps) {
+export function AddArticleDialog({ onAdd, children }: AddArticleDialogProps) {
 	const [open, setOpen] = useState(false);
 	const [url, setUrl] = useState("");
 	const [loading, setLoading] = useState(false);
@@ -64,24 +48,7 @@ export function AddArticleDialog({
 
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
-			<DialogTrigger asChild>
-				<Button
-					variant={triggerVariant}
-					size={triggerSize}
-					className={triggerClassName}
-					aria-label={triggerAriaLabel}
-				>
-					<BookmarkPlus className="h-[1.125rem] w-[1.125rem]" />
-					<span
-						className={cn(
-							collapseLabelOnMobile ? "hidden sm:inline" : "",
-							triggerLabelClassName,
-						)}
-					>
-						Add article
-					</span>
-				</Button>
-			</DialogTrigger>
+			<DialogTrigger asChild>{children}</DialogTrigger>
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
 					<DialogTitle>Save article</DialogTitle>
