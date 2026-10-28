@@ -54,6 +54,8 @@ export type ArticleCollectionNavigate = (options: {
 export type ArticleCardProps = {
 	article: ArticleWithTags;
 	selected: boolean;
+	/** True while any article in the list is selected; keeps checkboxes visible. */
+	selectionMode?: boolean;
 	onSelect: (id: string, selected: boolean) => void;
 	onOpenArticle: (id: string, isRead: boolean) => void | Promise<void>;
 	onToggleRead: (id: string, isRead: boolean) => void;

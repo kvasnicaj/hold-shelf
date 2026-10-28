@@ -6,21 +6,26 @@ type HomeStatsSectionProps = {
 		savedThisWeek: number;
 	};
 };
+
 export function HomeStatsSection({ stats }: HomeStatsSectionProps) {
 	return (
 		<dl
 			aria-label="Reading stats"
-			className="grid grid-cols-2 gap-4 rounded-xl border bg-muted/20 p-4 sm:grid-cols-4"
+			className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-muted-foreground"
 		>
-			{[
-				["Unread", stats.unread],
-				["Total", stats.total],
-				["Read this week", stats.readThisWeek],
-				["Saved this week", stats.savedThisWeek],
-			].map(([label, value]) => (
-				<div key={label}>
-					<dt className="text-xs text-muted-foreground">{label}</dt>
-					<dd className="mt-1 text-xl font-semibold tabular-nums">{value}</dd>
+			{(
+				[
+					["unread", stats.unread],
+					["on the shelf", stats.total],
+					["read this week", stats.readThisWeek],
+					["saved this week", stats.savedThisWeek],
+				] as const
+			).map(([label, value]) => (
+				<div key={label} className="flex items-baseline gap-1.5">
+					<dt>{label}</dt>
+					<dd className="order-first font-bold tabular-nums text-foreground">
+						{value}
+					</dd>
 				</div>
 			))}
 		</dl>

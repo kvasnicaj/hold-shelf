@@ -67,7 +67,6 @@ export function TagsPage() {
 			selectedIds={selectedIds}
 			tagList={tagList}
 			title={selectedTagTitle}
-			icon={Tag}
 			headingActions={selectedTagActions}
 			searchPlaceholder="Search tagged articles..."
 			emptyStateMessage="No articles with this tag."

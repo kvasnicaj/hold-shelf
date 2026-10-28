@@ -125,6 +125,28 @@ The reader is its own mode: everything except the text steps back.
 - On mobile, rows show a two-line title and a meta line, and tags filter
   through a scrolling chip row ending in Manage.
 
+## Unread and Favorites
+
+- Comfortable density: one hairline-divided list, no per-article card frames.
+- Each row: hover checkbox, unread spine, favicon, a 15 px semibold title, a
+  two-line excerpt, then site, time and tag labels.
+- Row actions (tags, bookmark, read, delete) appear on hover. On phones they
+  stay visible under the title.
+- Page header matches Library: serif title with the count beside it, search
+  and sort on one line.
+
+## Home
+
+- Spacious density. The header is a serif line ("Make time for a good read"),
+  a sentence about what is waiting, and the counts as one quiet line instead
+  of tiles.
+- Continue reading leads: a serif title, the site, a 3 px teal progress line,
+  Continue as the primary action and Mark as read beside it. Other articles in
+  progress follow as compact rows.
+- Three shelves follow: Oldest unread, Recently saved, Favorites. Each heading
+  sits on a 2 px ink line, the shelf from the logo, with a link to the full
+  page. Items use serif titles.
+
 ## Quick save
 
 - One panel for saving links, opened by Save a link, the mobile Save tab, the

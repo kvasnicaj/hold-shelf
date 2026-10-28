@@ -1,4 +1,3 @@
-import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { ArticleSortSelect } from "#/components/articles/article-sort-select";
 import type { ArticleSort } from "#/components/articles/types";
@@ -6,7 +5,6 @@ import { PageSearchField } from "#/components/layout/page-search-field";
 
 type ArticlesHeaderProps = {
 	title: string;
-	icon?: LucideIcon;
 	total: number;
 	sort?: ArticleSort;
 	onSortChange: (sort: ArticleSort) => void;
@@ -21,7 +19,6 @@ type ArticlesHeaderProps = {
 
 export function ArticlesHeader({
 	title,
-	icon: Icon,
 	total,
 	sort,
 	onSortChange,
@@ -35,13 +32,15 @@ export function ArticlesHeader({
 }: ArticlesHeaderProps) {
 	return (
 		<>
-			<div className="flex min-w-0 flex-wrap items-center justify-between gap-2">
-				<h1 className="font-serif flex min-w-0 items-center gap-2 text-2xl font-semibold">
-					{Icon ? (
-						<Icon className="h-6 w-6 shrink-0 text-muted-foreground" />
-					) : null}
-					<span className="truncate">{title}</span>
-				</h1>
+			<div className="flex min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-2">
+				<div className="flex min-w-0 items-baseline gap-3">
+					<h1 className="truncate font-serif text-[1.75rem] leading-tight font-semibold">
+						{title}
+					</h1>
+					<p className="shrink-0 text-sm tabular-nums text-muted-foreground">
+						{total} article{total !== 1 ? "s" : ""}
+					</p>
+				</div>
 				{headingActions ? (
 					<div className="flex shrink-0 items-center gap-1">
 						{headingActions}
@@ -49,43 +48,31 @@ export function ArticlesHeader({
 				) : null}
 			</div>
 
-			<div className="@container">
-				<div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2 @min-[48rem]:grid-cols-[minmax(max-content,1fr)_auto_minmax(max-content,1fr)]">
-					<p className="min-w-0 text-sm text-muted-foreground @min-[48rem]:col-start-1 @min-[48rem]:row-start-1">
-						{total} article{total !== 1 ? "s" : ""}
-					</p>
-
-					{selectionActions && (
-						<div className="min-w-0 justify-self-end @min-[48rem]:col-start-2 @min-[48rem]:row-start-1 @min-[48rem]:justify-self-center">
-							{selectionActions}
-						</div>
-					)}
-
-					<div className="col-span-full flex flex-col gap-2 @min-[34rem]:flex-row @min-[34rem]:items-center @min-[48rem]:col-span-1 @min-[48rem]:col-start-3 @min-[48rem]:row-start-1 @min-[48rem]:justify-self-end">
-						<PageSearchField
-							debounceMs={250}
-							value={searchValue}
-							placeholder={searchPlaceholder}
-							ariaLabel={searchPlaceholder}
-							onSearch={onSearch}
-							className="w-full @min-[34rem]:w-64"
-						/>
-						<ArticleSortSelect
-							value={sort}
-							onChange={onSortChange}
-							className="w-full @min-[34rem]:w-40"
-						/>
-					</div>
-				</div>
+			<div className="flex gap-2 sm:justify-end">
+				<PageSearchField
+					debounceMs={250}
+					value={searchValue}
+					placeholder={searchPlaceholder}
+					ariaLabel={searchPlaceholder}
+					onSearch={onSearch}
+					className="min-w-0 flex-1 sm:w-64 sm:flex-none"
+				/>
+				<ArticleSortSelect
+					value={sort}
+					onChange={onSortChange}
+					className="w-36 shrink-0"
+				/>
 			</div>
 
+			{selectionActions}
+
 			{total === 0 && (
-				<div className="flex flex-col items-center justify-center py-20 text-center">
-					<p className="text-lg text-muted-foreground">{emptyStateMessage}</p>
+				<div className="flex flex-col items-center justify-center gap-1.5 py-20 text-center">
+					<p className="font-serif text-xl font-semibold">
+						{emptyStateMessage}
+					</p>
 					{emptyStateHint && (
-						<p className="mt-1 text-sm text-muted-foreground">
-							{emptyStateHint}
-						</p>
+						<p className="text-sm text-muted-foreground">{emptyStateHint}</p>
 					)}
 				</div>
 			)}

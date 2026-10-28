@@ -1,5 +1,5 @@
 import { useIsMutating } from "@tanstack/react-query";
-import { BookOpen, Check, Star, Trash2 } from "lucide-react";
+import { Bookmark, BookOpen, Check, Trash2 } from "lucide-react";
 import { TagPicker } from "#/components/tags/tag-picker";
 import type { Tag } from "#/components/tags/types";
 import { Button } from "#/components/ui/button";
@@ -67,11 +67,9 @@ export function ArticleCardActions({
 					onToggleFavorite(articleId, !isFavorite);
 				}}
 				title={isFavorite ? "Remove from favorites" : "Add to favorites"}
-				className={
-					isFavorite ? "text-amber-500 hover:text-amber-600" : undefined
-				}
+				className={isFavorite ? "text-favorite hover:text-favorite" : undefined}
 			>
-				<Star className={cn(iconClassName, isFavorite && "fill-current")} />
+				<Bookmark className={cn(iconClassName, isFavorite && "fill-current")} />
 			</Button>
 			<Button
 				disabled={pending}

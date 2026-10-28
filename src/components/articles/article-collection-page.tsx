@@ -1,4 +1,3 @@
-import type { LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { ArticleList } from "#/components/articles/article-list";
 import { ArticlesHeader } from "#/components/articles/articles-header";
@@ -9,7 +8,6 @@ import type { Tag } from "#/components/tags/types";
 
 type ArticleCollectionPageProps = {
 	title: string;
-	icon?: LucideIcon;
 	headingActions?: ReactNode;
 	searchPlaceholder: string;
 	emptyStateMessage: string;
@@ -40,7 +38,6 @@ type ArticleCollectionPageProps = {
 
 export function ArticleCollectionPage({
 	title,
-	icon,
 	headingActions,
 	searchPlaceholder,
 	emptyStateMessage,
@@ -83,7 +80,6 @@ export function ArticleCollectionPage({
 		<div className="w-full space-y-4">
 			<ArticlesHeader
 				title={title}
-				icon={icon}
 				headingActions={headingActions}
 				total={total}
 				sort={sort}

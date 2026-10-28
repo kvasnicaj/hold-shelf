@@ -143,6 +143,8 @@ export const getContinueReading = createServerFn({ method: "GET" }).handler(
 				id: articles.id,
 				title: articles.title,
 				url: articles.url,
+				hostname: articles.hostname,
+				faviconUrl: articles.faviconUrl,
 				isRead: articles.isRead,
 				progress: readingProgress.progress,
 			})

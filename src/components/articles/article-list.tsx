@@ -40,12 +40,13 @@ export function ArticleList({
 	const CardComponent = isMobile ? ArticleCardMobile : ArticleCard;
 
 	return (
-		<div className="space-y-2">
+		<div className="-mx-3 divide-y border-y bg-card sm:-mx-6 md:mx-0 md:bg-transparent">
 			{articles.map((article) => (
 				<CardComponent
 					key={article.id}
 					article={article}
 					selected={selected.has(article.id)}
+					selectionMode={selected.size > 0}
 					onSelect={onSelect}
 					onOpenArticle={onOpenArticle}
 					onToggleRead={onToggleRead}

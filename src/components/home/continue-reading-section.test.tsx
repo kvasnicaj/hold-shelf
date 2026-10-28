@@ -30,6 +30,8 @@ it("completes a partially read article even when opening already marked it read"
 			id: "a1",
 			title: "My article",
 			url: "https://example.com",
+			hostname: "example.com",
+			faviconUrl: null,
 			isRead: true,
 			progress: 3500,
 		},
