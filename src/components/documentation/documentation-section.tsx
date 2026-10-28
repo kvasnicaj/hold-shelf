@@ -14,7 +14,7 @@ export function DocumentationSection({
 	return (
 		<section className="min-w-0 space-y-4">
 			<div className="space-y-1">
-				<h2 className="display-title text-2xl font-semibold text-(--sea-ink)">
+				<h2 className="font-serif text-2xl font-semibold text-foreground">
 					{title}
 				</h2>
 				{description ? (

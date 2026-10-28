@@ -16,8 +16,8 @@ export function HomePage() {
 
 	return (
 		<div className="w-full space-y-6">
-			<div className="rise-in space-y-1">
-				<h1 className="display-title text-3xl font-bold">
+			<div className="space-y-1">
+				<h1 className="font-serif text-3xl font-semibold">
 					Make time for a good read
 				</h1>
 				<p className="text-muted-foreground">

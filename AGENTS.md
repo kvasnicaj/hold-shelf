@@ -59,6 +59,7 @@ Install shadcn components: `pnpm dlx shadcn@latest add <component>`
 - Strict TypeScript (ES2022 target, bundler resolution)
 - Biome excludes `routeTree.gen.ts`, `styles.css`, and `src/components/ui/` from linting
 - Theme: dark/light via CSS variables + localStorage, init script in `__root.tsx` prevents flash
+- Design language: follow `docs/design-language.md` for color tokens, type, radius and density; never use raw colors or zinc defaults
 - Server functions that need auth use a shared `requireUserId()` helper that calls `getRequest()` + `getAuth().api.getSession()`
 
 ### Code structure rules

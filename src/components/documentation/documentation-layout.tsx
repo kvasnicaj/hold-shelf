@@ -22,7 +22,6 @@ export function DocumentationLayout({
 	const Icon = kind === "api" ? BookOpen : Terminal;
 	return (
 		<main className="relative min-h-svh bg-background px-4 py-8 sm:px-6 sm:py-10">
-			<div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--lagoon)/0.08,transparent_65%)]" />
 			<div className="relative mx-auto flex min-w-0 max-w-5xl flex-col gap-8">
 				<header className="space-y-6">
 					<a href="/" className="inline-flex no-underline">
@@ -30,18 +29,18 @@ export function DocumentationLayout({
 					</a>
 					<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 						<div className="flex min-w-0 items-start gap-3">
-							<div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-(--lagoon)/10 ring-1 ring-(--lagoon)/20">
-								<Icon className="size-6 text-(--lagoon)" />
+							<div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-select ring-1 ring-mark/20">
+								<Icon className="size-6 text-mark" />
 							</div>
 							<div className="space-y-2">
 								<Badge variant="outline" className="gap-1">
 									<KeyRound className="size-3" />
 									Personal access tokens
 								</Badge>
-								<h1 className="display-title text-3xl font-bold text-(--sea-ink)">
+								<h1 className="font-serif text-3xl font-semibold text-foreground">
 									{title}
 								</h1>
-								<p className="max-w-2xl text-sm leading-6 text-(--sea-ink-soft)">
+								<p className="max-w-2xl text-sm leading-6 text-muted-foreground">
 									{description}
 								</p>
 							</div>

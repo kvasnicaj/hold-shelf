@@ -117,12 +117,12 @@ and accompanies the exported brand assets. No Source Serif font download is
 required to render the logo.
 
 
-The app loads Lora and Manrope through Google Fonts. Font binaries are not checked
-into this repository. Both families are distributed under the SIL Open Font
-License; include their upstream licenses if adding self-hosted font files:
+The app bundles Manrope and Source Serif 4 from the `@fontsource-variable` npm
+packages, which ship each family's license. Font binaries are not checked into
+this repository. Both families are distributed under the SIL Open Font License:
 
-- [Lora](https://github.com/google/fonts/tree/main/ofl/lora)
 - [Manrope](https://github.com/google/fonts/tree/main/ofl/manrope)
+- [Source Serif 4](https://github.com/adobe-fonts/source-serif)
 
 ## Installed dependencies
 

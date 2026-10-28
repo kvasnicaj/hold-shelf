@@ -22,13 +22,13 @@ export function SavePage({ url }: SavePageProps) {
 		<div className="flex min-h-screen items-center justify-center bg-background p-4">
 			<Card className="w-full max-w-md">
 				<CardHeader className="space-y-4 text-center">
-					<div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-(--lagoon)/10 ring-1 ring-(--lagoon)/20">
+					<div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-select ring-1 ring-mark/20">
 						{status === "saving" ? (
-							<LoaderCircle className="size-7 animate-spin text-(--lagoon)" />
+							<LoaderCircle className="size-7 animate-spin text-mark" />
 						) : status === "idle" ? (
-							<Bookmark className="size-7 text-(--lagoon)" />
+							<Bookmark className="size-7 text-mark" />
 						) : isSuccess ? (
-							<CheckCircle2 className="size-7 text-(--lagoon)" />
+							<CheckCircle2 className="size-7 text-mark" />
 						) : (
 							<CircleAlert className="size-7 text-destructive" />
 						)}

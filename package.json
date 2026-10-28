@@ -30,8 +30,8 @@
     "brand:generate": "node scripts/generate-brand-assets.mjs"
   },
   "dependencies": {
-    "@fontsource-variable/lora": "5.3.0",
     "@fontsource-variable/manrope": "5.3.0",
+    "@fontsource-variable/source-serif-4": "5.3.0",
     "@hold-shelf/api-contracts": "workspace:*",
     "@sentry/cloudflare": "11.9.0",
     "@sentry/react": "11.9.0",

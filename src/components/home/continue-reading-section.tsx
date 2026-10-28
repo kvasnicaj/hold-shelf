@@ -18,7 +18,7 @@ export function ContinueReadingSection() {
 			aria-label="Continue reading"
 			className="rounded-2xl border border-primary/20 bg-primary/5 p-5"
 		>
-			<h2 className="display-title mb-4 text-xl font-semibold">
+			<h2 className="font-serif mb-4 text-xl font-semibold">
 				Continue reading
 			</h2>
 			<div className="grid gap-3 lg:grid-cols-2">

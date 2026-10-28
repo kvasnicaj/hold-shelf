@@ -97,7 +97,7 @@ export function TagsPage() {
 				<div className="w-full space-y-4">
 					{!selectedTagId ? (
 						<>
-							<h1 className="display-title text-2xl font-bold">Tags</h1>
+							<h1 className="font-serif text-2xl font-semibold">Tags</h1>
 							<PageSearchField
 								value={filter}
 								placeholder="Search tags..."

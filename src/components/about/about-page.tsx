@@ -7,19 +7,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 export function AboutPage() {
 	return (
 		<div className="relative min-h-svh overflow-hidden bg-background px-6 py-10">
-			<div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--lagoon)/0.08,transparent_65%)]" />
-
 			<div className="relative mx-auto flex max-w-3xl flex-col gap-6">
 				<div className="flex items-center justify-between gap-4">
 					<div className="flex items-center gap-3">
-						<div className="flex size-12 items-center justify-center rounded-2xl bg-(--lagoon)/10 ring-1 ring-(--lagoon)/20">
+						<div className="flex size-12 items-center justify-center rounded-2xl bg-select ring-1 ring-mark/20">
 							<BrandLogo variant="symbol" className="size-6" decorative />
 						</div>
 						<div>
-							<p className="display-title text-2xl font-bold text-(--sea-ink)">
+							<p className="font-serif text-2xl font-semibold text-foreground">
 								About Hold Shelf
 							</p>
-							<p className="text-sm text-(--sea-ink-soft)">
+							<p className="text-sm text-muted-foreground">
 								A simple reading shelf for the things worth coming back to
 							</p>
 						</div>
@@ -71,7 +69,7 @@ export function AboutPage() {
 							For questions, feedback, or support, email{" "}
 							<a
 								href="mailto:info@hold-shelf.com"
-								className="font-medium text-foreground underline underline-offset-4 transition-colors hover:text-(--lagoon)"
+								className="font-medium text-foreground underline underline-offset-4 transition-colors hover:text-primary"
 							>
 								info@hold-shelf.com
 							</a>

@@ -58,8 +58,10 @@ at 28 px.
 
 The component adapts to the app theme and exposes the accessible name “Hold
 Shelf.” Pass `decorative` only when nearby text already provides that name.
-Interface typography remains Manrope, with Lora for existing display headings;
-the Source Serif selection applies to the logo.
+The interface shares the wordmark's family: Source Serif 4 sets page titles,
+headings and reading text, and Manrope sets controls, navigation and metadata.
+See [design-language.md](./design-language.md) for the full type scale and
+color tokens.
 
 ## Regeneration
 

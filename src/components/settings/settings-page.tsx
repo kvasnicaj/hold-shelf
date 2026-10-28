@@ -38,7 +38,7 @@ export function SettingsPage() {
 	return (
 		<div className="w-full space-y-4">
 			<div className="space-y-1">
-				<h1 className="display-title text-2xl font-bold">Settings</h1>
+				<h1 className="font-serif text-2xl font-semibold">Settings</h1>
 				<p className="text-sm text-muted-foreground">
 					Manage reading behavior, account access, and integrations.
 				</p>
@@ -67,8 +67,8 @@ export function SettingsPage() {
 						</CardHeader>
 						<CardContent className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 							<div className="flex items-start gap-3">
-								<div className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl bg-(--lagoon)/10 ring-1 ring-(--lagoon)/20">
-									<Globe className="size-5 text-(--lagoon)" />
+								<div className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl bg-select ring-1 ring-mark/20">
+									<Globe className="size-5 text-mark" />
 								</div>
 								<div className="space-y-1">
 									<p className="text-sm font-medium">
