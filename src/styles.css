@@ -69,6 +69,9 @@
 	--favorite: #8f6210;
 	--favorite-fill: #f3e6c8;
 	--danger: #b03f2c;
+	/* Floating bars and toasts flip to the opposite brand color. */
+	--inverse: #173a40;
+	--on-inverse: #d7ece8;
 
 	/* Brand artwork */
 	--logo-mark: #328f97;
@@ -126,6 +129,8 @@
 	--favorite: #e0ad55;
 	--favorite-fill: #3a3220;
 	--danger: #e07a66;
+	--inverse: #d7ece8;
+	--on-inverse: #173a40;
 
 	--logo-mark: #d7ece8;
 	--logo-word: #d7ece8;
@@ -157,6 +162,8 @@
 	--color-mark: var(--mark);
 	--color-favorite: var(--favorite);
 	--color-favorite-fill: var(--favorite-fill);
+	--color-inverse: var(--inverse);
+	--color-inverse-foreground: var(--on-inverse);
 	--color-destructive: var(--destructive);
 	--color-destructive-foreground: var(--destructive-foreground);
 	--color-border: var(--border);
@@ -191,21 +198,12 @@ body {
 	-moz-osx-font-smoothing: grayscale;
 }
 
-a {
-	color: var(--primary);
-	text-decoration-color: color-mix(in srgb, var(--primary) 40%, transparent);
-	text-decoration-thickness: 1px;
-	text-underline-offset: 2px;
-}
-
-a:hover {
-	text-decoration-color: currentColor;
-}
-
 input[type="search"]::-webkit-search-cancel-button {
 	cursor: pointer;
 }
 
+/* Base styles live in a layer so component utilities (e.g. text-foreground on
+ * an article title link) override them. */
 @layer base {
 	* {
 		@apply border-border outline-ring/50;
@@ -213,5 +211,14 @@ input[type="search"]::-webkit-search-cancel-button {
 	body {
 		background-color: var(--background);
 		color: var(--foreground);
+	}
+	a {
+		color: var(--primary);
+		text-decoration-color: color-mix(in srgb, var(--primary) 40%, transparent);
+		text-decoration-thickness: 1px;
+		text-underline-offset: 2px;
+	}
+	a:hover {
+		text-decoration-color: currentColor;
 	}
 }

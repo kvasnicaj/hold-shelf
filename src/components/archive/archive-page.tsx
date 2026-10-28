@@ -1,4 +1,3 @@
-import { Archive } from "lucide-react";
 import { ArchiveFilters } from "#/components/archive/archive-filters";
 import { ArchiveTable } from "#/components/archive/archive-table";
 import { useArchivePage } from "#/components/archive/use-archive-page";
@@ -37,10 +36,14 @@ export function ArchivePage() {
 
 	return (
 		<div className="w-full space-y-4">
-			<h1 className="font-serif flex items-center gap-2 text-2xl font-semibold">
-				<Archive className="h-6 w-6 text-muted-foreground" />
-				<span>Library</span>
-			</h1>
+			<div className="flex items-baseline gap-3">
+				<h1 className="font-serif text-[1.75rem] leading-tight font-semibold">
+					Library
+				</h1>
+				<p className="text-sm tabular-nums text-muted-foreground">
+					{total} article{total !== 1 ? "s" : ""}
+				</p>
+			</div>
 
 			{selectedIds.length > 0 && (
 				<BulkActionsPanel
@@ -64,10 +67,6 @@ export function ArchivePage() {
 				onSortChange={updateSort}
 			/>
 
-			<p className="text-sm text-muted-foreground">
-				{total} article{total !== 1 ? "s" : ""}
-			</p>
-
 			{articles.length === 0 ? (
 				<div className="flex flex-col items-center justify-center py-20 text-center">
 					<p className="text-lg text-muted-foreground">
@@ -82,6 +81,7 @@ export function ArchivePage() {
 						articles={articles}
 						rowSelection={rowSelection}
 						onRowSelectionChange={setRowSelection}
+						groupedByMonth={sort !== "title"}
 						availableTags={tagList}
 						onAddTag={handleAddTag}
 						onRemoveTag={handleRemoveTag}

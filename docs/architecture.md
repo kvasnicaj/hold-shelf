@@ -147,7 +147,7 @@ Responsibilities:
   the mobile bottom bar; both open the same `AddArticleDialog`
 - renders a flat mobile bottom bar with four destinations around Save; the
   active tab sits on a short teal line, and Unread shows its count
-- moves Tags out of the mobile bottom bar into the mobile account menu
+- leaves Tags out of the mobile bottom bar; Library's tag row links to tag management
 - provides a dynamic toolbar channel via `ToolbarActionsProvider`
 - renders column-owned navbars through `ColumnNavbar`, which accepts left,
   center, and right action arrays and collapses side tools into a mobile
@@ -171,7 +171,6 @@ Used by:
 
 - `ArticlesPage`, `FavoritesPage`, and `ArchivePage` for page-scoped search
 - `TagsPage` for `CreateTagDialog`
-- `BulkActionsPanel` for centered bulk actions
 - `TagsPage` for tag filtering search
 
 ## Public routes
@@ -573,26 +572,26 @@ Component tree:
 
 ```text
 ArchivePage
-|- ToolbarSlot
-|  |- AddArticleDialog
-|- page title
-|- filter bar
-|  |- active tag badge?
-|  |- tag filter
+|- page title and article count
+|- BulkActionsPanel? (floating toolbar when rows are selected)
+|- ArchiveFilters
 |  |- read status filter
+|  |- page search
+|  |- ArchiveTagsCombobox (desktop)
 |  |- sort filter
-|- BulkActionsPanel? (when rows selected)
-|- table wrapper
-|  |- TanStack Table
-|  |  |- selection column
-|  |  |- status column
-|  |  |- title column
+|  |- ArchiveTagChips (mobile, with Manage link to /app/tags)
+|- ArchiveTable (desktop)
+|  |- TanStack Table, one tbody per month when sorted by date
+|  |  |- selection column (revealed on hover or while selecting)
+|  |  |- status column (ReadStateSpine)
+|  |  |- title column (favicon, title, favorite, hostname)
 |  |  |- tags column
 |  |  |- saved date column
 |  |  |- ArchiveActionsCell (stable across table updates)
 |  |     |- TagPicker
-|  |     |- toggle read button
-|  |     |- delete button
+|  |     |- ArticleActionsMenuItems
+|- ArchiveTableMobile (mobile)
+|  |- ArchiveMobileRow per article, grouped by month
 |- pagination
 ```
 
@@ -608,8 +607,12 @@ Core functionality:
 - supports the same article mutations as the unread page
 - keeps tag-picker portal interactions inside the picker so assigning one or
   several tags never opens the article reader
-- uses a table instead of cards for denser browsing
+- uses a compact catalog table instead of cards for dense browsing; date sorts
+  group rows under month headings, title sort keeps one list
+- unread articles carry a teal spine, read titles are softened, and titles stay
+  ink rather than link-colored
 - mobile Library rows expose the same `TagPicker` alongside article actions
+- mobile filters tags with a scrolling row of chips that ends in Manage
 
 ### Settings
 
@@ -661,7 +664,7 @@ Core functionality:
 - `AddArticleDialog`: add URL flow
 - `ArticleList`: maps article arrays to cards
 - `ArticleCard`: compact article presentation and actions
-- `BulkActionsPanel`: multi-select actions in the shared toolbar center
+- `BulkActionsPanel`: floating multi-select toolbar above the content
 
 ### Tags route
 
@@ -989,7 +992,7 @@ Library keeps the existing `/app/archive` URL. Search includes cached article te
 as well as metadata, with owner and status filters applied. This uses SQLite text
 matching, not a relevance-ranked full-text index. Global search is hidden when the
 current page supplies its own search. Mobile account navigation directly exposes
-Tags, Settings and Trash; desktop/mobile menus share `AccountMenuItems`.
+Settings and Trash; desktop/mobile menus share `AccountMenuItems`.
 
 Collection loaders and components share React Query options. Mutation settlement
 refreshes article lists, tags, reader, Trash, Continue reading, and router-backed

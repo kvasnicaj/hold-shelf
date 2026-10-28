@@ -1,4 +1,4 @@
-import { screen } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type * as React from "react";
 import { useState } from "react";
@@ -223,5 +223,54 @@ describe("ArchiveTable", () => {
 				availableTags,
 			}),
 		);
+	});
+
+	it("groups date-sorted rows under month headings", () => {
+		renderArchiveTable({
+			groupedByMonth: true,
+			articles: [
+				buildArticle({
+					id: "a1",
+					title: "July read",
+					createdAt: new Date("2026-07-22T00:00:00.000Z"),
+				}),
+				buildArticle({
+					id: "a2",
+					title: "Another July read",
+					createdAt: new Date("2026-07-03T00:00:00.000Z"),
+				}),
+				buildArticle({
+					id: "a3",
+					title: "April read",
+					createdAt: new Date("2026-04-05T00:00:00.000Z"),
+				}),
+			],
+		});
+
+		const groups = screen.getAllByRole("rowgroup").slice(1);
+		expect(groups).toHaveLength(2);
+		expect(
+			within(groups[0] as HTMLElement).getByRole("columnheader", {
+				name: /july 2026\s*2/i,
+			}),
+		).toBeInTheDocument();
+		expect(
+			within(groups[1] as HTMLElement).getByRole("link", {
+				name: "April read",
+			}),
+		).toBeInTheDocument();
+	});
+
+	it("keeps a single ungrouped list for title sorting", () => {
+		renderArchiveTable({
+			articles: [
+				buildArticle({ id: "a1", createdAt: new Date("2026-07-22") }),
+				buildArticle({ id: "a2", createdAt: new Date("2026-04-05") }),
+			],
+		});
+
+		expect(
+			screen.queryByRole("columnheader", { name: /2026/ }),
+		).not.toBeInTheDocument();
 	});
 });

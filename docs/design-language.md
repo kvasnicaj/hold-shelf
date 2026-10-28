@@ -42,6 +42,7 @@ at them, and every neutral is tinted toward the brand ink.
 | Action | `bg-primary`, `text-primary` | `#23767e` | `#6cc3c4` | Primary buttons, links |
 | Favorite | `text-favorite`, `bg-favorite-fill` | `#8f6210` | `#e0ad55` | Favorite marker, the only warm color |
 | Danger | `text-destructive`, `bg-destructive` | `#b03f2c` | `#e07a66` | Delete, errors |
+| Inverse | `bg-inverse`, `text-inverse-foreground` | `#173a40` / `#d7ece8` | `#d7ece8` / `#173a40` | Floating bars and toasts |
 
 Text tokens meet WCAG AA on paper, sheet and raised in both themes. Mark is for
 non-text UI only (3:1). Dark mode is built on the brand ink, not black, and the
@@ -100,7 +101,29 @@ The reader is its own mode: everything except the text steps back.
   has a teal icon and a short teal line under it, echoing the logo's shelf.
   Labels are always visible.
 - **Mobile top bar:** brand symbol on the left, account avatar on the right.
-  Tags are reached from the account menu.
+  On mobile, tags are reached from Library's tag row.
+
+## Article states
+
+- **Unread:** an upright 3 px teal spine (`ReadStateSpine`) before the row.
+  It is the one mark taken from the logo; read rows keep the space empty.
+- **Read:** the title turns `text-muted-foreground` at regular weight.
+- **Favorite:** a filled ochre bookmark after the title.
+- **Selected:** a square checkbox and a `bg-select` row. Checkboxes in dense
+  lists appear on hover, on focus, or once anything is selected.
+- **Titles** are ink, never link-colored; teal is reserved for state.
+
+## Library
+
+- Compact density: one line per article, 44 px rows, no card frame. Columns
+  line up without vertical rules.
+- When sorted by date, rows sit under month headings (serif month, tabular
+  count). Sorting by title shows one list.
+- Row actions (tags, more) appear on hover or focus.
+- Bulk actions float at the bottom as an inverse toolbar instead of moving
+  the header.
+- On mobile, rows show a two-line title and a meta line, and tags filter
+  through a scrolling chip row ending in Manage.
 
 ## shadcn components
 
@@ -110,5 +133,5 @@ easy to merge.
 
 | Component | Change |
 | --- | --- |
-| `badge` | `secondary` uses the label colors (`bg-muted text-muted-foreground`) |
-| `toggle-group` | The active item uses `bg-select` with a `ring-mark/45` edge |
+| `badge` | Square `rounded-sm` labels instead of pills; `secondary` uses the label colors (`bg-muted text-muted-foreground`) |
+| `toggle-group` | A `bg-muted` track without a border; the active item is a sheet (`bg-card`) with a hairline ring |
