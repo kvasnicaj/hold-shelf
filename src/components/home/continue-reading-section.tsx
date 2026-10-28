@@ -1,5 +1,5 @@
+import { Check } from "@phosphor-icons/react";
 import { useQuery } from "@tanstack/react-query";
-import { Check } from "lucide-react";
 import { ArticleExternalLink } from "#/components/articles/article-external-link";
 import { ReadingProgressBar } from "#/components/articles/reading-progress-bar";
 import { useArticleMutations } from "#/components/articles/use-article-mutations";

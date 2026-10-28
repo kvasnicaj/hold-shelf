@@ -1,10 +1,10 @@
-import type { LucideIcon } from "lucide-react";
+import type { Icon as PhosphorIcon } from "@phosphor-icons/react";
 import type { ComponentProps, ReactNode } from "react";
 import { DropdownMenuItem } from "#/components/ui/dropdown-menu";
 import { cn } from "#/lib/utils";
 
 type SidebarUserMenuItemProps = {
-	icon: LucideIcon;
+	icon: PhosphorIcon;
 	children: ReactNode;
 	className?: string;
 	onSelect?: ComponentProps<typeof DropdownMenuItem>["onSelect"];

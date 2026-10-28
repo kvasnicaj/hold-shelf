@@ -1,4 +1,4 @@
-import { GitBranch } from "lucide-react";
+import { GithubLogo } from "@phosphor-icons/react";
 import { useLoginPage } from "#/components/auth/use-login-page";
 import { PublicPageLayout } from "#/components/public/public-page-layout";
 import { Button } from "#/components/ui/button";
@@ -37,7 +37,7 @@ export function LoginPage({
 						disabled={socialLoading}
 						onClick={() => void handleGitHubSignIn()}
 					>
-						<GitBranch />
+						<GithubLogo />
 						{socialLoading ? "Redirecting..." : "Continue with GitHub"}
 					</Button>
 					{error && (

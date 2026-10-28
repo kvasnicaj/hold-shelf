@@ -77,6 +77,14 @@ uppercase.
 Spacing follows a 4 px grid. Control heights are 28 (small), 32 (default) and
 40 (large, mobile).
 
+## Icons
+
+Phosphor (`@phosphor-icons/react`) in the regular weight. Active and filled
+states switch to the fill weight: the current navigation item, the favorite
+bookmark, the Save tab. Sizes follow the text: 16 px in controls and rows,
+18–22 px in toolbars and the mobile bar. Import the `Tag` icon as `TagIcon`
+where the `Tag` type is also used.
+
 ## Density
 
 | Level | Job | Screens |
@@ -197,4 +205,5 @@ easy to merge.
 | Component | Change |
 | --- | --- |
 | `badge` | Square `rounded-sm` labels instead of pills; `secondary` uses the label colors (`bg-muted text-muted-foreground`) |
+| all | Icons come from Phosphor instead of lucide (`components.json` sets `iconLibrary` to `phosphor`); swap the icons in any newly added component |
 | `toggle-group` | A `bg-muted` track without a border; the active item is a sheet (`bg-card`) with a hairline ring |

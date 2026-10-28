@@ -1,5 +1,5 @@
+import { Plus } from "@phosphor-icons/react";
 import type { VariantProps } from "class-variance-authority";
-import { Plus } from "lucide-react";
 import { CreateTagFormFields } from "#/components/tags/create-tag-form-fields";
 import { CreatedTagsList } from "#/components/tags/created-tags-list";
 import { useCreateTagDialog } from "#/components/tags/use-create-tag-dialog";

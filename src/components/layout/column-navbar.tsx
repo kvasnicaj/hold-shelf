@@ -1,4 +1,4 @@
-import { MoreHorizontal } from "lucide-react";
+import { DotsThree } from "@phosphor-icons/react";
 import { Children, type ReactNode } from "react";
 import { Button } from "#/components/ui/button";
 import {
@@ -79,7 +79,7 @@ export function ColumnNavbar({
 								className="md:hidden"
 								title={mobileMenuLabel}
 							>
-								<MoreHorizontal className="h-[1.125rem] w-[1.125rem]" />
+								<DotsThree className="h-[1.125rem] w-[1.125rem]" />
 								<span className="sr-only">{mobileMenuLabel}</span>
 							</Button>
 						</PopoverTrigger>

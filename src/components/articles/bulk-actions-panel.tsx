@@ -1,4 +1,4 @@
-import { BookOpen, Check, Trash2, X } from "lucide-react";
+import { BookOpen, Check, Trash, X } from "@phosphor-icons/react";
 import { BulkActionButton } from "#/components/articles/bulk-action-button";
 
 type BulkActionsPanelProps = {
@@ -32,7 +32,7 @@ export function BulkActionsPanel({
 					label="Mark unread"
 					onClick={onMarkUnread}
 				/>
-				<BulkActionButton icon={Trash2} label="Delete" onClick={onDelete} />
+				<BulkActionButton icon={Trash} label="Delete" onClick={onDelete} />
 				<BulkActionButton
 					icon={X}
 					label="Clear selection"

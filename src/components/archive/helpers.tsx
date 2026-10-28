@@ -1,3 +1,4 @@
+import { BookmarkSimple } from "@phosphor-icons/react";
 import {
 	columnSizingFeature,
 	columnVisibilityFeature,
@@ -7,7 +8,6 @@ import {
 	Subscribe,
 	tableFeatures,
 } from "@tanstack/react-table";
-import { Bookmark } from "lucide-react";
 import { ArchiveActionsCell } from "#/components/archive/archive-actions-cell";
 import type { ArchiveActions } from "#/components/archive/types";
 import { ArticleExternalLink } from "#/components/articles/article-external-link";
@@ -127,9 +127,10 @@ export function createArchiveColumns({
 							{article.title ?? article.url}
 						</ArticleExternalLink>
 						{article.isFavorite && (
-							<Bookmark
+							<BookmarkSimple
+								weight="fill"
 								aria-label="Favorite"
-								className="size-3.5 shrink-0 fill-current text-favorite"
+								className="size-3.5 shrink-0 text-favorite"
 							/>
 						)}
 						{article.hostname && (

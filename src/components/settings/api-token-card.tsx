@@ -1,11 +1,11 @@
 import {
+	ArrowClockwise,
 	BookOpen,
 	Check,
 	Copy,
-	KeyRound,
-	RotateCw,
-	Trash2,
-} from "lucide-react";
+	Key,
+	Trash,
+} from "@phosphor-icons/react";
 import { useApiTokenCard } from "#/components/settings/use-api-token-card";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
@@ -28,7 +28,7 @@ export function ApiTokenCard() {
 		<Card>
 			<CardHeader>
 				<CardTitle className="flex items-center gap-2">
-					<KeyRound className="size-5" />
+					<Key className="size-5" />
 					API access
 				</CardTitle>
 			</CardHeader>
@@ -52,7 +52,7 @@ export function ApiTokenCard() {
 								disabled={loading}
 								onClick={() => void handleGenerate()}
 							>
-								<RotateCw className="size-4" />
+								<ArrowClockwise className="size-4" />
 								{apiToken ? "Regenerate" : "Generate token"}
 							</Button>
 							{apiToken ? (
@@ -62,7 +62,7 @@ export function ApiTokenCard() {
 									disabled={loading}
 									onClick={() => void handleRevoke()}
 								>
-									<Trash2 className="size-4" />
+									<Trash className="size-4" />
 									Revoke
 								</Button>
 							) : null}

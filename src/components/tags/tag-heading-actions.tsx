@@ -1,4 +1,4 @@
-import { ArrowLeft, Trash2 } from "lucide-react";
+import { ArrowLeft, Trash } from "@phosphor-icons/react";
 import { useState } from "react";
 import { RenameTagDialog } from "#/components/tags/rename-tag-dialog";
 import { ShareTagDialog } from "#/components/tags/share-tag-dialog";
@@ -73,7 +73,7 @@ export function TagHeadingActions({
 				aria-label={`Delete ${tagName}`}
 				title="Delete tag"
 			>
-				<Trash2 className="h-[1.125rem] w-[1.125rem]" />
+				<Trash className="h-[1.125rem] w-[1.125rem]" />
 			</Button>
 		</>
 	);

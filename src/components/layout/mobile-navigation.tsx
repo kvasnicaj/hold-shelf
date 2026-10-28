@@ -1,5 +1,5 @@
+import { Plus } from "@phosphor-icons/react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Plus } from "lucide-react";
 import { getMobileTabClassName } from "#/components/layout/helpers";
 import { MobileNavTabContent } from "#/components/layout/mobile-nav-tab-content";
 import { primaryNavItems, unreadNavHref } from "#/components/layout/nav-items";

@@ -1,8 +1,8 @@
-import type { LucideIcon } from "lucide-react";
+import type { Icon as PhosphorIcon } from "@phosphor-icons/react";
 import { cn } from "#/lib/utils";
 
 type MobileNavTabContentProps = {
-	icon: LucideIcon;
+	icon: PhosphorIcon;
 	label: string;
 	isActive?: boolean;
 	badge?: number;
@@ -27,7 +27,10 @@ export function MobileNavTabContent({
 					isActive && "text-mark after:bg-mark",
 				)}
 			>
-				<Icon className={primary ? "size-5" : "size-[1.375rem]"} />
+				<Icon
+					weight={isActive || primary ? "fill" : "regular"}
+					className={primary ? "size-5" : "size-[1.375rem]"}
+				/>
 				{badge !== undefined && (
 					<span
 						aria-hidden="true"

@@ -1,6 +1,6 @@
+import { MagnifyingGlass } from "@phosphor-icons/react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { Search } from "lucide-react";
 import { useState } from "react";
 import { useAutoMarkReadOnOpen } from "#/components/articles/use-auto-mark-read-on-open";
 import {
@@ -63,7 +63,7 @@ export function AppSearch() {
 			className="relative min-w-0 w-full max-w-2xl"
 		>
 			<ToolBox className="h-9 min-w-0 w-full gap-2 bg-background px-3">
-				<Search className="h-4 w-4 shrink-0 text-muted-foreground" />
+				<MagnifyingGlass className="h-4 w-4 shrink-0 text-muted-foreground" />
 				<ToolBoxInput
 					type="search"
 					className="min-w-0"

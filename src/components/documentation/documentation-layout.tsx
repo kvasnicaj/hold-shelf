@@ -1,4 +1,4 @@
-import { ArrowLeft, BookOpen, Terminal } from "lucide-react";
+import { ArrowLeft, BookOpen, Terminal } from "@phosphor-icons/react";
 import type { ReactNode } from "react";
 import { PublicPageHeading } from "#/components/public/public-page-heading";
 import { PublicPageLayout } from "#/components/public/public-page-layout";

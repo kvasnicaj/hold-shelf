@@ -1,9 +1,8 @@
+import { BookmarkSimple, BookOpen, Check, Trash } from "@phosphor-icons/react";
 import { useIsMutating } from "@tanstack/react-query";
-import { Bookmark, BookOpen, Check, Trash2 } from "lucide-react";
 import { TagPicker } from "#/components/tags/tag-picker";
 import type { Tag } from "#/components/tags/types";
 import { Button } from "#/components/ui/button";
-import { cn } from "#/lib/utils";
 
 type ArticleCardActionsProps = {
 	articleId: string;
@@ -69,7 +68,10 @@ export function ArticleCardActions({
 				title={isFavorite ? "Remove from favorites" : "Add to favorites"}
 				className={isFavorite ? "text-favorite hover:text-favorite" : undefined}
 			>
-				<Bookmark className={cn(iconClassName, isFavorite && "fill-current")} />
+				<BookmarkSimple
+					weight={isFavorite ? "fill" : "regular"}
+					className={iconClassName}
+				/>
 			</Button>
 			<Button
 				disabled={pending}
@@ -97,7 +99,7 @@ export function ArticleCardActions({
 				}}
 				title="Delete"
 			>
-				<Trash2 className={iconClassName} />
+				<Trash className={iconClassName} />
 			</Button>
 		</div>
 	);

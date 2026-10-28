@@ -1,6 +1,6 @@
+import { Plus } from "@phosphor-icons/react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Plus } from "lucide-react";
 import { BrandLogo } from "#/components/brand/brand-logo";
 import { primaryNavItems, unreadNavHref } from "#/components/layout/nav-items";
 import { NavLink } from "#/components/layout/nav-link";

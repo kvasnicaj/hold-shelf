@@ -1,4 +1,4 @@
-import { Bookmark, EllipsisVertical } from "lucide-react";
+import { BookmarkSimple, DotsThreeVertical } from "@phosphor-icons/react";
 import { ArticleActionsMenuItems } from "#/components/archive/article-actions-menu-items";
 import type { ArchiveActions } from "#/components/archive/types";
 import { ArticleExternalLink } from "#/components/articles/article-external-link";
@@ -96,9 +96,10 @@ export function ArchiveMobileRow({
 						</span>
 					)}
 					{article.isFavorite && (
-						<Bookmark
+						<BookmarkSimple
 							aria-label="Favorite"
-							className="size-3 fill-current text-favorite"
+							weight="fill"
+							className="size-3 text-favorite"
 						/>
 					)}
 					{article.tags.map((tag) => (
@@ -131,7 +132,7 @@ export function ArchiveMobileRow({
 							onClick={(event) => event.stopPropagation()}
 							onKeyDown={(event) => event.stopPropagation()}
 						>
-							<EllipsisVertical className="size-[1.125rem]" />
+							<DotsThreeVertical className="size-[1.125rem]" />
 						</Button>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align="end">

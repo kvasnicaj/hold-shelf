@@ -1,5 +1,5 @@
+import { PencilSimple } from "@phosphor-icons/react";
 import type { VariantProps } from "class-variance-authority";
-import { Pencil } from "lucide-react";
 import { useEffect, useState } from "react";
 import type { buttonVariants } from "#/components/ui/button";
 import { Button } from "#/components/ui/button";
@@ -68,7 +68,7 @@ export function RenameTagDialog({
 					title={triggerTitle}
 					aria-label={triggerAriaLabel}
 				>
-					<Pencil className="h-[1.125rem] w-[1.125rem]" />
+					<PencilSimple className="h-[1.125rem] w-[1.125rem]" />
 				</Button>
 			</DialogTrigger>
 			<DialogContent className="sm:max-w-md">

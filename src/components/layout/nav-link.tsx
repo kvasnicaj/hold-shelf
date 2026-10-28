@@ -1,10 +1,10 @@
+import type { Icon as PhosphorIcon } from "@phosphor-icons/react";
 import { Link } from "@tanstack/react-router";
-import type { LucideIcon } from "lucide-react";
 import { cn } from "#/lib/utils";
 
 type NavLinkProps = {
 	href: string;
-	icon: LucideIcon;
+	icon: PhosphorIcon;
 	label: string;
 	isActive: boolean;
 	badge?: number;
@@ -28,7 +28,10 @@ export function NavLink({
 					: "font-medium text-muted-foreground hover:bg-accent hover:text-foreground",
 			)}
 		>
-			<Icon className={cn("size-4 shrink-0", isActive && "text-mark")} />
+			<Icon
+				weight={isActive ? "fill" : "regular"}
+				className={cn("size-4 shrink-0", isActive && "text-mark")}
+			/>
 			<span className="flex-1 truncate">{label}</span>
 			{badge !== undefined && (
 				<span className="text-xs font-bold tabular-nums text-primary">

@@ -1,6 +1,6 @@
+import { Trash } from "@phosphor-icons/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
-import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { TrashDeleteDialog } from "#/components/library/trash-delete-dialog";
@@ -61,7 +61,7 @@ export function TrashPage() {
 					disabled={busy || !data.length}
 					onClick={() => requestDelete({ mode: "all" })}
 				>
-					<Trash2 className="size-4" />
+					<Trash className="size-4" />
 					Empty Trash
 				</Button>
 			</div>
@@ -112,7 +112,7 @@ export function TrashPage() {
 									)
 								}
 							>
-								<Trash2 className="size-4" />
+								<Trash className="size-4" />
 								Delete forever
 							</Button>
 						</li>

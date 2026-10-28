@@ -1,5 +1,5 @@
+import { ArrowLeft } from "@phosphor-icons/react";
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
 import { CookiePreferencesButton } from "#/components/privacy/cookie-preferences-button";
 import { PublicPageHeading } from "#/components/public/public-page-heading";
 import { PublicPageLayout } from "#/components/public/public-page-layout";
