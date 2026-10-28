@@ -176,15 +176,6 @@ export function createArchiveColumns({
 	]);
 }
 
-export function getTagChipClassName(isActive: boolean) {
-	return cn(
-		"inline-flex h-7 shrink-0 items-center gap-1.5 rounded-sm px-2.5 text-xs font-semibold transition-colors",
-		isActive
-			? "bg-select text-foreground ring-1 ring-mark/45 ring-inset"
-			: "bg-muted text-muted-foreground",
-	);
-}
-
 /** Groups consecutive items by their UTC save month; expects date-sorted input. */
 export function groupByMonth<T>(
 	items: T[],

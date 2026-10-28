@@ -33,9 +33,12 @@ export function AppSidebar() {
 
 			<div className="mr-3 mb-4">
 				<SaveLinkAction>
-					<Button className="w-full justify-start">
+					<Button className="w-full justify-start" aria-keyshortcuts="S">
 						<Plus />
 						Save a link
+						<kbd className="ml-auto border-primary-foreground/40 bg-transparent text-primary-foreground">
+							S
+						</kbd>
 					</Button>
 				</SaveLinkAction>
 			</div>

@@ -2,6 +2,7 @@ import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { MobileNavigation } from "#/components/layout/mobile-navigation";
+import { QuickSaveContext } from "#/components/quick-save/quick-save-context";
 import { renderWithProviders } from "#/test/render";
 
 const { getArticlesMock, routerState } = vi.hoisted(() => ({
@@ -11,10 +12,6 @@ const { getArticlesMock, routerState } = vi.hoisted(() => ({
 			pathname: "/app/favorites",
 		},
 	},
-}));
-
-vi.mock("#/components/articles/use-save-article", () => ({
-	useSaveArticle: () => ({ handleAdd: vi.fn() }),
 }));
 
 vi.mock("#/server/articles", () => ({
@@ -48,8 +45,13 @@ vi.mock("@tanstack/react-router", async () => {
 describe("MobileNavigation", () => {
 	it("renders four destinations around a one-tap save action", async () => {
 		const user = userEvent.setup();
+		const openQuickSave = vi.fn();
 		getArticlesMock.mockResolvedValue({ total: 3 });
-		renderWithProviders(<MobileNavigation />);
+		renderWithProviders(
+			<QuickSaveContext value={{ open: openQuickSave }}>
+				<MobileNavigation />
+			</QuickSaveContext>,
+		);
 
 		expect(screen.getByRole("navigation", { name: /primary/i })).toBeVisible();
 		expect(screen.getByRole("link", { name: /home/i })).toHaveAttribute(
@@ -65,6 +67,6 @@ describe("MobileNavigation", () => {
 		expect(screen.getAllByRole("link")).toHaveLength(4);
 
 		await user.click(screen.getByRole("button", { name: "Save a link" }));
-		expect(screen.getByRole("heading", { name: "Save article" })).toBeVisible();
+		expect(openQuickSave).toHaveBeenCalledTimes(1);
 	});
 });

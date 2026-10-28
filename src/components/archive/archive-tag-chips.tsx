@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { getTagChipClassName } from "#/components/archive/helpers";
+import { TagChip } from "#/components/tags/tag-chip";
 import type { Tag } from "#/components/tags/types";
 
 type ArchiveTagChipsProps = {
@@ -18,23 +18,20 @@ export function ArchiveTagChips({
 			aria-label="Filter by tag"
 			className="-mx-3 flex gap-1.5 overflow-x-auto px-3 [scrollbar-width:none] sm:-mx-6 sm:px-6 md:hidden"
 		>
-			<button
-				type="button"
-				aria-pressed={selectedTagIds.length === 0}
-				className={getTagChipClassName(selectedTagIds.length === 0)}
+			<TagChip
+				isActive={selectedTagIds.length === 0}
 				onClick={() => onChange([])}
 			>
 				All tags
-			</button>
+			</TagChip>
 			{tags.map((tag) => {
 				const isActive = selectedTagIds.includes(tag.id);
 
 				return (
-					<button
+					<TagChip
 						key={tag.id}
-						type="button"
-						aria-pressed={isActive}
-						className={getTagChipClassName(isActive)}
+						isActive={isActive}
+						count={tag.articleCount}
 						onClick={() =>
 							onChange(
 								isActive
@@ -44,12 +41,7 @@ export function ArchiveTagChips({
 						}
 					>
 						{tag.name}
-						{tag.articleCount !== undefined && (
-							<span className="font-medium tabular-nums opacity-70">
-								{tag.articleCount}
-							</span>
-						)}
-					</button>
+					</TagChip>
 				);
 			})}
 			<Link
