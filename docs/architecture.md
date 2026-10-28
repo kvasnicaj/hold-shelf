@@ -421,22 +421,23 @@ Component tree:
 ```text
 HomePage
 |- page header
+|  |- summary sentence (getHomeSummary)
+|  |- HomeStatsSection (one line of counts)
 |- ContinueReadingSection
-|- recent content grid
-|  |- recently saved card
-|  |  |- ArticleLink* + TagPicker*
-|  |- favorites card
-|  |  |- ArticleLink*
-|  |- oldest unread card
-|     |- ArticleLink*
-|- compact reading statistics
-|- empty state CTA -> /app/articles
+|  |- lead article with ReadingProgressBar, Continue and Mark as read
+|  |- other in-progress articles as compact rows
+|- EmptyLibraryCta (when the library is empty)
+|- RecentArticlesSection (otherwise)
+|  |- Shelf "Oldest unread" -> ShelfItem* with unread age
+|  |- Shelf "Recently saved" -> ShelfItem* + TagPicker*
+|  |- Shelf "Favorites" -> ShelfItem*
 ```
 
 Purpose:
 
-- dashboard and entry point after login
-- surfaces reading volume and quick links into saved content
+- spacious entry point after login: what is waiting, what to resume, and three
+  shelves of recent content rather than a stats dashboard
+- each shelf sits on a 2px ink line from the logo and links to its full page
 - dashboard article links use the shared open handler, so unread items can auto-mark
   as read when the user preference is enabled
 - recently saved articles reuse `TagPicker` and the shared article mutation hook
@@ -455,13 +456,14 @@ Component tree:
 
 ```text
 ArticlesPage
-|- BulkActionsPanel? (when rows selected)
-|- page title
-|- sort control
+|- page title and article count
+|- search and sort controls
+|- BulkActionsPanel? (floating, when rows are selected)
 |- empty state
-|- ArticleList
-|  |- ArticleCard*
-|     |- Checkbox
+|- ArticleList (comfortable rows divided by hairlines)
+|  |- ArticleCard* (ArticleCardMobile* on phones)
+|     |- Checkbox (revealed on hover or while selecting)
+|     |- ReadStateSpine
 |     |- article link / favicon / metadata
 |     |- tag badges
 |     |- TagPicker
@@ -494,13 +496,14 @@ Component tree:
 
 ```text
 FavoritesPage
-|- BulkActionsPanel? (when rows selected)
-|- page title
-|- sort control
+|- page title and article count
+|- search and sort controls
+|- BulkActionsPanel? (floating, when rows are selected)
 |- empty state
-|- ArticleList
-|  |- ArticleCard*
-|     |- Checkbox
+|- ArticleList (comfortable rows divided by hairlines)
+|  |- ArticleCard* (ArticleCardMobile* on phones)
+|     |- Checkbox (revealed on hover or while selecting)
+|     |- ReadStateSpine
 |     |- article link / favicon / metadata
 |     |- tag badges
 |     |- TagPicker
@@ -687,7 +690,9 @@ with a Paste from clipboard button.
 
 - `QuickSaveProvider` / `useQuickSave`: app-wide Quick save panel and its shortcuts
 - `ArticleList`: maps article arrays to cards
-- `ArticleCard`: compact article presentation and actions
+- `ArticleCard`: comfortable article row with excerpt, metadata and actions
+- `ReadStateSpine`: teal unread marker shared by every article list
+- `ReadingProgressBar`: thin teal progress line
 - `BulkActionsPanel`: floating multi-select toolbar above the content
 
 ### Tags route
@@ -718,8 +723,9 @@ with a Paste from clipboard button.
 
 ### Home route
 
-- `StatCard`: dashboard metric display
-- `ArticleLink`: lightweight recent-article row
+- `Shelf`: titled shelf with an ink shelf line and a link to the full page
+- `ShelfItem`: serif article title with site and an optional note or actions
+- `HomeStatsSection`: one-line reading counts
 
 ## Core server functionality
 

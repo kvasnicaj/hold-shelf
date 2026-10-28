@@ -34,7 +34,7 @@ function buildArticle(
 
 describe("ArticleCardMobile", () => {
 	it("renders the mobile layout without description or favicon and keeps controls before tags", () => {
-		renderWithProviders(
+		const { container } = renderWithProviders(
 			<ArticleCardMobile
 				article={buildArticle()}
 				selected={false}
@@ -52,7 +52,8 @@ describe("ArticleCardMobile", () => {
 
 		expect(screen.getByText("Design systems")).toBeInTheDocument();
 		expect(screen.queryByText("A useful article")).not.toBeInTheDocument();
-		expect(screen.queryByRole("img")).not.toBeInTheDocument();
+		expect(container.querySelector("img")).toBeNull();
+		expect(screen.getByRole("img", { name: "Unread" })).toBeInTheDocument();
 		expect(screen.getByText("example.com")).toBeInTheDocument();
 		expect(screen.getByTestId("tag-picker")).toHaveTextContent("t1");
 		expect(screen.getAllByText("Design")).not.toHaveLength(0);

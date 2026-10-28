@@ -169,8 +169,12 @@ describe("HomePage", () => {
 		renderWithProviders(<HomePage />);
 
 		expect(screen.getByText("Make time for a good read")).toBeInTheDocument();
-		expect(screen.getAllByText("Unread")).not.toHaveLength(0);
-		expect(screen.getAllByText("Total")).not.toHaveLength(0);
+		expect(
+			screen.getByText("3 articles are waiting for you."),
+		).toBeInTheDocument();
+		expect(screen.getByText("on the shelf").parentElement).toHaveTextContent(
+			"on the shelf5",
+		);
 		expect(screen.getByText("Recently saved")).toBeInTheDocument();
 		expect(screen.getByText("Favorites")).toBeInTheDocument();
 		expect(screen.getByText("Oldest unread")).toBeInTheDocument();

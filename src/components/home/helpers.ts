@@ -11,3 +11,12 @@ export const LANDING_PAGE_OG_IMAGE_URL =
 
 export const CHROME_EXTENSION_URL =
 	"https://chromewebstore.google.com/detail/hold-shelf/pbadpcgedkohkechgiciabdafiddhjkj";
+
+export function getHomeSummary(stats: { unread: number; total: number }) {
+	if (stats.total === 0) return "Your shelf is empty for now.";
+	if (stats.unread === 0) {
+		return "You're all caught up. The shelf is here when you want it.";
+	}
+	if (stats.unread === 1) return "One article is waiting for you.";
+	return `${stats.unread} articles are waiting for you.`;
+}

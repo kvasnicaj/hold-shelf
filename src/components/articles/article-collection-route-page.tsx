@@ -1,4 +1,3 @@
-import type { LucideIcon } from "lucide-react";
 import { ArticleCollectionPage } from "#/components/articles/article-collection-page";
 import type {
 	ArticleCollectionFilters,
@@ -16,7 +15,6 @@ type ArticleCollectionRoutePageProps = {
 	queryKey: ArticleCollectionQueryKey;
 	filters: ArticleCollectionFilters;
 	title: string;
-	icon: LucideIcon;
 	searchPlaceholder: string;
 	emptyStateMessage: string;
 	filteredEmptyStateMessage: string;
@@ -30,7 +28,6 @@ export function ArticleCollectionRoutePage({
 	queryKey,
 	filters,
 	title,
-	icon,
 	searchPlaceholder,
 	emptyStateMessage,
 	filteredEmptyStateMessage,
@@ -48,7 +45,6 @@ export function ArticleCollectionRoutePage({
 		<ArticleCollectionPage
 			{...pageState}
 			title={title}
-			icon={icon}
 			searchPlaceholder={searchPlaceholder}
 			emptyStateMessage={
 				pageState.q ? filteredEmptyStateMessage : emptyStateMessage
