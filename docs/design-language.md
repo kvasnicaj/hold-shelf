@@ -147,6 +147,19 @@ The reader is its own mode: everything except the text steps back.
   sits on a 2 px ink line, the shelf from the logo, with a link to the full
   page. Items use serif titles.
 
+## Reader
+
+- Text first: Source Serif 4 at 19 px by default, line height 1.65, a 64ch
+  measure, on the sheet color rather than pure white or black.
+- The header puts the source line (favicon, site, reading time, saved date)
+  above a 2em serif title.
+- One quiet toolbar: close, then read, bookmark, tags, Aa, refresh and open
+  original. Reading settings live in the Aa menu: text size 15–24, line width
+  narrow / normal / wide, serif or sans.
+- A 2 px teal line under the toolbar shows how far you have read.
+- Article prose uses the `prose-hold` utility so headings, links, quotes and
+  code take their colors from the tokens in both themes.
+
 ## Quick save
 
 - One panel for saving links, opened by Save a link, the mobile Save tab, the

@@ -1008,8 +1008,13 @@ The reader uses `#article=<id>` in the current app URL for reload and browser hi
 Below 1536px it is a Radix modal with focus trapping, Escape, and focus return; wider
 screens use a non-modal side column. The reader saves scroll position after an
 800ms pause and flushes on close/page hide, then updates Continue reading. A page
-shutdown can still interrupt an in-flight request. Text size is a local browser preference; line width is fixed at 70ch, bounded by
-the reader viewport; progress is stored with the user's article in D1.
+shutdown can still interrupt an in-flight request. Text size (15–24 px), line
+width (56, 64 or 76ch) and font (serif or sans) are local browser preferences set
+from the toolbar's Aa menu (`ReaderPreferences`, `useReaderSettings`); older stored
+text sizes are kept. A 2px teal line at the top of the reader shows the scroll
+position; progress is stored with the user's article in D1. The toolbar holds
+close, read, favorite, tags, reading settings, refresh and open original; on
+phones everything after close collapses into the overflow menu.
 
 Settings includes a JSON backup workflow with articles, tags, flags, saved content,
 reading progress, and Trash. Import accepts version 1 Hold Shelf backups up to
