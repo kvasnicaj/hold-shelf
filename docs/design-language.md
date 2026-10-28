@@ -175,6 +175,19 @@ The reader is its own mode: everything except the text steps back.
 - A plain save ends with the inverse toast "Saved to Unread" and a Read now
   action.
 
+## Public pages
+
+- Every public page (landing, about, privacy, docs, sign-in, `/save`, shared
+  tags, 404) uses `PublicPageLayout`: the horizontal logo top left, one action
+  top right, a content column, and a shared footer.
+- Spacious density. Titles use the serif display sizes; the landing headline
+  is left-aligned rather than centered under a stacked logo.
+- Document pages use plain sections with serif headings over hairlines, not
+  stacked cards. Short task pages (sign-in, `/save`) use one sheet panel.
+- The landing page closes with three short notes on the 2 px ink shelf line.
+- The Chrome extension's toolbar badge uses the action teal for success and
+  the danger brick for errors.
+
 ## shadcn components
 
 Style through tokens first. Change `src/components/ui/` only for defaults and

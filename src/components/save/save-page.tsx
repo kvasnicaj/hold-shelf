@@ -5,10 +5,9 @@ import {
 	CircleAlert,
 	LoaderCircle,
 } from "lucide-react";
-import { BrandLogo } from "#/components/brand/brand-logo";
+import { PublicPageLayout } from "#/components/public/public-page-layout";
 import { useSavePage } from "#/components/save/use-save-page";
 import { Button } from "#/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 
 type SavePageProps = {
 	url?: string;
@@ -19,25 +18,25 @@ export function SavePage({ url }: SavePageProps) {
 	const isSuccess = status === "saved" || status === "duplicate";
 
 	return (
-		<div className="flex min-h-screen items-center justify-center bg-background p-4">
-			<Card className="w-full max-w-md">
-				<CardHeader className="space-y-4 text-center">
-					<div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-select ring-1 ring-mark/20">
+		<PublicPageLayout centered>
+			<section
+				aria-live="polite"
+				className="mx-auto w-full max-w-md space-y-6 rounded-xl border bg-card p-6 sm:p-8"
+			>
+				<div className="flex items-start gap-4">
+					<div className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-select">
 						{status === "saving" ? (
-							<LoaderCircle className="size-7 animate-spin text-mark" />
+							<LoaderCircle className="size-5 animate-spin text-mark" />
 						) : status === "idle" ? (
-							<Bookmark className="size-7 text-mark" />
+							<Bookmark className="size-5 text-mark" />
 						) : isSuccess ? (
-							<CheckCircle2 className="size-7 text-mark" />
+							<CheckCircle2 className="size-5 text-mark" />
 						) : (
-							<CircleAlert className="size-7 text-destructive" />
+							<CircleAlert className="size-5 text-destructive" />
 						)}
 					</div>
-					<div className="space-y-2">
-						<div className="mx-auto flex items-center justify-center gap-2">
-							<BrandLogo className="h-7" />
-						</div>
-						<CardTitle>
+					<div className="min-w-0 space-y-1.5">
+						<h1 className="font-serif text-2xl font-semibold">
 							{status === "idle"
 								? "Save this article?"
 								: status === "saving"
@@ -45,32 +44,36 @@ export function SavePage({ url }: SavePageProps) {
 									: isSuccess
 										? "All set"
 										: "We hit a snag"}
-						</CardTitle>
+						</h1>
 						<p className="text-sm leading-relaxed text-muted-foreground">
 							{message}
 						</p>
 						{url && (
-							<p className="break-all text-xs text-muted-foreground">{url}</p>
+							<p className="truncate text-xs text-muted-foreground" title={url}>
+								{url}
+							</p>
 						)}
 					</div>
-				</CardHeader>
-				<CardContent className="space-y-3">
-					{(status === "idle" || status === "error") && (
-						<Button className="w-full" onClick={() => void save()}>
+				</div>
+				<div className="flex flex-col gap-2 sm:flex-row-reverse">
+					{status === "idle" || status === "error" ? (
+						<Button className="sm:flex-1" onClick={() => void save()}>
 							{status === "error" ? "Try saving again" : "Save article"}
 						</Button>
+					) : (
+						<Button asChild className="sm:flex-1">
+							<Link to="/app/articles" className="no-underline">
+								Open Unread
+							</Link>
+						</Button>
 					)}
-					<Button
-						asChild
-						className="w-full text-primary-foreground! hover:text-primary-foreground!"
-					>
-						<Link to="/app/articles">Open library</Link>
+					<Button asChild variant="ghost" className="sm:flex-1">
+						<Link to="/app/home" className="text-foreground no-underline">
+							Go to Home
+						</Link>
 					</Button>
-					<Button asChild variant="outline" className="w-full">
-						<Link to="/app/home">Go to dashboard</Link>
-					</Button>
-				</CardContent>
-			</Card>
-		</div>
+				</div>
+			</section>
+		</PublicPageLayout>
 	);
 }

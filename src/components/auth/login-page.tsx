@@ -1,9 +1,7 @@
 import { GitBranch } from "lucide-react";
 import { useLoginPage } from "#/components/auth/use-login-page";
-import { BrandLogo } from "#/components/brand/brand-logo";
-import { CookiePreferencesButton } from "#/components/privacy/cookie-preferences-button";
+import { PublicPageLayout } from "#/components/public/public-page-layout";
 import { Button } from "#/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 
 type LoginPageProps = {
 	callbackURL?: string;
@@ -20,42 +18,39 @@ export function LoginPage({
 	});
 
 	return (
-		<div className="flex min-h-screen items-center justify-center bg-background p-4">
-			<Card className="w-full max-w-sm">
-				<CardHeader className="space-y-4 text-center">
-					<div className="mx-auto flex items-center gap-2">
-						<BrandLogo className="h-9" />
-					</div>
-					<div className="space-y-2">
-						<CardTitle>Continue with GitHub</CardTitle>
-						<p className="text-sm text-muted-foreground">
-							Sign in to your library or create your account on first use with
-							your GitHub profile.
+		<PublicPageLayout centered>
+			<section className="mx-auto w-full max-w-sm space-y-6 rounded-xl border bg-card p-6 sm:p-8">
+				<div className="space-y-2">
+					<h1 className="font-serif text-2xl font-semibold">
+						Sign in to Hold Shelf
+					</h1>
+					<p className="text-sm leading-relaxed text-muted-foreground">
+						Sign in to your library or create your account on first use with
+						your GitHub profile.
+					</p>
+				</div>
+				<div className="space-y-3">
+					<Button
+						type="button"
+						size="lg"
+						className="w-full"
+						disabled={socialLoading}
+						onClick={() => void handleGitHubSignIn()}
+					>
+						<GitBranch />
+						{socialLoading ? "Redirecting..." : "Continue with GitHub"}
+					</Button>
+					{error && (
+						<p role="alert" className="text-sm text-destructive">
+							{error}
 						</p>
-					</div>
-				</CardHeader>
-				<CardContent>
-					<div className="space-y-4">
-						<Button
-							type="button"
-							className="w-full"
-							disabled={socialLoading}
-							onClick={() => void handleGitHubSignIn()}
-						>
-							<GitBranch className="mr-2 h-4 w-4" />
-							{socialLoading ? "Redirecting..." : "Continue with GitHub"}
-						</Button>
-						<p className="text-center text-xs leading-relaxed text-muted-foreground">
-							GitHub is the only sign-in method for Hold Shelf. We&apos;ll use
-							your GitHub account to create your profile and sign you in.
-						</p>
-						{error && <p className="text-sm text-destructive">{error}</p>}
-						<div className="text-center text-muted-foreground">
-							<CookiePreferencesButton />
-						</div>
-					</div>
-				</CardContent>
-			</Card>
-		</div>
+					)}
+				</div>
+				<p className="text-xs leading-relaxed text-muted-foreground">
+					GitHub is the only sign-in method for Hold Shelf. We&apos;ll use your
+					GitHub account to create your profile and sign you in.
+				</p>
+			</section>
+		</PublicPageLayout>
 	);
 }

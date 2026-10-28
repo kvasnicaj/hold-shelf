@@ -1,7 +1,7 @@
-import { ArrowLeft, BookOpen, KeyRound, Terminal } from "lucide-react";
+import { ArrowLeft, BookOpen, Terminal } from "lucide-react";
 import type { ReactNode } from "react";
-import { BrandLogo } from "#/components/brand/brand-logo";
-import { Badge } from "#/components/ui/badge";
+import { PublicPageHeading } from "#/components/public/public-page-heading";
+import { PublicPageLayout } from "#/components/public/public-page-layout";
 import { Button } from "#/components/ui/button";
 
 type DocumentationLayoutProps = {
@@ -19,63 +19,51 @@ export function DocumentationLayout({
 	actions,
 	children,
 }: DocumentationLayoutProps) {
-	const Icon = kind === "api" ? BookOpen : Terminal;
 	return (
-		<main className="relative min-h-svh bg-background px-4 py-8 sm:px-6 sm:py-10">
-			<div className="relative mx-auto flex min-w-0 max-w-5xl flex-col gap-8">
-				<header className="space-y-6">
-					<a href="/" className="inline-flex no-underline">
-						<BrandLogo className="h-7" />
+		<PublicPageLayout
+			width="wide"
+			actions={
+				<Button asChild variant="ghost">
+					<a href="/app/settings" className="text-foreground no-underline">
+						<ArrowLeft />
+						Settings
 					</a>
-					<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-						<div className="flex min-w-0 items-start gap-3">
-							<div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-select ring-1 ring-mark/20">
-								<Icon className="size-6 text-mark" />
-							</div>
-							<div className="space-y-2">
-								<Badge variant="outline" className="gap-1">
-									<KeyRound className="size-3" />
-									Personal access tokens
-								</Badge>
-								<h1 className="font-serif text-3xl font-semibold text-foreground">
-									{title}
-								</h1>
-								<p className="max-w-2xl text-sm leading-6 text-muted-foreground">
-									{description}
-								</p>
-							</div>
-						</div>
-						<Button asChild variant="outline" className="self-start">
-							<a href="/app/settings">
-								<ArrowLeft className="size-4" />
-								Settings
-							</a>
-						</Button>
-					</div>
-					<div className="flex flex-wrap items-center justify-between gap-3">
-						<nav aria-label="Documentation" className="flex gap-2">
+				</Button>
+			}
+		>
+			<div className="flex min-w-0 flex-col gap-10">
+				<div className="space-y-6">
+					<PublicPageHeading
+						eyebrow="Personal access tokens"
+						title={title}
+						description={description}
+					/>
+					<div className="flex flex-wrap items-center justify-between gap-3 border-b pb-4">
+						<nav aria-label="Documentation" className="flex gap-1">
 							<Button asChild variant={kind === "api" ? "secondary" : "ghost"}>
 								<a
 									href="/api-docs"
 									aria-current={kind === "api" ? "page" : undefined}
+									className="text-foreground no-underline"
 								>
-									<BookOpen className="size-4" /> REST API
+									<BookOpen /> REST API
 								</a>
 							</Button>
 							<Button asChild variant={kind === "cli" ? "secondary" : "ghost"}>
 								<a
 									href="/cli-docs"
 									aria-current={kind === "cli" ? "page" : undefined}
+									className="text-foreground no-underline"
 								>
-									<Terminal className="size-4" /> CLI
+									<Terminal /> CLI
 								</a>
 							</Button>
 						</nav>
 						{actions}
 					</div>
-				</header>
+				</div>
 				{children}
 			</div>
-		</main>
+		</PublicPageLayout>
 	);
 }

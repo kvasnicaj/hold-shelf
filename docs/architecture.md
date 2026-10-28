@@ -40,7 +40,7 @@ High-level CLI flow:
 |  |- RootDocument
 |  |- HeadContent / Scripts
 |  |- TanStack Devtools
-|  |- NotFoundPage -> BrandLogo
+|  |- NotFoundPage -> PublicPageLayout
 |
 |- /                          -> LandingPage
 |- /about                     -> AboutPage
@@ -177,6 +177,12 @@ Used by:
 
 ## Public routes
 
+Every public page renders inside `PublicPageLayout` (`src/components/public/`):
+a top bar with the horizontal logo linking home and one page action, a content
+column (`prose` or `wide`), and `PublicPageFooter` with About, Privacy Policy and
+Cookie preferences. Page titles use `PublicPageHeading`; document pages use
+`PublicSection` (serif heading over hairline-separated text) instead of cards.
+
 ### Landing page
 
 Route: `/`
@@ -185,11 +191,11 @@ Component tree:
 
 ```text
 LandingPage
-|- BrandLogo (stacked) / accessible app title
-|- tagline
+|- PublicPageLayout (wide, Sign in action -> /login)
+|- serif hero headline and description
 |- CTA button -> /login
 |- secondary extension link -> Chrome Web Store
-|- footer links -> /about, /privacy
+|- three feature notes on an ink shelf line (LANDING_FEATURES)
 ```
 
 Purpose:
@@ -206,10 +212,9 @@ Component tree:
 
 ```text
 AboutPage
-|- page header / branding
-|- back link
-|- description cards
-|- contact email
+|- PublicPageLayout (Home action)
+|- PublicPageHeading
+|- PublicSection* (purpose, feel, contact email)
 ```
 
 Purpose:
@@ -225,9 +230,9 @@ Component tree:
 
 ```text
 PrivacyPage
-|- page header / branding
-|- back link
-|- privacy policy cards
+|- PublicPageLayout (Home action)
+|- PublicPageHeading
+|- PublicSection* (one per policy topic)
 ```
 
 Purpose:
@@ -242,7 +247,7 @@ Component tree:
 
 ```text
 ApiDocsPage
-|- DocumentationLayout (shared with CliDocsPage: BrandLogo home link, header, navigation, width, theme)
+|- DocumentationLayout (shared with CliDocsPage: PublicPageLayout, Settings action, heading, REST API / CLI navigation)
 |- DocumentationSection (shared section typography and spacing)
 |- API overview panel
 |- agent Markdown export link -> /api-docs/agents
@@ -269,8 +274,9 @@ Component tree:
 
 ```text
 LoginPage
-|- Card
-|  |- app branding
+|- PublicPageLayout (centered)
+|- sign-in panel
+|  |- serif title and description
 |  |- GitHub sign-in button
 |  |- GitHub-only auth copy
 ```
@@ -292,11 +298,11 @@ Component tree:
 
 ```text
 SavePage
-|- status icon
-|- save result copy
-|- saved URL
-|- CTA -> /app/articles
-|- CTA -> /app/home
+|- PublicPageLayout (centered)
+|- status panel
+|  |- status icon, serif title, result copy, saved URL
+|  |- Save article / Try again, or Open Unread -> /app/articles
+|  |- Go to Home -> /app/home
 ```
 
 Core functionality:
@@ -320,9 +326,9 @@ Component tree:
 
 ```text
 SharedTagPage
-|- Hold Shelf branding
-|- owner first-name heading / shared tag summary
-|- SharedArticleList
+|- PublicPageLayout ("Create your own shelf" action)
+|- PublicPageHeading (owner first name, tag label, article count)
+|- SharedArticleList (hairline-divided rows)
 |  |- SharedArticleCard*
 |- pagination
 ```

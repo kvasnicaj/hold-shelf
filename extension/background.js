@@ -1,6 +1,6 @@
 const APP_ORIGIN = "https://hold-shelf.com";
-const SUCCESS_BADGE_COLOR = "#4fb8b2";
-const ERROR_BADGE_COLOR = "#d9534f";
+const SUCCESS_BADGE_COLOR = "#23767e";
+const ERROR_BADGE_COLOR = "#b03f2c";
 
 chrome.runtime.onInstalled.addListener(() => {
 	chrome.contextMenus.create({

@@ -1,24 +1,22 @@
 import { Link } from "@tanstack/react-router";
-import { BrandLogo } from "#/components/brand/brand-logo";
+import { PublicPageHeading } from "#/components/public/public-page-heading";
+import { PublicPageLayout } from "#/components/public/public-page-layout";
 import { Button } from "#/components/ui/button";
 
 export function SharedTagUnavailablePage() {
 	return (
-		<div className="flex min-h-svh items-center justify-center bg-background px-6 text-center">
-			<div className="flex max-w-md flex-col items-center gap-4">
-				<div className="flex size-14 items-center justify-center rounded-2xl bg-select ring-1 ring-mark/20">
-					<BrandLogo variant="symbol" />
-				</div>
-				<h1 className="font-serif text-3xl font-semibold">
-					This shared shelf is unavailable
-				</h1>
-				<p className="text-muted-foreground">
-					The link may have been stopped or may no longer exist.
-				</p>
-				<Button asChild variant="outline">
-					<Link to="/">Go to Hold Shelf</Link>
+		<PublicPageLayout centered>
+			<PublicPageHeading
+				align="center"
+				title="This shared shelf is unavailable"
+				description="The link may have been stopped or may no longer exist."
+			>
+				<Button asChild variant="outline" className="mt-3">
+					<Link to="/" className="text-foreground no-underline">
+						Go to Hold Shelf
+					</Link>
 				</Button>
-			</div>
-		</div>
+			</PublicPageHeading>
+		</PublicPageLayout>
 	);
 }

@@ -7,7 +7,7 @@ type SharedArticleListProps = {
 
 export function SharedArticleList({ articles }: SharedArticleListProps) {
 	return (
-		<div className="space-y-3">
+		<div className="divide-y border-y">
 			{articles.map((article) => (
 				<SharedArticleCard key={article.url} article={article} />
 			))}

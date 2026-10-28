@@ -1,18 +1,23 @@
 import { Link } from "@tanstack/react-router";
-import { BrandLogo } from "#/components/brand/brand-logo";
+import { PublicPageHeading } from "#/components/public/public-page-heading";
+import { PublicPageLayout } from "#/components/public/public-page-layout";
+import { Button } from "#/components/ui/button";
 
 export function NotFoundPage() {
 	return (
-		<div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
-			<BrandLogo className="mb-4" />
-			<h1 className="font-serif text-6xl font-semibold text-foreground">404</h1>
-			<p className="text-lg text-muted-foreground">This page doesn't exist.</p>
-			<Link
-				to="/app/home"
-				className="mt-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground no-underline hover:bg-primary/90"
+		<PublicPageLayout centered>
+			<PublicPageHeading
+				align="center"
+				eyebrow="404"
+				title="This page isn't on the shelf"
+				description="The link may be old, or the page may have moved."
 			>
-				Go home
-			</Link>
-		</div>
+				<Button asChild className="mt-3">
+					<Link to="/app/home" className="no-underline">
+						Go to your shelf
+					</Link>
+				</Button>
+			</PublicPageHeading>
+		</PublicPageLayout>
 	);
 }
