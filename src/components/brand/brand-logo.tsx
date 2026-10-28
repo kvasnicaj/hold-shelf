@@ -41,13 +41,13 @@ export function BrandLogo({
 				<g transform={layout.symbolTransform || undefined}>
 					<path
 						d={compact ? artwork.smallSymbol : artwork.symbol}
-						className="fill-(--brand-mark)"
+						className="fill-(--logo-mark)"
 					/>
 				</g>
 			)}
 			{variant !== "symbol" && (
 				<g transform={layout.wordmarkTransform}>
-					<path d={artwork.wordmark} className="fill-(--sea-ink)" />
+					<path d={artwork.wordmark} className="fill-(--logo-word)" />
 				</g>
 			)}
 		</svg>

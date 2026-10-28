@@ -37,7 +37,7 @@ export function ArchivePage() {
 
 	return (
 		<div className="w-full space-y-4">
-			<h1 className="display-title flex items-center gap-2 text-2xl font-bold">
+			<h1 className="font-serif flex items-center gap-2 text-2xl font-semibold">
 				<Archive className="h-6 w-6 text-muted-foreground" />
 				<span>Library</span>
 			</h1>

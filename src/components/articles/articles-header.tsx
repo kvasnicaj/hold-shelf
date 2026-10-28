@@ -36,7 +36,7 @@ export function ArticlesHeader({
 	return (
 		<>
 			<div className="flex min-w-0 flex-wrap items-center justify-between gap-2">
-				<h1 className="display-title flex min-w-0 items-center gap-2 text-2xl font-bold">
+				<h1 className="font-serif flex min-w-0 items-center gap-2 text-2xl font-semibold">
 					{Icon ? (
 						<Icon className="h-6 w-6 shrink-0 text-muted-foreground" />
 					) : null}

@@ -28,8 +28,6 @@ export function SharedTagPage() {
 
 	return (
 		<div className="relative min-h-svh overflow-hidden bg-background px-4 py-8 sm:px-6 sm:py-12">
-			<div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,var(--lagoon)/0.08,transparent_65%)]" />
-
 			<main className="relative mx-auto flex max-w-3xl flex-col gap-8">
 				<header className="space-y-6 text-center">
 					<Link
@@ -40,10 +38,10 @@ export function SharedTagPage() {
 					</Link>
 
 					<div className="space-y-3">
-						<p className="text-sm font-medium text-(--lagoon-deep)">
+						<p className="text-sm font-medium text-primary">
 							Shared reading list
 						</p>
-						<h1 className="display-title text-3xl font-bold tracking-tight sm:text-4xl">
+						<h1 className="font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
 							{data.ownerFirstName} is sharing articles with you
 						</h1>
 						<div className="flex items-center justify-center gap-2 text-muted-foreground">

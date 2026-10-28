@@ -55,7 +55,7 @@ export function TrashPage() {
 	return (
 		<div className="w-full space-y-5">
 			<div className="flex flex-wrap items-center justify-between gap-3">
-				<h1 className="display-title text-3xl font-bold">Trash</h1>
+				<h1 className="font-serif text-3xl font-semibold">Trash</h1>
 				<Button
 					variant="outline"
 					disabled={busy || !data.length}

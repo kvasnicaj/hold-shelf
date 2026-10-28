@@ -94,7 +94,7 @@ export function ReaderBody({ data, fontSize }: ReaderBodyProps) {
 				style={{ maxWidth: "70ch", fontSize: `${fontSize}px` }}
 			>
 				<header className="mb-8 space-y-3">
-					<h1 className="display-title text-3xl font-bold leading-tight">
+					<h1 className="font-serif text-3xl font-semibold leading-tight">
 						{data.article.title ?? data.article.url}
 					</h1>
 					<ArticleReaderMetadata payload={data} />

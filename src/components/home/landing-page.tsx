@@ -7,16 +7,14 @@ import { Button } from "#/components/ui/button";
 export function LandingPage() {
 	return (
 		<div className="relative flex min-h-svh flex-col overflow-hidden px-6">
-			<div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_40%,var(--lagoon)/0.06,transparent_70%)]" />
-
 			<div className="flex flex-1 items-center justify-center">
-				<div className="rise-in relative z-10 flex max-w-2xl flex-col items-center text-center">
+				<div className="relative z-10 flex max-w-2xl flex-col items-center text-center">
 					<h1>
 						<BrandLogo variant="stacked" className="w-64 sm:w-80" decorative />
 						<span className="sr-only">Hold Shelf</span>
 					</h1>
 
-					<p className="mt-4 text-lg leading-relaxed text-(--sea-ink-soft) sm:text-xl">
+					<p className="mt-4 text-lg leading-relaxed text-muted-foreground sm:text-xl">
 						A quiet place for the articles you&rsquo;ll actually read.{" "}
 						<br className="hidden sm:block" />
 						Save now from the web app or straight from Chrome.
@@ -32,28 +30,28 @@ export function LandingPage() {
 						</Button>
 					</div>
 
-					<p className="mt-4 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm text-(--sea-ink-soft)">
+					<p className="mt-4 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
 						<span>Also available as a Chrome extension.</span>
 						<AddToChromeButton
 							variant="link"
-							className="h-auto px-0 text-sm font-medium text-(--lagoon) no-underline hover:text-(--lagoon) hover:underline"
+							className="h-auto px-0 text-sm font-medium text-primary no-underline hover:underline"
 						/>
 					</p>
 				</div>
 			</div>
 
 			<footer className="relative z-10 flex justify-center pb-8 pt-4">
-				<p className="text-sm text-(--sea-ink-soft)">
+				<p className="text-sm text-muted-foreground">
 					<Link
 						to="/about"
-						className="underline-offset-4 transition-colors hover:text-(--sea-ink) hover:underline"
+						className="underline-offset-4 transition-colors hover:text-foreground hover:underline"
 					>
 						About
 					</Link>
 					<span className="px-2">|</span>
 					<Link
 						to="/privacy"
-						className="underline-offset-4 transition-colors hover:text-(--sea-ink) hover:underline"
+						className="underline-offset-4 transition-colors hover:text-foreground hover:underline"
 					>
 						Privacy Policy
 					</Link>

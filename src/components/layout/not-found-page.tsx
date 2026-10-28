@@ -5,7 +5,7 @@ export function NotFoundPage() {
 	return (
 		<div className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
 			<BrandLogo className="mb-4" />
-			<h1 className="display-title text-6xl font-bold text-foreground">404</h1>
+			<h1 className="font-serif text-6xl font-semibold text-foreground">404</h1>
 			<p className="text-lg text-muted-foreground">This page doesn't exist.</p>
 			<Link
 				to="/app/home"
