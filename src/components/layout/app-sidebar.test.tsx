@@ -6,6 +6,7 @@ import { renderWithProviders } from "#/test/render";
 
 const {
 	openQuickSaveMock,
+	openSearchMock,
 	routerState,
 	routerInvalidateMock,
 	routerNavigateMock,
@@ -18,6 +19,7 @@ const {
 	useSessionMock,
 } = vi.hoisted(() => ({
 	openQuickSaveMock: vi.fn(),
+	openSearchMock: vi.fn(),
 	routerState: {
 		location: {
 			pathname: "/app/favorites",
@@ -62,6 +64,10 @@ vi.mock("@tanstack/react-router", async () => {
 		}),
 	};
 });
+
+vi.mock("#/components/search/use-search", () => ({
+	useSearch: () => ({ open: openSearchMock }),
+}));
 
 vi.mock("#/components/quick-save/use-quick-save", () => ({
 	useQuickSave: () => ({ open: openQuickSaveMock }),
@@ -165,5 +171,20 @@ describe("AppSidebar", () => {
 		await user.click(saveButton);
 
 		expect(openQuickSaveMock).toHaveBeenCalledTimes(1);
+	});
+
+	it("opens search from the sidebar and advertises navigation shortcuts", async () => {
+		const user = userEvent.setup();
+		renderWithProviders(<AppSidebar />);
+
+		const searchButton = screen.getByRole("button", { name: /search/i });
+		expect(searchButton).toHaveAttribute("aria-keyshortcuts", "/");
+		await user.click(searchButton);
+		expect(openSearchMock).toHaveBeenCalledTimes(1);
+
+		expect(screen.getByRole("link", { name: /home/i })).toHaveAttribute(
+			"aria-keyshortcuts",
+			"g h",
+		);
 	});
 });

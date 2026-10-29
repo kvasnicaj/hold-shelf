@@ -115,20 +115,22 @@ AppLayout
 |- ToolbarActionsProvider
 |- ArticleReaderProvider
 |- QuickSaveProvider -> QuickSaveDialog (one instance for the whole app)
+|- SearchProvider -> SearchDialog -> SearchPanel
+|- ShortcutsProvider -> KeyboardShortcutsDialog
 |  |- desktop sidebar column (paper ground)
 |  |  |- AppSidebar -> BrandLogo (horizontal)
 |  |  |  |- SaveLinkAction (opens Quick save)
-|  |  |  |- NavLink (Home, Unread, Favorites, Library)
+|  |  |  |- Search button (opens the search dialog)
+|  |  |  |- NavLink (Home, Unread, Favorites, Library, with G shortcuts)
 |  |  |  |- SidebarTagsSection (only the tag list scrolls)
 |  |  |  |- SidebarUserMenu -> UserAvatar
 |  |
 |  |- main content (sheet inset into the paper ground on desktop)
-|  |  |- TopBar
+|  |  |- TopBar (phones only)
 |  |  |  |- ColumnNavbar
 |  |  |  |  |- AppBrandMark -> BrandLogo (symbol)
-|  |  |  |  |- global article search
-|  |  |  |  |- route-provided toolbar center/actions
-|  |  |  |  |- AppToolbar (mobile account menu) -> UserAvatar
+|  |  |  |  |- route-provided actions
+|  |  |  |  |- search button and AppToolbar (account menu) -> UserAvatar
 |  |  |
 |  |  |- Outlet
 |  |
@@ -144,7 +146,12 @@ Responsibilities:
 
 - blocks unauthenticated access with `getSession()`
 - provides shared desktop/mobile navigation
-- keeps the brand mark in the mobile top bar while the mobile navigation stays route-focused
+- shows no top bar on desktop, so every page heading starts in the same place;
+  phones keep a top bar with the brand mark, search and account
+- opens one search dialog from the sidebar, the mobile top bar, or the / key
+- handles keyboard shortcuts in `ShortcutsProvider`: S saves a link, / searches,
+  ? lists shortcuts, and G followed by H, U, F or L opens Home, Unread,
+  Favorites or Library. Shortcuts ignore text fields and open dialogs
 - places Save a link at the top of the desktop sidebar and as the center tab of
   the mobile bottom bar; both open the shared Quick save panel
 - renders a flat mobile bottom bar with four destinations around Save; the
@@ -687,7 +694,8 @@ with a Paste from clipboard button.
 - `SaveLinkAction`: makes any trigger element open Quick save
 - `useUnreadCount`: shared unread total for the sidebar and bottom bar
 - `ColumnNavbar`: shared column header chrome for left, center, and right controls
-- `AppSearch`: global article search with preview results
+- `SearchPanel` / `useSearch`: app-wide search dialog with highlighted preview results
+- `ShortcutsProvider`: keyboard shortcuts and their help dialog
 - `AppToolbar`: compact account menu and sign out
 - `ToolBox`: shared chrome for toolbar controls
 
@@ -1033,8 +1041,8 @@ Credentials, API tokens, and public sharing links are excluded. Export reads in
 
 Library keeps the existing `/app/archive` URL. Search includes cached article text
 as well as metadata, with owner and status filters applied. This uses SQLite text
-matching, not a relevance-ranked full-text index. Global search is hidden when the
-current page supplies its own search. Mobile account navigation directly exposes
+matching, not a relevance-ranked full-text index. Global search lives in a dialog
+opened from the sidebar, the mobile top bar or the / key. Mobile account navigation directly exposes
 Settings and Trash; desktop/mobile menus share `AccountMenuItems`.
 
 Collection loaders and components share React Query options. Mutation settlement

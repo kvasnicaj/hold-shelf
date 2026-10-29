@@ -1,26 +1,24 @@
+import { MagnifyingGlass } from "@phosphor-icons/react";
 import { useRouterState } from "@tanstack/react-router";
 import { AppBrandMark } from "#/components/layout/app-brand-mark";
-import { AppSearch } from "#/components/layout/app-search";
 import { AppToolbar } from "#/components/layout/app-toolbar";
 import { ColumnNavbar } from "#/components/layout/column-navbar";
 import { useToolbarActions } from "#/components/layout/toolbar-actions";
+import { useSearch } from "#/components/search/use-search";
+import { Button } from "#/components/ui/button";
 
+/** Phone-only bar: brand, search and account. Desktop uses the sidebar. */
 export function TopBar() {
 	const { actions } = useToolbarActions();
+	const search = useSearch();
 	const path = useRouterState({ select: (state) => state.location.pathname });
-	const hasPageSearch = [
-		"/app/archive",
-		"/app/articles",
-		"/app/favorites",
-		"/app/tags",
-	].includes(path);
 
 	return (
 		<ColumnNavbar
 			key={path}
 			aria-label="Main content navigation"
+			className="md:hidden"
 			left={[<AppBrandMark key="brand" />]}
-			center={hasPageSearch ? [] : [<AppSearch key="search" />]}
 			right={
 				actions
 					? [
@@ -33,11 +31,19 @@ export function TopBar() {
 						]
 					: []
 			}
-			mobileRight={[<AppToolbar key="account" />]}
+			mobileRight={[
+				<Button
+					key="search"
+					variant="ghost"
+					size="icon-sm"
+					aria-label="Search"
+					onClick={search.open}
+				>
+					<MagnifyingGlass className="size-5" />
+				</Button>,
+				<AppToolbar key="account" />,
+			]}
 			mobileMenuLabel="Main actions"
-			// On desktop the brand mark and account live in the sidebar, so an
-			// otherwise empty bar is hidden.
-			className={hasPageSearch && !actions ? "md:hidden" : undefined}
 		/>
 	);
 }

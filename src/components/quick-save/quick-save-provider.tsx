@@ -1,7 +1,7 @@
 import { type ReactNode, useCallback, useMemo, useState } from "react";
 import { QuickSaveContext } from "#/components/quick-save/quick-save-context";
 import { QuickSaveDialog } from "#/components/quick-save/quick-save-dialog";
-import { useQuickSaveShortcuts } from "#/components/quick-save/use-quick-save-shortcuts";
+import { useQuickSavePaste } from "#/components/quick-save/use-quick-save-paste";
 
 type QuickSaveProviderProps = {
 	children: ReactNode;
@@ -15,7 +15,7 @@ export function QuickSaveProvider({ children }: QuickSaveProviderProps) {
 	}, []);
 	const value = useMemo(() => ({ open }), [open]);
 
-	useQuickSaveShortcuts(open);
+	useQuickSavePaste(open);
 
 	return (
 		<QuickSaveContext value={value}>

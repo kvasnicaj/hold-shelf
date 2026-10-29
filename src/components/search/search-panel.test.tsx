@@ -1,7 +1,7 @@
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { AppSearch } from "#/components/layout/app-search";
+import { SearchPanel } from "#/components/search/search-panel";
 import { getArticles } from "#/server/articles";
 import { renderWithProviders } from "#/test/render";
 
@@ -47,7 +47,7 @@ const article = {
 	tags: [],
 };
 
-describe("AppSearch", () => {
+describe("SearchPanel", () => {
 	beforeEach(() => {
 		navigateMock.mockReset();
 		handleOpenArticleMock.mockReset().mockResolvedValue(undefined);
@@ -59,7 +59,7 @@ describe("AppSearch", () => {
 
 	it("searches saved articles globally and shows highlighted previews", async () => {
 		const user = userEvent.setup();
-		renderWithProviders(<AppSearch />);
+		renderWithProviders(<SearchPanel />);
 
 		await user.type(
 			screen.getByPlaceholderText("Search all saved articles..."),
@@ -103,7 +103,7 @@ describe("AppSearch", () => {
 			],
 			total: 1,
 		});
-		renderWithProviders(<AppSearch />);
+		renderWithProviders(<SearchPanel />);
 
 		await user.type(
 			screen.getByPlaceholderText("Search all saved articles..."),
@@ -130,7 +130,7 @@ describe("AppSearch", () => {
 
 	it("submits searches to the archive results page", async () => {
 		const user = userEvent.setup();
-		renderWithProviders(<AppSearch />);
+		renderWithProviders(<SearchPanel />);
 
 		const search = screen.getByPlaceholderText("Search all saved articles...");
 		await user.type(search, "rust{Enter}");

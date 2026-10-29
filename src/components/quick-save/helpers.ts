@@ -25,21 +25,3 @@ export function toHttpUrl(value: string): string | null {
 export function getDisplayHost(url: string): string {
 	return new URL(url).hostname.replace(/^www\./, "");
 }
-
-export function isEditableTarget(target: EventTarget | null): boolean {
-	if (!(target instanceof HTMLElement)) return false;
-	return (
-		target.isContentEditable ||
-		target instanceof HTMLInputElement ||
-		target instanceof HTMLTextAreaElement ||
-		target instanceof HTMLSelectElement
-	);
-}
-
-export function isModalOpen(): boolean {
-	return Boolean(
-		document.querySelector(
-			'[role="dialog"][data-state="open"], [role="alertdialog"][data-state="open"]',
-		),
-	);
-}
