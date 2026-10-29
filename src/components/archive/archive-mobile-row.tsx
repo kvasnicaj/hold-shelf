@@ -1,8 +1,8 @@
-import { BookmarkSimple, DotsThreeVertical } from "@phosphor-icons/react";
+import { DotsThreeVertical } from "@phosphor-icons/react";
 import { ArticleActionsMenuItems } from "#/components/archive/article-actions-menu-items";
 import type { ArchiveActions } from "#/components/archive/types";
 import { ArticleExternalLink } from "#/components/articles/article-external-link";
-import { ReadStateSpine } from "#/components/articles/read-state-spine";
+import { ArticleStateMarks } from "#/components/articles/article-state-marks";
 import type { ArticleWithTags } from "#/components/articles/types";
 import { TagPicker } from "#/components/tags/tag-picker";
 import { Badge } from "#/components/ui/badge";
@@ -42,7 +42,7 @@ export function ArchiveMobileRow({
 		// biome-ignore lint/a11y/useSemanticElements: The composite row contains nested controls, so it cannot be a native button.
 		<div
 			className={cn(
-				"grid cursor-pointer grid-cols-[6px_minmax(0,1fr)_auto] gap-x-2.5 border-b py-3 pr-2 pl-3",
+				"grid cursor-pointer grid-cols-[1.25rem_minmax(0,1fr)_auto] gap-x-2.5 border-b py-3 pr-2 pl-3",
 				isSelected && "bg-select",
 			)}
 			onClick={() => void onOpenArticle(article.id, article.isRead)}
@@ -54,7 +54,11 @@ export function ArchiveMobileRow({
 			role="button"
 			tabIndex={0}
 		>
-			<ReadStateSpine isRead={article.isRead} className="mt-1" />
+			<ArticleStateMarks
+				isRead={article.isRead}
+				isFavorite={article.isFavorite}
+				className="mt-0.5 self-start"
+			/>
 
 			<div className="min-w-0 space-y-1">
 				<div className="flex min-w-0 items-start gap-2">
@@ -94,13 +98,6 @@ export function ArchiveMobileRow({
 						<span className="tabular-nums">
 							· {formatDate(article.createdAt)}
 						</span>
-					)}
-					{article.isFavorite && (
-						<BookmarkSimple
-							aria-label="Favorite"
-							weight="fill"
-							className="size-3 text-favorite"
-						/>
 					)}
 					{article.tags.map((tag) => (
 						<Badge

@@ -17,8 +17,8 @@ vi.mock("#/server/tags", () => ({
 vi.mock("@tanstack/react-router", () => ({
 	useRouter: () => ({ invalidate: vi.fn() }),
 }));
-vi.mock("#/components/articles/use-auto-mark-read-on-open", () => ({
-	useAutoMarkReadOnOpen: () => ({ handleOpenArticle: vi.fn() }),
+vi.mock("#/components/articles/use-open-article", () => ({
+	useOpenArticle: () => ({ handleOpenArticle: vi.fn() }),
 }));
 vi.mock("#/components/article-reader/use-article-reader", () => ({
 	useArticleReader: () => ({ openArticle: vi.fn() }),

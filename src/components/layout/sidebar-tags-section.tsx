@@ -63,8 +63,8 @@ export function SidebarTagsSection({
 	}
 
 	return (
-		<section className="mt-6">
-			<div className="mb-2 flex items-center justify-between gap-2 px-2">
+		<section className="mt-6 flex min-h-0 flex-1 flex-col">
+			<div className="mr-3 mb-2 flex items-center justify-between gap-2 px-2">
 				<p className="text-xs font-semibold text-muted-foreground">Tags</p>
 				<CreateTagDialog
 					onCreate={handleCreateTag}
@@ -80,9 +80,12 @@ export function SidebarTagsSection({
 				placeholder="Filter tags..."
 				ariaLabel="Filter tags"
 				onSearch={setFilter}
-				className="mb-2"
+				className="mr-3 mb-2"
 			/>
-			<nav className="space-y-0.5">
+			<nav
+				aria-label="Tags"
+				className="min-h-0 flex-1 space-y-0.5 overflow-y-auto pr-3 [scrollbar-gutter:stable]"
+			>
 				{filteredTags.length > 0 ? (
 					filteredTags.map((tag) => (
 						<SidebarTagItem

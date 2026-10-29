@@ -95,4 +95,32 @@ describe("ArticleCard", () => {
 		await user.click(screen.getByTitle("Delete"));
 		expect(onDelete).toHaveBeenCalledWith("a1");
 	});
+
+	it("shows how long an unread article has waited and marks favorites beside the spine", () => {
+		const props = {
+			selected: false,
+			onSelect: vi.fn(),
+			onOpenArticle: vi.fn(),
+			onToggleRead: vi.fn(),
+			onToggleFavorite: vi.fn(),
+			onDelete: vi.fn(),
+		};
+		const first = renderWithProviders(
+			<ArticleCard article={buildArticle({ isFavorite: true })} {...props} />,
+		);
+
+		expect(screen.getByText(/^Unread for \d+ days$/)).toBeInTheDocument();
+		expect(screen.getByRole("img", { name: "Unread" })).toBeInTheDocument();
+		expect(screen.getByRole("img", { name: "Favorite" })).toBeInTheDocument();
+
+		first.unmount();
+		renderWithProviders(
+			<ArticleCard article={buildArticle({ isRead: true })} {...props} />,
+		);
+
+		expect(screen.queryByText(/^Unread for/)).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole("img", { name: "Favorite" }),
+		).not.toBeInTheDocument();
+	});
 });

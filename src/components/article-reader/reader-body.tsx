@@ -5,13 +5,18 @@ import { ArticleReaderContent } from "#/components/article-reader/article-reader
 import { ArticleReaderFallback } from "#/components/article-reader/article-reader-fallback";
 import { ArticleReaderMetadata } from "#/components/article-reader/article-reader-metadata";
 import {
+	READ_AT_END_PROGRESS,
 	READER_MEASURES,
 	withoutRepeatedTitle,
 } from "#/components/article-reader/helpers";
 import type { ReaderSettings } from "#/components/article-reader/types";
 import { cn } from "#/lib/utils";
 import type { ArticleReaderRecord } from "#/server/articles-service";
-import { getReadingProgress, saveReadingProgress } from "#/server/library";
+import {
+	finishReading,
+	getReadingProgress,
+	saveReadingProgress,
+} from "#/server/library";
 
 type ReaderBodyProps = {
 	data: ArticleReaderRecord;
@@ -46,6 +51,7 @@ export function ReaderBody({ data, settings }: ReaderBodyProps) {
 		const element = scroll.current;
 		if (!element) return;
 		let pending: number | null = null;
+		let finished = data.article.isRead;
 		let timer: ReturnType<typeof setTimeout> | undefined;
 		const flush = () => {
 			if (pending === null) return;
@@ -80,6 +86,24 @@ export function ReaderBody({ data, settings }: ReaderBodyProps) {
 				0,
 				Math.min(10000, Math.round((element.scrollTop / range) * 10000)),
 			);
+			if (!finished && pending >= READ_AT_END_PROGRESS) {
+				finished = true;
+				void finishReading({ data: { id: data.article.id } })
+					.then(() => {
+						void client.invalidateQueries({ queryKey: ["articles"] });
+						void client.invalidateQueries({
+							queryKey: ["article-reader", data.article.id],
+						});
+						void client.invalidateQueries({ queryKey: ["continue-reading"] });
+						toast.success("Marked as read", { id: "read-at-end" });
+					})
+					.catch(() => {
+						finished = false;
+						toast.error("This article could not be marked as read.", {
+							id: "read-at-end-error",
+						});
+					});
+			}
 			clearTimeout(timer);
 			timer = setTimeout(flush, 800);
 		};
@@ -91,7 +115,7 @@ export function ReaderBody({ data, settings }: ReaderBodyProps) {
 			element.removeEventListener("scroll", onScroll);
 			window.removeEventListener("pagehide", flush);
 		};
-	}, [client, data.article.id]);
+	}, [client, data.article.id, data.article.isRead]);
 	return (
 		<div ref={scroll} className="min-h-0 flex-1 overflow-y-auto">
 			<div aria-hidden="true" className="sticky top-0 z-10 h-0.5">

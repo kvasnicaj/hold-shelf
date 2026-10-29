@@ -7,7 +7,7 @@ import {
 } from "#/components/articles/query-options";
 import type { ArticleSort } from "#/components/articles/types";
 import { useArticleMutations } from "#/components/articles/use-article-mutations";
-import { useAutoMarkReadOnOpen } from "#/components/articles/use-auto-mark-read-on-open";
+import { useOpenArticle } from "#/components/articles/use-open-article";
 
 const route = getRouteApi("/app/archive");
 
@@ -18,7 +18,7 @@ export function useArchivePage() {
 	const selectedTagIds = tags?.length ? tags : tag ? [tag] : [];
 	const navigate = useNavigate({ from: "/app/archive" });
 	const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
-	const { handleOpenArticle } = useAutoMarkReadOnOpen();
+	const { handleOpenArticle } = useOpenArticle();
 	const {
 		handleToggleRead,
 		handleToggleFavorite,

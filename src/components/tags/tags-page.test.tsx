@@ -94,9 +94,8 @@ vi.mock("#/server/tag-shares", () => ({
 	revokeTagShare: revokeTagShareMock,
 }));
 
-vi.mock("#/components/articles/use-auto-mark-read-on-open", () => ({
-	useAutoMarkReadOnOpen: () => ({
-		markReadOnOpen: true,
+vi.mock("#/components/articles/use-open-article", () => ({
+	useOpenArticle: () => ({
 		handleOpenArticle: vi.fn().mockResolvedValue(undefined),
 	}),
 }));

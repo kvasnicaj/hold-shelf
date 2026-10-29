@@ -2,7 +2,7 @@ import { MagnifyingGlass } from "@phosphor-icons/react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { useAutoMarkReadOnOpen } from "#/components/articles/use-auto-mark-read-on-open";
+import { useOpenArticle } from "#/components/articles/use-open-article";
 import {
 	getHighlightedParts,
 	getSearchPreviewText,
@@ -15,7 +15,7 @@ export function AppSearch() {
 	const [search, setSearch] = useState("");
 	const [focused, setFocused] = useState(false);
 	const navigate = useNavigate();
-	const { handleOpenArticle } = useAutoMarkReadOnOpen();
+	const { handleOpenArticle } = useOpenArticle();
 	const trimmedSearch = search.trim();
 	const debouncedSearch = useDebouncedValue(trimmedSearch);
 	const showResults = focused && trimmedSearch.length >= 2;
