@@ -8,6 +8,8 @@ type NavLinkProps = {
 	label: string;
 	isActive: boolean;
 	badge?: number;
+	/** Key pressed after G to reach this page. */
+	shortcutKey?: string;
 };
 
 export function NavLink({
@@ -16,11 +18,18 @@ export function NavLink({
 	label,
 	isActive,
 	badge,
+	shortcutKey,
 }: NavLinkProps) {
 	return (
 		<Link
 			to={href}
 			aria-current={isActive ? "page" : undefined}
+			aria-keyshortcuts={shortcutKey ? `g ${shortcutKey}` : undefined}
+			title={
+				shortcutKey
+					? `${label} (G then ${shortcutKey.toUpperCase()})`
+					: undefined
+			}
 			className={cn(
 				"flex h-8 items-center gap-2.5 rounded-md px-2.5 text-sm no-underline transition-colors",
 				isActive

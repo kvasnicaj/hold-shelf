@@ -1,4 +1,4 @@
-import { Plus } from "@phosphor-icons/react";
+import { MagnifyingGlass, Plus } from "@phosphor-icons/react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { BrandLogo } from "#/components/brand/brand-logo";
@@ -8,6 +8,7 @@ import { SaveLinkAction } from "#/components/layout/save-link-action";
 import { SidebarTagsSection } from "#/components/layout/sidebar-tags-section";
 import { SidebarUserMenu } from "#/components/layout/sidebar-user-menu";
 import { useUnreadCount } from "#/components/layout/use-unread-count";
+import { useSearch } from "#/components/search/use-search";
 import { Button } from "#/components/ui/button";
 import { getTags } from "#/server/tags";
 
@@ -16,6 +17,7 @@ export function AppSidebar() {
 	const currentPath = routerState.location.pathname;
 	const searchParams = routerState.location.search as Record<string, string>;
 	const unreadCount = useUnreadCount();
+	const search = useSearch();
 
 	const { data: tagList = [] } = useQuery({
 		queryKey: ["tags"],
@@ -31,7 +33,7 @@ export function AppSidebar() {
 				<BrandLogo className="h-7" />
 			</Link>
 
-			<div className="mr-3 mb-4">
+			<div className="mr-3 mb-4 space-y-2">
 				<SaveLinkAction>
 					<Button className="w-full justify-start" aria-keyshortcuts="S">
 						<Plus />
@@ -41,6 +43,16 @@ export function AppSidebar() {
 						</kbd>
 					</Button>
 				</SaveLinkAction>
+				<button
+					type="button"
+					onClick={search.open}
+					aria-keyshortcuts="/"
+					className="flex h-8 w-full items-center gap-2.5 rounded-md border border-sidebar-border bg-card px-2.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+				>
+					<MagnifyingGlass className="size-4 shrink-0" />
+					Search
+					<kbd className="ml-auto">/</kbd>
+				</button>
 			</div>
 
 			<div className="flex min-h-0 flex-1 flex-col">
@@ -52,6 +64,7 @@ export function AppSidebar() {
 							icon={item.icon}
 							label={item.label}
 							isActive={currentPath === item.href}
+							shortcutKey={item.shortcutKey}
 							badge={
 								item.href === unreadNavHref && unreadCount > 0
 									? unreadCount

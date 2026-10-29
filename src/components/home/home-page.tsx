@@ -16,7 +16,7 @@ export function HomePage() {
 		useArticleMutations();
 
 	return (
-		<div className="w-full space-y-8 md:px-2 md:pt-2">
+		<div className="w-full space-y-8">
 			<header className="space-y-2">
 				<h1 className="font-serif text-[2rem] leading-tight font-semibold text-balance">
 					Make time for a good read

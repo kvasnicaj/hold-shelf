@@ -100,16 +100,23 @@ The reader is its own mode: everything except the text steps back.
 - **Desktop:** the sidebar sits on the paper ground. Main content and the
   reader are sheets (`bg-card`, `rounded-xl`, border) set 8 px into the
   ground.
-- **Sidebar:** logo, then Save a link as the only primary button, then Home,
-  Unread, Favorites and Library, then Tags, then the account. The active item
-  is a sheet with a hairline ring and a filled teal icon. Counts use tabular
-  numbers; the unread count is teal. Only the tag list scrolls.
+- **No desktop top bar:** every page heading starts at the same place in the
+  sheet.
+- **Sidebar:** logo, then Save a link as the only primary button and a Search
+  field-style button, then Home, Unread, Favorites and Library, then Tags, then
+  the account. The active item is a sheet with a hairline ring and a filled
+  teal icon. Counts use tabular numbers; the unread count is teal. Only the tag
+  list scrolls.
 - **Mobile bottom bar:** Home, Unread, Save, Favorites, Library on a flat paper
   bar with one hairline. Save is a filled button in the middle. The active tab
   has a teal icon and a short teal line under it, echoing the logo's shelf.
   Labels are always visible.
-- **Mobile top bar:** brand symbol on the left, account avatar on the right.
-  On mobile, tags are reached from Library's tag row.
+- **Mobile top bar:** brand symbol on the left, search and the account avatar
+  on the right. On mobile, tags are reached from Library's tag row.
+- **Search** is one dialog opened from the sidebar, the mobile top bar or `/`.
+- **Keyboard shortcuts:** S saves a link, `/` searches, `?` lists shortcuts,
+  and G followed by H, U, F or L opens Home, Unread, Favorites or Library.
+  Navigation items carry the shortcut in `aria-keyshortcuts` and their tooltip.
 
 ## Article states
 
