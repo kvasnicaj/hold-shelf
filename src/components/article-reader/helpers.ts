@@ -4,6 +4,8 @@ import type {
 } from "#/components/article-reader/types";
 
 export const READER_SETTINGS_KEY = "reader-preferences";
+/** Scroll progress (out of 10000) at which an article counts as finished. */
+export const READ_AT_END_PROGRESS = 9800;
 export const READER_FONT_SIZE_RANGE = { min: 15, max: 24 } as const;
 export const DEFAULT_READER_SETTINGS: ReaderSettings = {
 	fontSize: 19,

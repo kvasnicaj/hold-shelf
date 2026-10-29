@@ -1,6 +1,7 @@
+import { getUnreadAgeLabel } from "#/components/article-reader/helpers";
 import { ArticleCardActions } from "#/components/articles/article-card-actions";
 import { ArticleExternalLink } from "#/components/articles/article-external-link";
-import { ReadStateSpine } from "#/components/articles/read-state-spine";
+import { ArticleStateMarks } from "#/components/articles/article-state-marks";
 import type { ArticleCardProps } from "#/components/articles/types";
 import { Badge } from "#/components/ui/badge";
 import { Checkbox } from "#/components/ui/checkbox";
@@ -20,13 +21,16 @@ export function ArticleCardMobile({
 	onRemoveTag,
 	onCreateTag,
 }: ArticleCardProps) {
-	const timeAgo = article.createdAt ? formatTimeAgo(article.createdAt) : "";
+	// Unread articles show how long they have waited; read ones show when they were saved.
+	const timeAgo =
+		getUnreadAgeLabel(article) ??
+		(article.createdAt ? formatTimeAgo(article.createdAt) : "");
 
 	return (
 		// biome-ignore lint/a11y/useSemanticElements: The composite card contains nested controls, so it cannot be a native button.
 		<div
 			className={cn(
-				"grid cursor-pointer grid-cols-[6px_minmax(0,1fr)] gap-x-2.5 py-3.5 pr-3 pl-3",
+				"grid cursor-pointer grid-cols-[1.25rem_minmax(0,1fr)] gap-x-2.5 py-3.5 pr-3 pl-3",
 				selected && "bg-select",
 			)}
 			onClick={() => void onOpenArticle(article.id, article.isRead)}
@@ -38,7 +42,11 @@ export function ArticleCardMobile({
 			role="button"
 			tabIndex={0}
 		>
-			<ReadStateSpine isRead={article.isRead} className="mt-1" />
+			<ArticleStateMarks
+				isRead={article.isRead}
+				isFavorite={article.isFavorite}
+				className="mt-0.5 self-start"
+			/>
 			<div className="min-w-0 space-y-2">
 				<ArticleExternalLink
 					articleId={article.id}

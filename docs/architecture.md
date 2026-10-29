@@ -119,7 +119,7 @@ AppLayout
 |  |  |- AppSidebar -> BrandLogo (horizontal)
 |  |  |  |- SaveLinkAction (opens Quick save)
 |  |  |  |- NavLink (Home, Unread, Favorites, Library)
-|  |  |  |- SidebarTagsSection
+|  |  |  |- SidebarTagsSection (only the tag list scrolls)
 |  |  |  |- SidebarUserMenu -> UserAvatar
 |  |
 |  |- main content (sheet inset into the paper ground on desktop)
@@ -444,8 +444,8 @@ Purpose:
 - spacious entry point after login: what is waiting, what to resume, and three
   shelves of recent content rather than a stats dashboard
 - each shelf sits on a 2px ink line from the logo and links to its full page
-- dashboard article links use the shared open handler, so unread items can auto-mark
-  as read when the user preference is enabled
+- dashboard article links use the shared `useOpenArticle` handler, which opens
+  the reader without changing read state
 - recently saved articles reuse `TagPicker` and the shared article mutation hook
   for tag creation, assignment, and removal
 
@@ -629,9 +629,9 @@ Component tree:
 
 ```text
 SettingsPage
+|- one column, from everyday options to account removal
 |- Appearance card
 |  |- ThemeToggle
-|- ReadingSettingsCard
 |- Browser extension card
 |  |- CTA button -> Chrome Web Store
 |- LibraryBackupCard
@@ -646,7 +646,6 @@ Core functionality:
 
 - cycles theme between light, dark, and auto
 - persists theme to `localStorage`
-- stores the auto-mark-read-on-open preference in the database per user
 - links signed-in users to the Chrome Web Store extension install
 - shows the signed-in GitHub account details and provider summary
 - lets users generate, replace, and revoke one personal access token
@@ -1014,7 +1013,10 @@ The reader uses `#article=<id>` in the current app URL for reload and browser hi
 Below 1536px it is a Radix modal with focus trapping, Escape, and focus return; wider
 screens use a non-modal side column. The reader saves scroll position after an
 800ms pause and flushes on close/page hide, then updates Continue reading. A page
-shutdown can still interrupt an in-flight request. Text size (15–24 px), line
+shutdown can still interrupt an in-flight request. Opening an article never
+changes its read state; when the reader scrolls past 98% of an unread article it
+calls `finishReading`, which marks it read and completes its progress. The older
+`markReadOnOpen` user setting is still stored but no longer used by the app. Text size (15–24 px), line
 width (56, 64 or 76ch) and font (serif or sans) are local browser preferences set
 from the toolbar's Aa menu (`ReaderPreferences`, `useReaderSettings`); older stored
 text sizes are kept. A 2px teal line at the top of the reader shows the scroll

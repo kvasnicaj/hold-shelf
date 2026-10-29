@@ -103,11 +103,11 @@ export function ArchiveTable({
 			}}
 		>
 			<table
-				className="group/table w-full table-fixed border-t"
+				className="group/table w-full table-fixed"
 				data-selecting={hasSelection}
 			>
 				<thead>
-					<tr className="h-8 text-left">
+					<tr className="h-8 border-b text-left">
 						{headers.map((header) => (
 							<th
 								key={header.id}
@@ -131,7 +131,7 @@ export function ArchiveTable({
 								<th
 									colSpan={headers.length}
 									scope="colgroup"
-									className="border-t px-2 pt-5 pb-1.5 text-left font-normal"
+									className="border-b px-2 pt-6 pb-1.5 text-left font-normal"
 								>
 									<MonthGroupLabel
 										label={group.label}
@@ -144,7 +144,7 @@ export function ArchiveTable({
 							<tr
 								key={row.id}
 								data-state={selectedRows[row.id] ? "selected" : undefined}
-								className="group/row h-11 cursor-pointer border-t transition-colors hover:bg-background data-[state=selected]:bg-select"
+								className="group/row h-11 cursor-pointer border-b transition-colors hover:bg-background data-[state=selected]:bg-select"
 								onClick={() =>
 									void onOpenArticle(row.original.id, row.original.isRead)
 								}

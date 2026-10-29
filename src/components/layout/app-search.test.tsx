@@ -24,8 +24,8 @@ vi.mock("@tanstack/react-router", async () => {
 	};
 });
 
-vi.mock("#/components/articles/use-auto-mark-read-on-open", () => ({
-	useAutoMarkReadOnOpen: () => ({
+vi.mock("#/components/articles/use-open-article", () => ({
+	useOpenArticle: () => ({
 		handleOpenArticle: handleOpenArticleMock,
 	}),
 }));

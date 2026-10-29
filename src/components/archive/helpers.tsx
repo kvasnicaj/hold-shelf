@@ -1,4 +1,3 @@
-import { BookmarkSimple } from "@phosphor-icons/react";
 import {
 	columnSizingFeature,
 	columnVisibilityFeature,
@@ -11,7 +10,7 @@ import {
 import { ArchiveActionsCell } from "#/components/archive/archive-actions-cell";
 import type { ArchiveActions } from "#/components/archive/types";
 import { ArticleExternalLink } from "#/components/articles/article-external-link";
-import { ReadStateSpine } from "#/components/articles/read-state-spine";
+import { ArticleStateMarks } from "#/components/articles/article-state-marks";
 import type { ArticleWithTags, MonthGroup } from "#/components/articles/types";
 import { Badge } from "#/components/ui/badge";
 import { Checkbox } from "#/components/ui/checkbox";
@@ -92,8 +91,13 @@ export function createArchiveColumns({
 		columnHelper.display({
 			id: "status",
 			header: () => null,
-			cell: ({ row }) => <ReadStateSpine isRead={row.original.isRead} />,
-			size: 14,
+			cell: ({ row }) => (
+				<ArticleStateMarks
+					isRead={row.original.isRead}
+					isFavorite={row.original.isFavorite}
+				/>
+			),
+			size: 28,
 		}),
 		columnHelper.accessor("title", {
 			header: "Title",
@@ -126,13 +130,6 @@ export function createArchiveColumns({
 						>
 							{article.title ?? article.url}
 						</ArticleExternalLink>
-						{article.isFavorite && (
-							<BookmarkSimple
-								weight="fill"
-								aria-label="Favorite"
-								className="size-3.5 shrink-0 text-favorite"
-							/>
-						)}
 						{article.hostname && (
 							<span className="min-w-10 shrink-[1000] truncate text-xs text-muted-foreground">
 								{article.hostname}

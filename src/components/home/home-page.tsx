@@ -1,6 +1,6 @@
 import { getRouteApi } from "@tanstack/react-router";
 import { useArticleMutations } from "#/components/articles/use-article-mutations";
-import { useAutoMarkReadOnOpen } from "#/components/articles/use-auto-mark-read-on-open";
+import { useOpenArticle } from "#/components/articles/use-open-article";
 import { ContinueReadingSection } from "#/components/home/continue-reading-section";
 import { EmptyLibraryCta } from "#/components/home/empty-library-cta";
 import { getHomeSummary } from "#/components/home/helpers";
@@ -11,7 +11,7 @@ const route = getRouteApi("/app/home");
 
 export function HomePage() {
 	const { stats, recent, tags } = route.useLoaderData();
-	const { handleOpenArticle } = useAutoMarkReadOnOpen();
+	const { handleOpenArticle } = useOpenArticle();
 	const { handleAddTag, handleRemoveTag, handleCreateTag } =
 		useArticleMutations();
 

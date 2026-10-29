@@ -43,8 +43,8 @@ export function AppSidebar() {
 				</SaveLinkAction>
 			</div>
 
-			<div className="min-h-0 flex-1 overflow-y-auto pr-3 [scrollbar-gutter:stable]">
-				<nav aria-label="Main" className="space-y-0.5">
+			<div className="flex min-h-0 flex-1 flex-col">
+				<nav aria-label="Main" className="mr-3 space-y-0.5">
 					{primaryNavItems.map((item) => (
 						<NavLink
 							key={item.href}

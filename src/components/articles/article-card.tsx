@@ -1,6 +1,7 @@
+import { getUnreadAgeLabel } from "#/components/article-reader/helpers";
 import { ArticleCardActions } from "#/components/articles/article-card-actions";
 import { ArticleCardContent } from "#/components/articles/article-card-content";
-import { ReadStateSpine } from "#/components/articles/read-state-spine";
+import { ArticleStateMarks } from "#/components/articles/article-state-marks";
 import type { ArticleCardProps } from "#/components/articles/types";
 import { Checkbox } from "#/components/ui/checkbox";
 import { formatTimeAgo } from "#/lib/formatters";
@@ -20,7 +21,10 @@ export function ArticleCard({
 	onRemoveTag,
 	onCreateTag,
 }: ArticleCardProps) {
-	const timeAgo = article.createdAt ? formatTimeAgo(article.createdAt) : "";
+	// Unread articles show how long they have waited; read ones show when they were saved.
+	const timeAgo =
+		getUnreadAgeLabel(article) ??
+		(article.createdAt ? formatTimeAgo(article.createdAt) : "");
 
 	return (
 		// biome-ignore lint/a11y/useSemanticElements: The composite card contains nested controls, so it cannot be a native button.
@@ -48,7 +52,11 @@ export function ArticleCard({
 					selected || selectionMode ? "opacity-100" : "opacity-0",
 				)}
 			/>
-			<ReadStateSpine isRead={article.isRead} className="mt-1" />
+			<ArticleStateMarks
+				isRead={article.isRead}
+				isFavorite={article.isFavorite}
+				className="mt-0.5"
+			/>
 
 			<ArticleCardContent
 				article={article}

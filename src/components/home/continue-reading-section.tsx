@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArticleExternalLink } from "#/components/articles/article-external-link";
 import { ReadingProgressBar } from "#/components/articles/reading-progress-bar";
 import { useArticleMutations } from "#/components/articles/use-article-mutations";
-import { useAutoMarkReadOnOpen } from "#/components/articles/use-auto-mark-read-on-open";
+import { useOpenArticle } from "#/components/articles/use-open-article";
 import { Button } from "#/components/ui/button";
 import { getContinueReading } from "#/server/library";
 
@@ -13,7 +13,7 @@ export function ContinueReadingSection() {
 		queryFn: () => getContinueReading(),
 	});
 	const { handleFinishReading, isPending } = useArticleMutations();
-	const { handleOpenArticle } = useAutoMarkReadOnOpen();
+	const { handleOpenArticle } = useOpenArticle();
 	const [lead, ...others] = data;
 	if (!lead) return null;
 	const leadPercent = Math.round(lead.progress / 100);

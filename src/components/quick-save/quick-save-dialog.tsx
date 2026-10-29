@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { tagListOptions } from "#/components/articles/query-options";
-import { useAutoMarkReadOnOpen } from "#/components/articles/use-auto-mark-read-on-open";
+import { useOpenArticle } from "#/components/articles/use-open-article";
 import { useSaveArticle } from "#/components/articles/use-save-article";
 import { QuickSaveForm } from "#/components/quick-save/quick-save-form";
 import type { QuickSaveMode } from "#/components/quick-save/types";
@@ -34,7 +34,7 @@ export function QuickSaveDialog({
 }: QuickSaveDialogProps) {
 	const isMobile = useIsMobile();
 	const { handleAdd } = useSaveArticle();
-	const { handleOpenArticle } = useAutoMarkReadOnOpen();
+	const { handleOpenArticle } = useOpenArticle();
 	const { data: tags = [] } = useQuery({ ...tagListOptions(), enabled: open });
 
 	async function handleSubmit(

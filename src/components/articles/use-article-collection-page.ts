@@ -14,7 +14,7 @@ import type {
 	ArticleSort,
 } from "#/components/articles/types";
 import { useArticleMutations } from "#/components/articles/use-article-mutations";
-import { useAutoMarkReadOnOpen } from "#/components/articles/use-auto-mark-read-on-open";
+import { useOpenArticle } from "#/components/articles/use-open-article";
 
 type UseArticleCollectionPageOptions = {
 	initialData: ArticleCollectionLoaderData;
@@ -35,7 +35,7 @@ export function useArticleCollectionPage({
 	const { q, sort, page: searchPage } = search;
 	const page = searchPage ?? 1;
 	const [selected, setSelected] = useState<Set<string>>(new Set());
-	const { handleOpenArticle } = useAutoMarkReadOnOpen();
+	const { handleOpenArticle } = useOpenArticle();
 	const {
 		handleToggleRead,
 		handleToggleFavorite,

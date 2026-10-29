@@ -102,8 +102,8 @@ The reader is its own mode: everything except the text steps back.
   ground.
 - **Sidebar:** logo, then Save a link as the only primary button, then Home,
   Unread, Favorites and Library, then Tags, then the account. The active item
-  is a sheet with a hairline ring and a teal icon. Counts use tabular numbers;
-  the unread count is teal.
+  is a sheet with a hairline ring and a filled teal icon. Counts use tabular
+  numbers; the unread count is teal. Only the tag list scrolls.
 - **Mobile bottom bar:** Home, Unread, Save, Favorites, Library on a flat paper
   bar with one hairline. Save is a filled button in the middle. The active tab
   has a teal icon and a short teal line under it, echoing the logo's shelf.
@@ -113,10 +113,15 @@ The reader is its own mode: everything except the text steps back.
 
 ## Article states
 
-- **Unread:** an upright 3 px teal spine (`ReadStateSpine`) before the row.
-  It is the one mark taken from the logo; read rows keep the space empty.
-- **Read:** the title turns `text-muted-foreground` at regular weight.
-- **Favorite:** a filled ochre bookmark after the title.
+- **State slot:** every article list starts each row with `ArticleStateMarks`,
+  a fixed slot holding the unread spine and the favorite bookmark. Empty marks
+  keep their space so titles line up.
+- **Unread:** an upright 3 px teal spine (`ReadStateSpine`), the one mark taken
+  from the logo. Unread rows show "Unread for N days" in their metadata.
+- **Read:** the title turns `text-muted-foreground` at regular weight. An
+  article becomes read when the reader reaches the end, or with Mark as read;
+  opening it does not change its state.
+- **Favorite:** a filled ochre bookmark in the state slot, beside the spine.
 - **Selected:** a square checkbox and a `bg-select` row. Checkboxes in dense
   lists appear on hover, on focus, or once anything is selected.
 - **Titles** are ink, never link-colored; teal is reserved for state.
@@ -124,7 +129,8 @@ The reader is its own mode: everything except the text steps back.
 ## Library
 
 - Compact density: one line per article, 44 px rows, no card frame. Columns
-  line up without vertical rules.
+  line up without vertical rules. The header row and month headings have one
+  underline; every row, including the last, ends with a hairline.
 - When sorted by date, rows sit under month headings (serif month, tabular
   count). Sorting by title shows one list.
 - Row actions (tags, more) appear on hover or focus.
@@ -167,6 +173,12 @@ The reader is its own mode: everything except the text steps back.
 - A 2 px teal line under the toolbar shows how far you have read.
 - Article prose uses the `prose-hold` utility so headings, links, quotes and
   code take their colors from the tokens in both themes.
+
+## Settings
+
+- One column of cards (max 3xl), ordered from everyday options to account
+  removal: appearance, browser extension, library backup, account, API token,
+  CLI, delete account.
 
 ## Quick save
 
