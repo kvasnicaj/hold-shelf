@@ -1,33 +1,25 @@
-import { DotsThreeVertical } from "@phosphor-icons/react";
-import { ArticleActionsMenuItems } from "#/components/archive/article-actions-menu-items";
 import type { ArchiveActions } from "#/components/archive/types";
 import { ArticleExternalLink } from "#/components/articles/article-external-link";
+import { ArticleRowMenu } from "#/components/articles/article-row-menu";
 import { ArticleStateMarks } from "#/components/articles/article-state-marks";
 import type { ArticleWithTags } from "#/components/articles/types";
-import { TagPicker } from "#/components/tags/tag-picker";
-import { Badge } from "#/components/ui/badge";
-import { Button } from "#/components/ui/button";
+import { TagLabel } from "#/components/tags/tag-label";
 import { Checkbox } from "#/components/ui/checkbox";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuTrigger,
-} from "#/components/ui/dropdown-menu";
 import { formatDate } from "#/lib/formatters";
 import { cn } from "#/lib/utils";
 
 type ArchiveMobileRowProps = ArchiveActions & {
 	article: ArticleWithTags;
 	isSelected: boolean;
-	showCheckbox: boolean;
+	/** True while any row is selected: taps toggle selection. */
+	selectionMode: boolean;
 	onSelectedChange: (isSelected: boolean) => void;
 };
 
 export function ArchiveMobileRow({
 	article,
 	isSelected,
-	showCheckbox,
+	selectionMode,
 	onSelectedChange,
 	availableTags,
 	onAddTag,
@@ -38,59 +30,72 @@ export function ArchiveMobileRow({
 	onToggleFavorite,
 	onDelete,
 }: ArchiveMobileRowProps) {
+	function activate() {
+		if (selectionMode) {
+			onSelectedChange(!isSelected);
+			return;
+		}
+		void onOpenArticle(article.id, article.isRead);
+	}
+
 	return (
 		// biome-ignore lint/a11y/useSemanticElements: The composite row contains nested controls, so it cannot be a native button.
 		<div
 			className={cn(
-				"grid cursor-pointer grid-cols-[1.25rem_minmax(0,1fr)_auto] gap-x-2.5 border-b py-3 pr-2 pl-3",
+				"grid cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-x-2.5 border-b py-2.5 pr-1 pl-3",
 				isSelected && "bg-select",
 			)}
-			onClick={() => void onOpenArticle(article.id, article.isRead)}
+			onClick={activate}
 			onKeyDown={(event) => {
 				if (event.key === "Enter" && event.target === event.currentTarget) {
-					void onOpenArticle(article.id, article.isRead);
+					activate();
 				}
 			}}
 			role="button"
 			tabIndex={0}
 		>
-			<ArticleStateMarks
-				isRead={article.isRead}
-				isFavorite={article.isFavorite}
-				className="mt-0.5 self-start"
-			/>
+			<div className="flex items-center gap-3 pt-0.5">
+				{selectionMode && (
+					<Checkbox
+						aria-label={`Select ${article.title ?? article.url}`}
+						checked={isSelected}
+						onCheckedChange={(value) => onSelectedChange(!!value)}
+						className="ml-1"
+						onClick={(event) => event.stopPropagation()}
+						onKeyDown={(event) => event.stopPropagation()}
+					/>
+				)}
+				<ArticleStateMarks
+					isRead={article.isRead}
+					isFavorite={article.isFavorite}
+				/>
+			</div>
 
-			<div className="min-w-0 space-y-1">
-				<div className="flex min-w-0 items-start gap-2">
-					{showCheckbox && (
-						<Checkbox
-							aria-label={`Select ${article.title ?? article.url}`}
-							checked={isSelected}
-							onCheckedChange={(value) => onSelectedChange(!!value)}
-							className="mt-0.5"
-							onClick={(event) => event.stopPropagation()}
-							onKeyDown={(event) => event.stopPropagation()}
-						/>
+			<div className="min-w-0 space-y-1 py-0.5">
+				<ArticleExternalLink
+					articleId={article.id}
+					href={article.url}
+					isRead={article.isRead}
+					onOpenArticle={onOpenArticle}
+					onClick={(event) => {
+						if (!selectionMode) return;
+						event.preventDefault();
+						event.stopPropagation();
+						activate();
+					}}
+					className={cn(
+						"block min-w-0 text-[15px] leading-snug no-underline",
+						article.isRead
+							? "font-normal text-muted-foreground"
+							: "font-semibold text-foreground",
 					)}
-					<ArticleExternalLink
-						articleId={article.id}
-						href={article.url}
-						isRead={article.isRead}
-						onOpenArticle={onOpenArticle}
-						className={cn(
-							"min-w-0 flex-1 text-[15px] leading-snug no-underline",
-							article.isRead
-								? "text-muted-foreground"
-								: "font-medium text-foreground",
-						)}
-					>
-						<span className="line-clamp-2 break-words">
-							{article.title ?? article.url}
-						</span>
-					</ArticleExternalLink>
-				</div>
+				>
+					<span className="line-clamp-2 break-words">
+						{article.title ?? article.url}
+					</span>
+				</ArticleExternalLink>
 
-				<div className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1 text-xs text-muted-foreground">
+				<div className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-1 text-meta text-muted-foreground">
 					<span className="max-w-full truncate">
 						{article.hostname ?? article.url}
 					</span>
@@ -100,56 +105,25 @@ export function ArchiveMobileRow({
 						</span>
 					)}
 					{article.tags.map((tag) => (
-						<Badge
-							key={tag.id}
-							variant="secondary"
-							className="px-1.5 py-0 text-[11px] font-semibold"
-						>
-							{tag.name}
-						</Badge>
+						<TagLabel key={tag.id} name={tag.name} />
 					))}
 				</div>
 			</div>
 
-			<div className="flex items-start justify-end">
-				<TagPicker
-					availableTags={availableTags}
-					selectedTagIds={article.tags.map((tag) => tag.id)}
-					articleIds={[article.id]}
-					onAddTag={onAddTag}
-					onRemoveTag={onRemoveTag}
-					onCreateTag={onCreateTag}
-				/>
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button
-							variant="ghost"
-							size="icon-xs"
-							aria-label={`Article actions for ${article.title ?? article.url}`}
-							onClick={(event) => event.stopPropagation()}
-							onKeyDown={(event) => event.stopPropagation()}
-						>
-							<DotsThreeVertical className="size-[1.125rem]" />
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end">
-						<DropdownMenuItem
-							onClick={(event) => {
-								event.stopPropagation();
-								onSelectedChange(!isSelected);
-							}}
-						>
-							{isSelected ? "Deselect article" : "Select article"}
-						</DropdownMenuItem>
-						<ArticleActionsMenuItems
-							article={article}
-							onToggleFavorite={onToggleFavorite}
-							onToggleRead={onToggleRead}
-							onDelete={onDelete}
-						/>
-					</DropdownMenuContent>
-				</DropdownMenu>
-			</div>
+			<ArticleRowMenu
+				article={article}
+				triggerSize="icon-touch"
+				triggerClassName="-mt-2 text-muted-foreground"
+				selected={isSelected}
+				onSelect={(_id, selected) => onSelectedChange(selected)}
+				onToggleRead={onToggleRead}
+				onToggleFavorite={onToggleFavorite}
+				onDelete={(id) => void onDelete([id])}
+				availableTags={availableTags}
+				onAddTag={onAddTag}
+				onRemoveTag={onRemoveTag}
+				onCreateTag={onCreateTag}
+			/>
 		</div>
 	);
 }

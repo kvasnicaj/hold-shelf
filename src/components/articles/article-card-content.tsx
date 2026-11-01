@@ -1,6 +1,6 @@
 import { ArticleExternalLink } from "#/components/articles/article-external-link";
+import { ArticleMetaLine } from "#/components/articles/article-meta-line";
 import type { ArticleWithTags } from "#/components/articles/types";
-import { Badge } from "#/components/ui/badge";
 import { cn } from "#/lib/utils";
 
 type ArticleCardContentProps = {
@@ -16,12 +16,12 @@ export function ArticleCardContent({
 }: ArticleCardContentProps) {
 	return (
 		<div className="min-w-0 flex-1 space-y-1">
-			<div className="flex min-w-0 items-center gap-2">
+			<div className="flex min-w-0 items-start gap-2">
 				{article.faviconUrl && (
 					<img
 						src={article.faviconUrl}
 						alt=""
-						className="size-4 shrink-0 rounded-[3px]"
+						className="mt-[0.1875rem] size-4 shrink-0 rounded-[3px]"
 						onError={(e) => {
 							e.currentTarget.style.display = "none";
 						}}
@@ -33,8 +33,10 @@ export function ArticleCardContent({
 					isRead={article.isRead}
 					onOpenArticle={onOpenArticle}
 					className={cn(
-						"truncate text-[15px] font-semibold leading-snug no-underline hover:underline",
-						article.isRead ? "text-muted-foreground" : "text-foreground",
+						"line-clamp-2 text-[15px] leading-snug break-words no-underline hover:underline",
+						article.isRead
+							? "font-normal text-muted-foreground"
+							: "font-semibold text-foreground",
 					)}
 				>
 					{article.title ?? article.hostname ?? article.url}
@@ -47,20 +49,12 @@ export function ArticleCardContent({
 				</p>
 			)}
 
-			<div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 pt-0.5 text-xs text-muted-foreground">
-				{article.hostname && <span>{article.hostname}</span>}
-				{article.hostname && timeAgo && <span aria-hidden="true">·</span>}
-				{timeAgo && <span className="tabular-nums">{timeAgo}</span>}
-				{article.tags.map((tag) => (
-					<Badge
-						key={tag.id}
-						variant="secondary"
-						className="ml-0.5 px-1.5 py-0 text-[11px] font-semibold"
-					>
-						{tag.name}
-					</Badge>
-				))}
-			</div>
+			<ArticleMetaLine
+				hostname={article.hostname}
+				timeAgo={timeAgo}
+				tags={article.tags}
+				className="pt-0.5"
+			/>
 		</div>
 	);
 }

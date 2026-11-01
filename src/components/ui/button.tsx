@@ -12,6 +12,8 @@ const buttonVariants = cva(
 				default: "bg-primary text-primary-foreground hover:bg-primary/90",
 				destructive:
 					"bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:bg-destructive/60 dark:focus-visible:ring-destructive/40",
+				"destructive-outline":
+					"border border-destructive/35 bg-transparent text-destructive hover:bg-destructive/10 hover:text-destructive focus-visible:ring-destructive/20",
 				outline:
 					"border bg-background hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50",
 				secondary:
@@ -30,6 +32,9 @@ const buttonVariants = cva(
 					"size-7 rounded-md [&_svg:not([class*='size-'])]:size-3.5",
 				"icon-sm":
 					"size-9 [&_svg:not([class*='size-'])]:size-[1.125rem]",
+				/** 44 px touch target with a toolbar-sized icon. */
+				"icon-touch":
+					"size-11 [&_svg:not([class*='size-'])]:size-5",
 				"icon-lg":
 					"size-[3.25rem] [&_svg:not([class*='size-'])]:size-8",
 			},

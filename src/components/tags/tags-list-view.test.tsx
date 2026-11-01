@@ -12,7 +12,6 @@ vi.mock("#/components/tags/tag-item", () => ({
 	TagItem: (props: {
 		tag: { id: string; name: string; articleCount: number };
 		isActive: boolean;
-		mobile: boolean;
 		onSelect: () => void;
 		onRename: (id: string, name: string) => Promise<void>;
 		onDelete: (id: string) => Promise<void>;
@@ -20,7 +19,7 @@ vi.mock("#/components/tags/tag-item", () => ({
 		tagItemMock(props);
 		return (
 			<button type="button" onClick={props.onSelect}>
-				{props.tag.name}:{String(props.isActive)}:{String(props.mobile)}
+				{props.tag.name}:{String(props.isActive)}
 			</button>
 		);
 	},
@@ -58,7 +57,7 @@ describe("TagsListView", () => {
 		expect(tagItemMock).not.toHaveBeenCalled();
 	});
 
-	it("renders tag items with active and mobile state and forwards selection", async () => {
+	it("renders tag items with active state and forwards selection", async () => {
 		const user = userEvent.setup();
 		const onSelectTag = vi.fn();
 		const onRename = vi.fn().mockResolvedValue(undefined);
@@ -72,7 +71,6 @@ describe("TagsListView", () => {
 				]}
 				filter=""
 				activeTagId="t2"
-				mobile
 				onSelectTag={onSelectTag}
 				onRename={onRename}
 				onDelete={onDelete}
@@ -84,7 +82,6 @@ describe("TagsListView", () => {
 			expect.objectContaining({
 				tag: expect.objectContaining({ id: "t1" }),
 				isActive: false,
-				mobile: true,
 				onRename,
 				onDelete,
 			}),
@@ -93,13 +90,10 @@ describe("TagsListView", () => {
 			expect.objectContaining({
 				tag: expect.objectContaining({ id: "t2" }),
 				isActive: true,
-				mobile: true,
 			}),
 		);
 
-		await user.click(
-			screen.getByRole("button", { name: "Engineering:true:true" }),
-		);
+		await user.click(screen.getByRole("button", { name: "Engineering:true" }));
 		expect(onSelectTag).toHaveBeenCalledWith("t2");
 	});
 });

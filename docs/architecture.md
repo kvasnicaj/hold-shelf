@@ -112,7 +112,6 @@ Component tree:
 
 ```text
 AppLayout
-|- ToolbarActionsProvider
 |- ArticleReaderProvider
 |- QuickSaveProvider -> QuickSaveDialog (one instance for the whole app)
 |- SearchProvider -> SearchDialog -> SearchPanel
@@ -129,7 +128,6 @@ AppLayout
 |  |  |- TopBar (phones only)
 |  |  |  |- ColumnNavbar
 |  |  |  |  |- AppBrandMark -> BrandLogo (symbol)
-|  |  |  |  |- route-provided actions
 |  |  |  |  |- search button and AppToolbar (account menu) -> UserAvatar
 |  |  |
 |  |  |- Outlet
@@ -157,10 +155,11 @@ Responsibilities:
 - renders a flat mobile bottom bar with four destinations around Save; the
   active tab sits on a short teal line, and Unread shows its count
 - leaves Tags out of the mobile bottom bar; Library's tag row links to tag management
-- provides a dynamic toolbar channel via `ToolbarActionsProvider`
 - renders column-owned navbars through `ColumnNavbar`, which accepts left,
-  center, and right action arrays and collapses side tools into a mobile
-  overflow menu
+  center, and right item arrays and shows every item. It never hides items in an
+  unlabeled overflow; an owner that runs out of room on phones hides the
+  secondary items itself and repeats them, with labels, in an `ActionsMenu`
+- page actions live in the page heading (`PageHeading`), not in the top bar
 
 ### Brand identity
 
@@ -171,16 +170,21 @@ The component supports horizontal, stacked, symbol, and wordmark layouts; theme
 colors come from `--brand-mark` and `--sea-ink`. It supplies an accessible name
 unless explicitly decorative. See [brand usage](./branding.md).
 
-### Toolbar action system
+### Page headings and action menus
 
-`src/components/layout/toolbar-actions.tsx` lets page components push content
-into the shared top bar without putting page-specific UI into the layout.
+There is no route-to-top-bar action channel. Each page renders its own
+`PageHeading` (`src/components/layout/page-heading.tsx`): the Title 1 serif
+heading, an optional count and description, and its actions on the same line,
+so every page title starts at the same anchor. Settings keeps a narrower column
+below the same anchor.
 
-Used by:
-
-- `ArticlesPage`, `FavoritesPage`, and `ArchivePage` for page-scoped search
-- `TagsPage` for `CreateTagDialog`
-- `TagsPage` for tag filtering search
+Secondary actions that do not fit go into `ActionsMenu`
+(`src/components/layout/actions-menu.tsx`): one "more" button that opens a
+vertical menu of labeled items. Given tag picker options, it adds Tags…, which
+opens `TagPickerPanel` anchored to the same button once the menu has closed.
+`ArticleRowMenu` builds the article version (Select, Mark as read, favorite,
+Tags…, Move to Trash) used by phone rows, the Library table and narrow
+comfortable lists. The reader and the phone tag list use `ActionsMenu` directly.
 
 ## Public routes
 
@@ -199,9 +203,10 @@ Component tree:
 ```text
 LandingPage
 |- PublicPageLayout (wide, Sign in action -> /login)
-|- serif hero headline and description
-|- CTA button -> /login
-|- secondary extension link -> Chrome Web Store
+|- hero: serif headline, description, CTA -> /login, extension link
+|- LandingPreview (beside the hero on wide screens, below it on phones):
+|  a still of Continue reading and an Unread list built from ArticleStateMarks
+|  and ReadingProgressBar with example essays (LANDING_PREVIEW)
 |- three feature notes on an ink shelf line (LANDING_FEATURES)
 ```
 
@@ -545,15 +550,13 @@ Component tree:
 
 ```text
 TagsPage
-|- ToolbarSlot
-|  |- CreateTagDialog
-|- ToolbarSearch? (tag list mode)
-|- page title
-|- list mode
-|  |- TagItem*
-|     |- select tag
-|     |- rename action
-|     |- delete action
+|- PageHeading "Tags" with CreateTagDialog (labeled Create tag)
+|- desktop: hint to choose a tag in the sidebar
+|- phone list mode
+|  |- PageSearchField (filter tags)
+|  |- TagsListView (one hairline-divided list)
+|     |- TagItem*: tag name and count open the tag;
+|        ActionsMenu holds Rename (inline) and Delete tag (danger)
 |- selected tag mode
 |  |- back button
 |  |- selected tag title / count
@@ -588,24 +591,24 @@ Component tree:
 ArchivePage
 |- page title and article count
 |- BulkActionsPanel? (floating toolbar when rows are selected)
-|- ArchiveFilters
+|- ArchiveFilters (wraps by its own width, `@container/filters`)
 |  |- read status filter
 |  |- page search
 |  |- ArchiveTagsCombobox (desktop)
 |  |- sort filter
-|  |- ArchiveTagChips (mobile, with Manage link to /app/tags)
-|- ArchiveTable (desktop)
+|  |- ArchiveTagChips (mobile: scrolling chips, Manage tags fixed at the end)
+|- ArchiveTable (desktop, inside `@container/library`)
 |  |- TanStack Table, one tbody per month when sorted by date
-|  |  |- selection column (revealed on hover or while selecting)
+|  |  |- selection column (revealed on hover, focus, touch or while selecting)
 |  |  |- status column (ReadStateSpine)
-|  |  |- title column (favicon, title, favorite, hostname)
-|  |  |- tags column
-|  |  |- saved date column
+|  |  |- title column (favicon, title, favorite, hostname); takes the rest
+|  |  |- tags column (collapses below a 42rem content width)
+|  |  |- saved date column (collapses below 28rem)
 |  |  |- ArchiveActionsCell (stable across table updates)
 |  |     |- TagPicker
-|  |     |- ArticleActionsMenuItems
+|  |     |- ArticleRowMenu
 |- ArchiveTableMobile (mobile)
-|  |- ArchiveMobileRow per article, grouped by month
+|  |- ArchiveMobileRow per article, grouped by month, with ArticleRowMenu
 |- pagination
 ```
 
@@ -625,8 +628,14 @@ Core functionality:
   group rows under month headings, title sort keeps one list
 - unread articles carry a teal spine, read titles are softened, and titles stay
   ink rather than link-colored
-- mobile Library rows expose the same `TagPicker` alongside article actions
-- mobile filters tags with a scrolling row of chips that ends in Manage
+- column widths follow the table's own content width, not the viewport, so the
+  table also fits beside the wide reader; collapsed columns keep zero-width
+  invisible cells so month headings never add a phantom column
+- mobile Library rows keep one labeled row menu (Select, read, favorite,
+  Tags…, Move to Trash); selecting a row starts selection mode, where taps
+  toggle rows and the floating bulk bar acts on them
+- mobile filters tags with a scrolling row of chips; Manage tags stays fixed
+  outside the scrolling strip
 
 ### Settings
 
@@ -637,8 +646,9 @@ Component tree:
 ```text
 SettingsPage
 |- one column, from everyday options to account removal
+|- PageHeading at the shared anchor; cards below in a max-w-3xl column
 |- Appearance card
-|  |- ThemeToggle
+|  |- ThemeChoice (Light / Dark / System)
 |- Browser extension card
 |  |- CTA button -> Chrome Web Store
 |- LibraryBackupCard
@@ -651,8 +661,9 @@ SettingsPage
 
 Core functionality:
 
-- cycles theme between light, dark, and auto
-- persists theme to `localStorage`
+- offers labeled Light, Dark and System choices; the account menu shows the
+  same choice as a radio group (`ThemeMenuItems`), and both follow each other
+- persists theme to `localStorage` and applies it like the pre-paint init script
 - links signed-in users to the Chrome Web Store extension install
 - shows the signed-in GitHub account details and provider summary
 - lets users generate, replace, and revoke one personal access token
@@ -675,7 +686,8 @@ Flow:
 
 1. `QuickSaveForm` normalizes the input with `toHttpUrl` (adds `https://` when
    the scheme is missing, rejects non-web links) and previews the site.
-2. Optional tags are chosen inline before saving.
+2. Optional tags sit on a labeled Tags row: chosen tags show as removable chips
+   and Choose tags opens the searchable `TagPicker` with existing tags.
 3. Enter saves; Shift+Enter (or Save and read) saves and opens the reader.
 4. `useSaveArticle` calls `createArticle`, assigns the chosen tags with
    `addTagToArticles`, and refreshes article and tag queries.
@@ -694,16 +706,23 @@ with a Paste from clipboard button.
 - `SaveLinkAction`: makes any trigger element open Quick save
 - `useUnreadCount`: shared unread total for the sidebar and bottom bar
 - `ColumnNavbar`: shared column header chrome for left, center, and right controls
-- `SearchPanel` / `useSearch`: app-wide search dialog with highlighted preview results
+- `PageHeading`: Title 1 page heading with count, description and actions
+- `ActionsMenu`: labeled vertical menu of secondary actions, optionally with Tags…
+- `SearchPanel` / `useSearch`: app-wide search dialog. It separates searching,
+  empty, error and result states (keeping the last results dimmed while the
+  next search runs), shows a passage of saved text for body-only matches, and
+  has a close button and a visible "Show all matches in Library" action
 - `ShortcutsProvider`: keyboard shortcuts and their help dialog
 - `AppToolbar`: compact account menu and sign out
-- `ToolBox`: shared chrome for toolbar controls
 
 ### Articles
 
 - `QuickSaveProvider` / `useQuickSave`: app-wide Quick save panel and its shortcuts
 - `ArticleList`: maps article arrays to cards
-- `ArticleCard`: comfortable article row with excerpt, metadata and actions
+- `ArticleCard`: comfortable article row with excerpt, metadata and actions;
+  inline hover actions in lists at least 48rem wide, an `ArticleRowMenu` below
+- `ArticleCardMobile`: phone row with one `ArticleRowMenu`; supports selection mode
+- `ArticleMetaLine` / `TagLabel`: shared site, age and tag labels at the metadata size
 - `ReadStateSpine`: teal unread marker shared by every article list
 - `ReadingProgressBar`: thin teal progress line
 - `BulkActionsPanel`: floating multi-select toolbar above the content
@@ -711,7 +730,10 @@ with a Paste from clipboard button.
 ### Tags route
 
 - `CreateTagDialog`: dedicated tag creation flow
-- `TagPicker`: attach/detach tags and create new ones inline. All article surfaces,
+- `TagPicker` / `TagPickerPanel`: attach/detach tags and create new ones inline
+  (creation is optional; Quick save offers existing tags only). A custom
+  `trigger` replaces the icon button, and `ActionsMenu` anchors the panel to its
+  menu button. All article surfaces,
   including mobile Library, use the same editor with checked selections and a
   selected count. The editor stays open while adding, removing, or creating tags;
   Done, Escape, or an outside click closes it. Pending changes update the selection
@@ -1029,8 +1051,16 @@ width (56, 64 or 76ch) and font (serif or sans) are local browser preferences se
 from the toolbar's Aa menu (`ReaderPreferences`, `useReaderSettings`); older stored
 text sizes are kept. A 2px teal line at the top of the reader shows the scroll
 position; progress is stored with the user's article in D1. The toolbar holds
-close, read, favorite, tags, reading settings, refresh and open original; on
-phones everything after close collapses into the overflow menu.
+close, read, favorite, tags, reading settings, refresh and open original. On
+phones it keeps close, read, favorite and Aa in the bar and moves tags, refresh
+and open original into a labeled `ActionsMenu`.
+
+The reader shows one title. `splitRepeatedTitle` drops a first heading that
+repeats the saved title, comparing plain text with quotes, dashes, case and
+trailing punctuation normalized, and allowing a short publisher name around
+the title ("Title — Site", "Site | Title"). When the saved title carries the
+publisher, the heading's cleaner text becomes the displayed title; a colon
+subtitle or a long tail never counts as a publisher.
 
 Settings includes a JSON backup workflow with articles, tags, flags, saved content,
 reading progress, and Trash. Import accepts version 1 Hold Shelf backups up to
@@ -1041,7 +1071,9 @@ Credentials, API tokens, and public sharing links are excluded. Export reads in
 
 Library keeps the existing `/app/archive` URL. Search includes cached article text
 as well as metadata, with owner and status filters applied. This uses SQLite text
-matching, not a relevance-ranked full-text index. Global search lives in a dialog
+matching, not a relevance-ranked full-text index. When a search is given, each
+listed article also carries `matchExcerpt`: about 240 characters of saved text
+around the first body match (null otherwise). The public API does not expose it. Global search lives in a dialog
 opened from the sidebar, the mobile top bar or the / key. Mobile account navigation directly exposes
 Settings and Trash; desktop/mobile menus share `AccountMenuItems`.
 

@@ -205,6 +205,12 @@
 	--tw-prose-td-borders: var(--border);
 }
 
+/* Small / metadata style from the type scale: 12.5/18. */
+@utility text-meta {
+	font-size: 0.78125rem;
+	line-height: 1.125rem;
+}
+
 html,
 body,
 #app {

@@ -7,8 +7,12 @@ type UseTagPickerOptions = {
 	articleIds: string[];
 	onAddTag: (tagId: string, articleIds: string[]) => void | Promise<void>;
 	onRemoveTag: (tagId: string, articleIds: string[]) => void | Promise<void>;
-	onCreateTag: (name: string) => Promise<Tag>;
+	/** Omit to offer only existing tags. */
+	onCreateTag?: (name: string) => Promise<Tag>;
 };
+
+export type TagPickerOptions = UseTagPickerOptions;
+export type TagPickerState = ReturnType<typeof useTagPicker>;
 
 export function useTagPicker({
 	availableTags,
@@ -39,6 +43,7 @@ export function useTagPicker({
 		tag.name.toLowerCase().includes(query.toLowerCase()),
 	);
 	const canCreate =
+		!!onCreateTag &&
 		!!query &&
 		!tags.some((tag) => tag.name.toLowerCase() === query.toLowerCase());
 	const busy = creating || pending !== null;
@@ -80,7 +85,7 @@ export function useTagPicker({
 	}
 
 	async function createAndAssignTag() {
-		if (busy || !canCreate) return;
+		if (busy || !canCreate || !onCreateTag) return;
 		setCreating(true);
 		setError(null);
 		try {
@@ -118,6 +123,7 @@ export function useTagPicker({
 		busy,
 		error,
 		canCreate,
+		canCreateTags: Boolean(onCreateTag),
 		toggleTag,
 		createAndAssignTag,
 	};

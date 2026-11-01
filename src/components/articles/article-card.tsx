@@ -1,6 +1,7 @@
 import { getUnreadAgeLabel } from "#/components/article-reader/helpers";
 import { ArticleCardActions } from "#/components/articles/article-card-actions";
 import { ArticleCardContent } from "#/components/articles/article-card-content";
+import { ArticleRowMenu } from "#/components/articles/article-row-menu";
 import { ArticleStateMarks } from "#/components/articles/article-state-marks";
 import type { ArticleCardProps } from "#/components/articles/types";
 import { Checkbox } from "#/components/ui/checkbox";
@@ -48,7 +49,7 @@ export function ArticleCard({
 				onCheckedChange={(checked) => onSelect(article.id, !!checked)}
 				onClick={(event) => event.stopPropagation()}
 				className={cn(
-					"mt-1 transition-opacity focus-visible:opacity-100 group-hover:opacity-100",
+					"mt-1 transition-opacity focus-visible:opacity-100 group-hover:opacity-100 pointer-coarse:opacity-100",
 					selected || selectionMode ? "opacity-100" : "opacity-0",
 				)}
 			/>
@@ -63,7 +64,9 @@ export function ArticleCard({
 				onOpenArticle={onOpenArticle}
 				timeAgo={timeAgo}
 			/>
+			{/* Wide lists show the actions inline on hover; narrower ones collapse them into a labeled menu. */}
 			<ArticleCardActions
+				className="hidden @3xl/list:flex"
 				articleId={article.id}
 				isRead={article.isRead}
 				isFavorite={article.isFavorite}
@@ -72,6 +75,17 @@ export function ArticleCard({
 				onToggleRead={onToggleRead}
 				onToggleFavorite={onToggleFavorite}
 				onDelete={onDelete}
+				onAddTag={onAddTag}
+				onRemoveTag={onRemoveTag}
+				onCreateTag={onCreateTag}
+			/>
+			<ArticleRowMenu
+				article={article}
+				triggerClassName="-my-1 shrink-0 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100 data-[state=open]:opacity-100 pointer-coarse:size-10 pointer-coarse:opacity-100 @3xl/list:hidden"
+				onToggleRead={onToggleRead}
+				onToggleFavorite={onToggleFavorite}
+				onDelete={onDelete}
+				availableTags={availableTags}
 				onAddTag={onAddTag}
 				onRemoveTag={onRemoveTag}
 				onCreateTag={onCreateTag}

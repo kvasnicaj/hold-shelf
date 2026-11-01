@@ -50,7 +50,7 @@ export function ArchiveTagsCombobox({
 				<Button
 					type="button"
 					variant="outline"
-					className="h-9 w-full justify-between px-3 font-normal md:w-48"
+					className="h-9 w-full justify-between px-3 font-normal md:w-44"
 					aria-label="Tag filters"
 				>
 					<span className="flex min-w-0 items-center gap-2">

@@ -1,15 +1,8 @@
-import { DotsThreeVertical } from "@phosphor-icons/react";
 import { useContext } from "react";
 import { ArchiveActionsContext } from "#/components/archive/archive-actions-context";
-import { ArticleActionsMenuItems } from "#/components/archive/article-actions-menu-items";
+import { ArticleRowMenu } from "#/components/articles/article-row-menu";
 import type { ArticleWithTags } from "#/components/articles/types";
 import { TagPicker } from "#/components/tags/tag-picker";
-import { Button } from "#/components/ui/button";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuTrigger,
-} from "#/components/ui/dropdown-menu";
 
 type ArchiveActionsCellProps = { row: { original: ArticleWithTags } };
 
@@ -27,7 +20,7 @@ export function ArchiveActionsCell({ row }: ArchiveActionsCellProps) {
 		onDelete,
 	} = actions;
 	return (
-		<div className="flex min-w-[3.75rem] items-center justify-end gap-px whitespace-nowrap opacity-0 transition-opacity group-hover/row:opacity-100 group-focus-within/row:opacity-100">
+		<div className="flex items-center justify-end gap-px whitespace-nowrap opacity-0 transition-opacity group-hover/row:opacity-100 group-focus-within/row:opacity-100 has-data-[state=open]:opacity-100 pointer-coarse:opacity-100">
 			<TagPicker
 				availableTags={availableTags}
 				selectedTagIds={article.tags.map((tag) => tag.id)}
@@ -35,29 +28,16 @@ export function ArchiveActionsCell({ row }: ArchiveActionsCellProps) {
 				onRemoveTag={onRemoveTag}
 				onCreateTag={onCreateTag}
 				articleIds={[article.id]}
+				align="end"
+				triggerClassName="pointer-coarse:size-10"
 			/>
-			<DropdownMenu>
-				<DropdownMenuTrigger asChild>
-					<Button
-						variant="ghost"
-						size="icon-xs"
-						aria-label={`Article actions for ${article.title ?? article.url}`}
-						title="More actions"
-						onClick={(event) => event.stopPropagation()}
-						onKeyDown={(event) => event.stopPropagation()}
-					>
-						<DotsThreeVertical className="size-3.5" />
-					</Button>
-				</DropdownMenuTrigger>
-				<DropdownMenuContent align="end">
-					<ArticleActionsMenuItems
-						article={article}
-						onToggleFavorite={onToggleFavorite}
-						onToggleRead={onToggleRead}
-						onDelete={onDelete}
-					/>
-				</DropdownMenuContent>
-			</DropdownMenu>
+			<ArticleRowMenu
+				article={article}
+				triggerClassName="pointer-coarse:size-10"
+				onToggleRead={onToggleRead}
+				onToggleFavorite={onToggleFavorite}
+				onDelete={(id) => void onDelete([id])}
+			/>
 		</div>
 	);
 }

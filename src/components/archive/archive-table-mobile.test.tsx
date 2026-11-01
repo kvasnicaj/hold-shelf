@@ -58,7 +58,7 @@ describe("ArchiveTableMobile", () => {
 		expect(screen.getAllByText("Design")).not.toHaveLength(0);
 		expect(
 			screen.getByRole("button", {
-				name: /article actions for archived article/i,
+				name: /more actions for archived article/i,
 			}),
 		).toBeInTheDocument();
 	});
@@ -89,25 +89,25 @@ describe("ArchiveTableMobile", () => {
 
 		await user.click(
 			screen.getByRole("button", {
-				name: /article actions for archived article/i,
+				name: /more actions for archived article/i,
 			}),
 		);
-		await user.click(screen.getByRole("menuitem", { name: /select article/i }));
+		await user.click(screen.getByRole("menuitem", { name: /^select$/i }));
 		expect(onRowSelectionChange).toHaveBeenCalled();
 		expect(onOpenArticle).not.toHaveBeenCalled();
 
 		await user.click(
 			screen.getByRole("button", {
-				name: /article actions for archived article/i,
+				name: /more actions for archived article/i,
 			}),
 		);
-		await user.click(screen.getByRole("menuitem", { name: /mark read/i }));
+		await user.click(screen.getByRole("menuitem", { name: /mark as read/i }));
 		expect(onToggleRead).toHaveBeenCalledWith("a1", true);
 		expect(onOpenArticle).not.toHaveBeenCalled();
 
 		await user.click(
 			screen.getByRole("button", {
-				name: /article actions for archived article/i,
+				name: /more actions for archived article/i,
 			}),
 		);
 		await user.click(
@@ -118,10 +118,10 @@ describe("ArchiveTableMobile", () => {
 
 		await user.click(
 			screen.getByRole("button", {
-				name: /article actions for archived article/i,
+				name: /more actions for archived article/i,
 			}),
 		);
-		await user.click(screen.getByRole("menuitem", { name: /^delete$/i }));
+		await user.click(screen.getByRole("menuitem", { name: /move to trash/i }));
 		expect(onDelete).toHaveBeenCalledWith(["a1"]);
 		expect(onOpenArticle).not.toHaveBeenCalled();
 	});
@@ -144,6 +144,37 @@ describe("ArchiveTableMobile", () => {
 		);
 
 		expect(screen.getByRole("checkbox")).toBeInTheDocument();
+	});
+
+	it("toggles rows instead of opening them while selecting", async () => {
+		const user = userEvent.setup();
+		const onRowSelectionChange = vi.fn();
+		const onOpenArticle = vi.fn().mockResolvedValue(undefined);
+		renderWithProviders(
+			<ArchiveTableMobile
+				articles={[
+					buildArticle({ tags: [] }),
+					buildArticle({ id: "a2", title: "Second article", tags: [] }),
+				]}
+				rowSelection={{ a1: true }}
+				onRowSelectionChange={onRowSelectionChange}
+				availableTags={availableTags}
+				onAddTag={vi.fn().mockResolvedValue(undefined)}
+				onRemoveTag={vi.fn().mockResolvedValue(undefined)}
+				onCreateTag={vi.fn().mockResolvedValue(availableTags[0])}
+				onOpenArticle={onOpenArticle}
+				onToggleRead={vi.fn().mockResolvedValue(undefined)}
+				onToggleFavorite={vi.fn().mockResolvedValue(undefined)}
+				onDelete={vi.fn().mockResolvedValue(undefined)}
+			/>,
+		);
+
+		await user.click(screen.getByText("Second article"));
+		expect(onOpenArticle).not.toHaveBeenCalled();
+		const update = onRowSelectionChange.mock.calls[0]?.[0] as (
+			current: Record<string, boolean>,
+		) => Record<string, boolean>;
+		expect(update({ a1: true })).toEqual({ a1: true, a2: true });
 	});
 
 	it("shows a read indicator for read articles", () => {

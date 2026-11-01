@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
+import { PageHeading } from "#/components/layout/page-heading";
 import { TrashDeleteDialog } from "#/components/library/trash-delete-dialog";
 import { Button } from "#/components/ui/button";
 import {
@@ -54,22 +55,20 @@ export function TrashPage() {
 
 	return (
 		<div className="w-full space-y-5">
-			<div className="flex flex-wrap items-center justify-between gap-3">
-				<h1 className="font-serif text-3xl font-semibold">Trash</h1>
-				<Button
-					variant="outline"
-					disabled={busy || !data.length}
-					onClick={() => requestDelete({ mode: "all" })}
-				>
-					<Trash className="size-4" />
-					Empty Trash
-				</Button>
-			</div>
-			<p className="text-muted-foreground">
-				Restore articles to keep reading, or permanently delete them to free up
-				your library. Tags, saved content, and reading progress are kept until
-				permanent deletion.
-			</p>
+			<PageHeading
+				title="Trash"
+				description="Restore articles to keep reading them. Tags, saved text and reading position stay with an article until you delete it forever."
+				actions={
+					<Button
+						variant="destructive-outline"
+						disabled={busy || !data.length}
+						onClick={() => requestDelete({ mode: "all" })}
+					>
+						<Trash className="size-4" />
+						Empty Trash
+					</Button>
+				}
+			/>
 			{isPending ? (
 				<p role="status">Loading Trash…</p>
 			) : isError ? (
@@ -78,11 +77,11 @@ export function TrashPage() {
 					<Button onClick={() => void refetch()}>Try again</Button>
 				</p>
 			) : data.length === 0 ? (
-				<p className="rounded-xl border p-12 text-center text-muted-foreground">
+				<p className="rounded-lg border p-12 text-center text-muted-foreground">
 					Trash is empty.
 				</p>
 			) : (
-				<ul className="divide-y rounded-xl border">
+				<ul className="divide-y rounded-lg border">
 					{data.map((article) => (
 						<li
 							key={article.id}
@@ -90,7 +89,7 @@ export function TrashPage() {
 						>
 							<div className="min-w-0 basis-full sm:basis-0 sm:flex-1">
 								<p className="font-medium">{article.title ?? article.url}</p>
-								<p className="truncate text-xs text-muted-foreground">
+								<p className="truncate text-meta text-muted-foreground">
 									{article.url}
 								</p>
 							</div>
@@ -103,6 +102,7 @@ export function TrashPage() {
 							</Button>
 							<Button
 								variant="ghost"
+								className="text-destructive hover:bg-destructive/10 hover:text-destructive"
 								disabled={busy}
 								aria-label={`Permanently delete ${article.title ?? article.url}`}
 								onClick={() =>

@@ -5,6 +5,7 @@ export function ReaderCloseButton({ onClick }: { onClick: () => void }) {
 		<Button
 			variant="ghost"
 			size="icon-sm"
+			className="pointer-coarse:size-10"
 			onClick={onClick}
 			aria-label="Close reader"
 			title="Close reader"

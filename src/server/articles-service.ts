@@ -22,7 +22,12 @@ type ArticleTagRow = ArticleTagRecord & {
 	articleId: string;
 };
 
-export type ArticleWithTagsRecord = ArticleRecord & {
+/** A listed article; searches add a passage of saved text around the match. */
+export type ArticleListRecord = ArticleRecord & {
+	matchExcerpt?: string | null;
+};
+
+export type ArticleWithTagsRecord = ArticleListRecord & {
 	tags: ArticleTagRecord[];
 };
 
@@ -93,7 +98,7 @@ export type ArticlesRepository = {
 		sort: ArticleSort;
 		limit: number;
 		offset: number;
-	}) => Promise<{ rows: ArticleRecord[]; total: number }>;
+	}) => Promise<{ rows: ArticleListRecord[]; total: number }>;
 	listArticleTags: (articleIds: string[]) => Promise<ArticleTagRow[]>;
 	getArticleById: (args: {
 		userId: string;

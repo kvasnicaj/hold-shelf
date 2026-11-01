@@ -4,7 +4,6 @@ type TagsListViewProps = {
 	filteredTags: Array<{ id: string; name: string; articleCount: number }>;
 	filter: string;
 	activeTagId?: string;
-	mobile?: boolean;
 	onSelectTag: (tagId: string) => void;
 	onRename: (id: string, name: string) => Promise<void>;
 	onDelete: (id: string) => Promise<void>;
@@ -16,15 +15,14 @@ export function TagsListView({
 	filteredTags,
 	filter,
 	activeTagId,
-	mobile = false,
 	onSelectTag,
 	onRename,
 	onDelete,
-	className = "space-y-2",
+	className = "-mx-3 divide-y border-y bg-card px-3 sm:-mx-6 sm:px-6",
 	emptyStateClassName = "px-2 py-6 text-center text-sm text-muted-foreground",
 }: TagsListViewProps) {
 	return (
-		<nav className={className}>
+		<nav aria-label="Tags" className={className}>
 			{filteredTags.length === 0 ? (
 				<p className={emptyStateClassName}>
 					{filter ? "No tags match." : "No tags yet."}
@@ -35,7 +33,6 @@ export function TagsListView({
 						key={tag.id}
 						tag={tag}
 						isActive={activeTagId === tag.id}
-						mobile={mobile}
 						onSelect={() => onSelectTag(tag.id)}
 						onRename={onRename}
 						onDelete={onDelete}

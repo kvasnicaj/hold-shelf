@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { ArticleExternalLink } from "#/components/articles/article-external-link";
 import type { RecentArticle } from "#/components/home/types";
+import { cn } from "#/lib/utils";
 
 type ShelfItemProps = {
 	article: RecentArticle;
@@ -23,11 +24,16 @@ export function ShelfItem({
 					href={article.url}
 					isRead={article.isRead}
 					onOpenArticle={onOpenArticle}
-					className="line-clamp-2 font-serif text-base leading-snug font-semibold text-pretty text-foreground no-underline hover:underline"
+					className={cn(
+						"line-clamp-2 font-serif text-base leading-snug text-pretty no-underline hover:underline",
+						article.isRead
+							? "font-normal text-muted-foreground"
+							: "font-semibold text-foreground",
+					)}
 				>
 					{article.title ?? article.hostname ?? article.url}
 				</ArticleExternalLink>
-				<div className="flex min-w-0 items-center gap-1.5 text-xs text-muted-foreground">
+				<div className="flex min-w-0 items-center gap-1.5 text-meta text-muted-foreground">
 					{article.faviconUrl && (
 						<img
 							src={article.faviconUrl}

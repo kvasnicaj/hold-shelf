@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { ColumnNavbar } from "#/components/layout/column-navbar";
 
 describe("ColumnNavbar", () => {
-	it("renders left, center, right slots and a mobile overflow trigger", () => {
+	it("renders every slot item directly, without hiding any behind an unlabeled strip", () => {
 		render(
 			<ColumnNavbar
 				aria-label="Library column"
@@ -18,20 +18,19 @@ describe("ColumnNavbar", () => {
 						Right action
 					</button>,
 				]}
-				mobileMenuLabel="More library actions"
 			/>,
 		);
 
 		const navbar = screen.getByRole("navigation", { name: "Library column" });
 
 		expect(
-			within(navbar).getAllByRole("button", { name: "Left action" }),
-		).toHaveLength(2);
+			within(navbar).getByRole("button", { name: "Left action" }),
+		).toBeInTheDocument();
 		expect(
 			within(navbar).getByLabelText("Search articles"),
 		).toBeInTheDocument();
 		expect(
-			within(navbar).getByRole("button", { name: "More library actions" }),
+			within(navbar).getByRole("button", { name: "Right action" }),
 		).toBeInTheDocument();
 	});
 });

@@ -153,19 +153,19 @@ describe("ArchiveTable", () => {
 
 		await user.click(
 			screen.getByRole("button", {
-				name: /article actions for archived article/i,
+				name: /more actions for archived article/i,
 			}),
 		);
-		await user.click(screen.getByRole("menuitem", { name: /mark read/i }));
+		await user.click(screen.getByRole("menuitem", { name: /mark as read/i }));
 		expect(onToggleRead).toHaveBeenCalledWith("a1", true);
 		expect(onOpenArticle).not.toHaveBeenCalled();
 
 		await user.click(
 			screen.getByRole("button", {
-				name: /article actions for archived article/i,
+				name: /more actions for archived article/i,
 			}),
 		);
-		await user.click(screen.getByRole("menuitem", { name: /^delete$/i }));
+		await user.click(screen.getByRole("menuitem", { name: /move to trash/i }));
 		expect(onDelete).toHaveBeenCalledWith(["a1"]);
 		expect(onOpenArticle).not.toHaveBeenCalled();
 		expect(archiveTableMobileMock).not.toHaveBeenCalled();

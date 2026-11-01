@@ -6,19 +6,30 @@ type TagChipProps = {
 	onClick: () => void;
 	children: ReactNode;
 	count?: number;
+	/** Accessible name when it differs from the visible text. */
+	label?: string;
 };
 
-export function TagChip({ isActive, onClick, children, count }: TagChipProps) {
+export function TagChip({
+	isActive,
+	onClick,
+	children,
+	count,
+	label,
+}: TagChipProps) {
 	return (
 		<button
 			type="button"
-			aria-pressed={isActive}
+			aria-pressed={label ? undefined : isActive}
+			aria-label={label}
 			className={getTagChipClassName(isActive)}
 			onClick={onClick}
 		>
 			{children}
 			{count !== undefined && (
-				<span className="font-medium tabular-nums opacity-70">{count}</span>
+				<span className="text-xs font-medium tabular-nums text-muted-foreground">
+					{count}
+				</span>
 			)}
 		</button>
 	);

@@ -17,7 +17,7 @@ export function AppToolbar() {
 				<DropdownMenuTrigger asChild>
 					<Button
 						variant="ghost"
-						size="icon-sm"
+						size="icon-touch"
 						className="rounded-full md:hidden"
 						aria-label="Account menu"
 					>

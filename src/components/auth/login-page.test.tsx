@@ -55,7 +55,7 @@ describe("LoginPage", () => {
 		).toBeInTheDocument();
 		expect(
 			screen.getByText(
-				/sign in to your library or create your account on first use/i,
+				/hold shelf signs in with github\. your first visit creates your library/i,
 			),
 		).toBeInTheDocument();
 		expect(screen.queryByLabelText("Email")).not.toBeInTheDocument();

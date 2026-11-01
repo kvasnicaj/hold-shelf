@@ -54,7 +54,7 @@ export function ArchiveTableMobile({
 								key={article.id}
 								article={article}
 								isSelected={isSelected}
-								showCheckbox={hasSelection || isSelected}
+								selectionMode={hasSelection}
 								onSelectedChange={(value) => toggleRow(article.id, value)}
 								{...actions}
 							/>

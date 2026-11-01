@@ -34,7 +34,7 @@ export function MobileNavTabContent({
 				{badge !== undefined && (
 					<span
 						aria-hidden="true"
-						className="absolute -top-0.5 right-0 min-w-4 rounded-sm bg-primary px-1 text-center text-[10px] font-bold leading-4 tabular-nums text-primary-foreground"
+						className="absolute -top-0.5 right-0 min-w-[1.125rem] rounded-sm bg-primary px-1 text-center text-xs font-bold leading-[1.125rem] tabular-nums text-primary-foreground"
 					>
 						{badge}
 					</span>

@@ -63,7 +63,13 @@ logo turns mint (`--logo-mark`, `--logo-word`).
 
 Use `font-serif font-semibold` for serif headings. Use tabular numbers
 (`tabular-nums`) for counts and dates. Labels are sentence case, not tracked
-uppercase.
+uppercase. The `text-meta` utility sets the Small style (12.5/18) for metadata
+lines; tag labels, counts and the mobile tab labels are never below 12 px.
+App page titles come from `PageHeading` (Title 1 at 28/36), so every page,
+Tags included, uses the same size and starts at the same anchor.
+
+Placeholders use Ink soft when they carry the only instruction (Search and
+Quick save fields); Ink faint stays for decorative hints.
 
 ## Shape and space
 
@@ -75,7 +81,10 @@ uppercase.
 | 12 px | `rounded-xl` | Content sheet, dialogs |
 
 Spacing follows a 4 px grid. Control heights are 28 (small), 32 (default) and
-40 (large, mobile).
+40 (large, mobile). On touch screens (`pointer-coarse`) every control gets at
+least a 40 px hit area and row menus and toolbar menus 44 px (`icon-touch`),
+while icons keep their 16–20 px size. Checkboxes stay 16 px squares with a
+4 px radius and an invisible 40–44 px hit area.
 
 ## Icons
 
@@ -112,8 +121,18 @@ The reader is its own mode: everything except the text steps back.
   has a teal icon and a short teal line under it, echoing the logo's shelf.
   Labels are always visible.
 - **Mobile top bar:** brand symbol on the left, search and the account avatar
-  on the right. On mobile, tags are reached from Library's tag row.
+  on the right. Pages put their own actions in their heading, never in the top
+  bar. On mobile, tags are reached from Library's Manage tags link.
+- **Overflow:** no unlabeled icon strips. Secondary actions sit in
+  `ActionsMenu`, a vertical menu with a label on every item; the primary action
+  stays visible beside it.
 - **Search** is one dialog opened from the sidebar, the mobile top bar or `/`.
+  It has a close button and a "Show all matches in Library" action; keyboard
+  hints show only with a fine pointer. While a query runs it says Searching…
+  (previous results stay, dimmed), an empty result appears only after the query
+  answered, and errors offer Try again. Body-only matches show the saved passage
+  around the match. On phones the panel is pinned near the top so it stays above
+  the keyboard.
 - **Keyboard shortcuts:** S saves a link, `/` searches, `?` lists shortcuts,
   and G followed by H, U, F or L opens Home, Unread, Favorites or Library.
   Navigation items carry the shortcut in `aria-keyshortcuts` and their tooltip.
@@ -125,12 +144,19 @@ The reader is its own mode: everything except the text steps back.
   keep their space so titles line up.
 - **Unread:** an upright 3 px teal spine (`ReadStateSpine`), the one mark taken
   from the logo. Unread rows show "Unread for N days" in their metadata.
-- **Read:** the title turns `text-muted-foreground` at regular weight. An
-  article becomes read when the reader reaches the end, or with Mark as read;
-  opening it does not change its state.
+- **Read:** the title turns `text-muted-foreground` at regular weight in every
+  list, Home's serif shelves included. An article becomes read when the reader
+  reaches the end, or with Mark as read; opening it does not change its state.
 - **Favorite:** a filled ochre bookmark in the state slot, beside the spine.
-- **Selected:** a square checkbox and a `bg-select` row. Checkboxes in dense
-  lists appear on hover, on focus, or once anything is selected.
+- **Selected:** a square checkbox and a `bg-select` row. On desktop, checkboxes
+  appear on hover, on focus, on touch screens, or once anything is selected. On
+  phones, Select in a row's menu starts selection mode: every row shows its
+  checkbox, a tap toggles the row instead of opening it, and the bulk bar's
+  close button ends it.
+- **Recoverable vs. permanent:** moving to Trash is a routine action, labeled
+  "Move to Trash" in neutral text. Permanent deletion (Delete forever, Empty
+  Trash, Delete tag, Delete account) uses the danger color and keeps its
+  confirmation where one exists.
 - **Titles** are ink, never link-colored; teal is reserved for state.
 
 ## Library
@@ -140,19 +166,24 @@ The reader is its own mode: everything except the text steps back.
   underline; every row, including the last, ends with a hairline.
 - When sorted by date, rows sit under month headings (serif month, tabular
   count). Sorting by title shows one list.
-- Row actions (tags, more) appear on hover or focus.
+- Columns follow the table's own width (`@container/library`), not the
+  viewport, so the table fits beside the wide reader and in tablet columns. The
+  title takes the remaining width; tags collapse below a 42rem column, the date
+  below 28rem. Row actions (tags, more) appear on hover, focus or touch.
 - Bulk actions float at the bottom as an inverse toolbar instead of moving
   the header.
-- On mobile, rows show a two-line title and a meta line, and tags filter
-  through a scrolling chip row ending in Manage.
+- On mobile, rows show a two-line title, a meta line and one row menu, and
+  tags filter through a scrolling chip row; Manage tags stays fixed outside it.
 
 ## Unread and Favorites
 
 - Comfortable density: one hairline-divided list, no per-article card frames.
-- Each row: hover checkbox, unread spine, favicon, a 15 px semibold title, a
-  two-line excerpt, then site, time and tag labels.
-- Row actions (tags, bookmark, read, delete) appear on hover. On phones they
-  stay visible under the title.
+- Each row: hover checkbox, unread spine, favicon, a 15 px title (semibold
+  unread, regular read) that wraps to two lines, a two-line excerpt, then site,
+  time and tag labels.
+- Row actions (tags, bookmark, read, Move to Trash) appear on hover in lists at
+  least 48rem wide. Narrower lists show one row menu instead, so hidden actions
+  never squeeze the title. Phone rows keep only the menu, at 44 px.
 - Page header matches Library: serif title with the count beside it, search
   and sort on one line.
 
@@ -175,17 +206,23 @@ The reader is its own mode: everything except the text steps back.
 - The header puts the source line (favicon, site, reading time, saved date)
   above a 2em serif title.
 - One quiet toolbar: close, then read, bookmark, tags, Aa, refresh and open
-  original. Reading settings live in the Aa menu: text size 15–24, line width
-  narrow / normal / wide, serif or sans.
+  original. On phones read, bookmark and Aa stay in the bar and tags, refresh
+  and open original move to a labeled menu. Reading settings live in the Aa
+  menu: text size 15–24, line width narrow / normal / wide, serif or sans.
+- One title: a first heading that repeats the saved title, with or without the
+  publisher, is not shown twice.
 - A 2 px teal line under the toolbar shows how far you have read.
 - Article prose uses the `prose-hold` utility so headings, links, quotes and
   code take their colors from the tokens in both themes.
 
 ## Settings
 
-- One column of cards (max 3xl), ordered from everyday options to account
-  removal: appearance, browser extension, library backup, account, API token,
-  CLI, delete account.
+- One column of cards (max 3xl) below a heading at the shared page anchor,
+  ordered from everyday options to account removal: appearance, browser
+  extension, library backup, account, API token, CLI, delete account. Cards are
+  flat: sheet surface and a hairline, no shadow.
+- Theme is an explicit Light / Dark / System choice, the same in Settings and
+  the account menu.
 
 ## Quick save
 
@@ -194,7 +231,9 @@ The reader is its own mode: everything except the text steps back.
 - The link is the whole form: one large field with no label row. The status
   line under it previews the site ("overreacted.io · Saves to Unread") or
   explains a problem in plain words.
-- Tags are optional chips chosen before saving.
+- Tags are optional: a labeled Tags row shows chosen tags as removable chips
+  and Choose tags opens the searchable tag picker, so it stays compact however
+  many tags exist.
 - Enter saves, Shift+Enter saves and opens the reader. The footer shows these
   as `kbd` hints on desktop.
 - Desktop: a sheet-colored panel near the top with `shadow-float`. Phones: a
@@ -211,7 +250,10 @@ The reader is its own mode: everything except the text steps back.
   is left-aligned rather than centered under a stacked logo.
 - Document pages use plain sections with serif headings over hairlines, not
   stacked cards. Short task pages (sign-in, `/save`) use one sheet panel.
-- The landing page closes with three short notes on the 2 px ink shelf line.
+- The landing page shows the product: a still of Continue reading and an
+  Unread list with spines, built from the app's own components. Copy names
+  concrete benefits (the text is kept, your place is remembered) rather than
+  calm. It closes with three short notes on the 2 px ink shelf line.
 - The Chrome extension's toolbar badge uses the action teal for success and
   the danger brick for errors.
 
@@ -225,4 +267,11 @@ easy to merge.
 | --- | --- |
 | `badge` | Square `rounded-sm` labels instead of pills; `secondary` uses the label colors (`bg-muted text-muted-foreground`) |
 | all | Icons come from Phosphor instead of lucide (`components.json` sets `iconLibrary` to `phosphor`); swap the icons in any newly added component |
-| `toggle-group` | A `bg-muted` track without a border; the active item is a sheet (`bg-card`) with a hairline ring |
+| `toggle-group` | A `bg-muted` track without a border; the active item is a sheet (`bg-card`) with a hairline ring and no shadow |
+| `card` | No shadow; separation comes from the sheet surface and its hairline |
+| `checkbox` | `rounded-sm` (4 px) square, no shadow, an invisible 40 px hit area (44 px on touch) |
+| `popover`, `dropdown-menu`, `select` content, `dialog`, `sheet` | Floating layers use `shadow-float`; dialogs are `rounded-xl` on the sheet color |
+| `dialog` | The close button is a 36 px ghost icon button |
+| `dropdown-menu` | Items grow to 40 px on touch screens; radio items mark the choice with a check |
+| `select`, `switch` | No `shadow-xs` on the trigger |
+| `button` | `destructive-outline` variant for permanent deletion; `icon-touch` size (44 px, 20 px icon) |

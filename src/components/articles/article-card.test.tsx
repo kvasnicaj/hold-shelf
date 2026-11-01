@@ -92,8 +92,35 @@ describe("ArticleCard", () => {
 		await user.click(screen.getByTitle("Add to favorites"));
 		expect(onToggleFavorite).toHaveBeenCalledWith("a1", true);
 
-		await user.click(screen.getByTitle("Delete"));
+		await user.click(screen.getByTitle("Move to Trash"));
 		expect(onDelete).toHaveBeenCalledWith("a1");
+	});
+
+	it("offers the same actions in a labeled menu for narrower lists", async () => {
+		const user = userEvent.setup();
+		const onToggleFavorite = vi.fn();
+		renderWithProviders(
+			<ArticleCard
+				article={buildArticle({ isFavorite: true })}
+				selected={false}
+				onSelect={vi.fn()}
+				onOpenArticle={vi.fn()}
+				onToggleRead={vi.fn()}
+				onToggleFavorite={onToggleFavorite}
+				onDelete={vi.fn()}
+			/>,
+		);
+
+		await user.click(
+			screen.getByRole("button", { name: "More actions for Design systems" }),
+		);
+		expect(
+			screen.getByRole("menuitem", { name: "Mark as read" }),
+		).toBeInTheDocument();
+		await user.click(
+			screen.getByRole("menuitem", { name: "Remove from favorites" }),
+		);
+		expect(onToggleFavorite).toHaveBeenCalledWith("a1", false);
 	});
 
 	it("shows how long an unread article has waited and marks favorites beside the spine", () => {

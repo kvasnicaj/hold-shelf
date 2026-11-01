@@ -7,7 +7,7 @@ import { ArticleReaderMetadata } from "#/components/article-reader/article-reade
 import {
 	READ_AT_END_PROGRESS,
 	READER_MEASURES,
-	withoutRepeatedTitle,
+	splitRepeatedTitle,
 } from "#/components/article-reader/helpers";
 import type { ReaderSettings } from "#/components/article-reader/types";
 import { cn } from "#/lib/utils";
@@ -28,6 +28,10 @@ export function ReaderBody({ data, settings }: ReaderBodyProps) {
 	const scroll = useRef<HTMLDivElement>(null);
 	const restored = useRef(false);
 	const [readPercent, setReadPercent] = useState(0);
+	const shown =
+		data.content.status === "ready"
+			? splitRepeatedTitle(data.content.markdown, data.article.title)
+			: { title: data.article.title, markdown: "" };
 	const { data: progress } = useQuery({
 		queryKey: ["reading-progress", data.article.id],
 		staleTime: 30_000,
@@ -137,16 +141,11 @@ export function ReaderBody({ data, settings }: ReaderBodyProps) {
 				<header className="mb-8 space-y-3">
 					<ArticleReaderMetadata payload={data} />
 					<h1 className="text-[2em] leading-[1.12] font-semibold tracking-[-0.01em] text-balance">
-						{data.article.title ?? data.article.url}
+						{shown.title ?? data.article.url}
 					</h1>
 				</header>
 				{data.content.status === "ready" ? (
-					<ArticleReaderContent
-						markdown={withoutRepeatedTitle(
-							data.content.markdown,
-							data.article.title,
-						)}
-					/>
+					<ArticleReaderContent markdown={shown.markdown} />
 				) : (
 					<ArticleReaderFallback
 						url={data.article.url}

@@ -20,24 +20,25 @@ export function AboutPage() {
 			<div className="space-y-10">
 				<PublicPageHeading
 					title="About Hold Shelf"
-					description="A simple reading shelf for the things worth coming back to."
+					description="A read-it-later app for articles you mean to come back to."
 				/>
 				<PublicSection title="What the app is for">
 					<p>
-						Hold Shelf is a read-it-later app for saving articles you want to
-						keep, without turning your reading list into noise.
-					</p>
-					<p>
-						You can save links from the web app or from the browser extension,
-						then come back to them when you actually have time to read.
+						Save links from the web app or the Chrome extension, then come back
+						to them when you have time to read.
 					</p>
 				</PublicSection>
 
-				<PublicSection title="How it feels">
+				<PublicSection title="How it works">
 					<p>
-						The goal is to keep reading calm and intentional. Hold Shelf gives
-						you a quiet place to collect useful articles, organize them, and
-						pick them up later without clutter.
+						Saving a link stores the article&rsquo;s text, so it stays readable
+						if the page changes later. The reader keeps your place as you
+						scroll, and Home shows what you were reading and what has waited
+						longest.
+					</p>
+					<p>
+						Tags and favorites are there when you want to organize, and stay out
+						of the way when you don&rsquo;t.
 					</p>
 				</PublicSection>
 

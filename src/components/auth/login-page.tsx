@@ -25,8 +25,8 @@ export function LoginPage({
 						Sign in to Hold Shelf
 					</h1>
 					<p className="text-sm leading-relaxed text-muted-foreground">
-						Sign in to your library or create your account on first use with
-						your GitHub profile.
+						Hold Shelf signs in with GitHub. Your first visit creates your
+						library.
 					</p>
 				</div>
 				<div className="space-y-3">
@@ -46,10 +46,6 @@ export function LoginPage({
 						</p>
 					)}
 				</div>
-				<p className="text-xs leading-relaxed text-muted-foreground">
-					GitHub is the only sign-in method for Hold Shelf. We&apos;ll use your
-					GitHub account to create your profile and sign you in.
-				</p>
 			</section>
 		</PublicPageLayout>
 	);

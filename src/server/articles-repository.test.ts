@@ -95,6 +95,60 @@ it("handles 100 article operations within D1 limits and excludes Trash without l
 	await tagRepo.removeTagFromArticles({ tagId: "tag", articleIds: ids });
 	expect(await repo.listArticleTags(ids)).toHaveLength(0);
 });
+it("returns the saved text around a body match with search results", async () => {
+	const repo = createArticlesRepository();
+	const before = "Words before the match. ".repeat(10);
+	await database.db.insert(articles).values([
+		{
+			id: "body",
+			userId: "owner",
+			url: "https://example.com/body",
+			title: "Notes",
+		},
+		{
+			id: "titled",
+			userId: "owner",
+			url: "https://example.com/titled",
+			title: "Server Components explained",
+		},
+	]);
+	await database.db.insert(articleContentCache).values({
+		articleId: "body",
+		status: "ready",
+		markdown: "Body",
+		plainText: `${before}Server Components let the server render part of the tree.`,
+		wordCount: 60,
+		sourceUrl: "https://example.com/body",
+		extractionVersion: "markdown-v3",
+		fetchedAt: new Date(),
+	});
+
+	const { rows } = await repo.listArticles({
+		userId: "owner",
+		search: "server components",
+		sort: "title",
+		limit: 20,
+		offset: 0,
+	});
+	const excerpts = Object.fromEntries(
+		rows.map((row) => [row.id, row.matchExcerpt]),
+	);
+
+	expect(excerpts.titled).toBeNull();
+	expect(excerpts.body).toContain("Server Components let the server");
+	expect(excerpts.body?.length).toBeLessThanOrEqual(240);
+	expect(excerpts.body?.startsWith(before)).toBe(false);
+	expect(
+		(
+			await repo.listArticles({
+				userId: "owner",
+				sort: "title",
+				limit: 20,
+				offset: 0,
+			})
+		).rows.every((row) => row.matchExcerpt === null),
+	).toBe(true);
+});
 it("returns a domain duplicate result for simultaneous saves", async () => {
 	const repo = createArticlesRepository();
 	const results = await Promise.allSettled(

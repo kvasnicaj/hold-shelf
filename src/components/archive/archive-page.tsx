@@ -2,7 +2,9 @@ import { ArchiveFilters } from "#/components/archive/archive-filters";
 import { ArchiveTable } from "#/components/archive/archive-table";
 import { useArchivePage } from "#/components/archive/use-archive-page";
 import { BulkActionsPanel } from "#/components/articles/bulk-actions-panel";
+import { PageHeading } from "#/components/layout/page-heading";
 import { AppPagination } from "#/components/pagination/app-pagination";
+import { getArticleCountLabel } from "#/lib/formatters";
 
 export function ArchivePage() {
 	const {
@@ -36,14 +38,7 @@ export function ArchivePage() {
 
 	return (
 		<div className="w-full space-y-4">
-			<div className="flex items-baseline gap-3">
-				<h1 className="font-serif text-[1.75rem] leading-tight font-semibold">
-					Library
-				</h1>
-				<p className="text-sm tabular-nums text-muted-foreground">
-					{total} article{total !== 1 ? "s" : ""}
-				</p>
-			</div>
+			<PageHeading title="Library" count={getArticleCountLabel(total)} />
 
 			{selectedIds.length > 0 && (
 				<BulkActionsPanel

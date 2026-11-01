@@ -18,7 +18,10 @@ describe("TagItem", () => {
 			/>,
 		);
 
-		await user.click(screen.getByRole("button", { name: /rename design/i }));
+		await user.click(
+			screen.getByRole("button", { name: "Actions for Design" }),
+		);
+		await user.click(screen.getByRole("menuitem", { name: "Rename" }));
 		const input = screen.getByDisplayValue("Design");
 		await user.clear(input);
 		await user.type(input, "Research");
@@ -44,10 +47,13 @@ describe("TagItem", () => {
 			/>,
 		);
 
-		await user.click(screen.getByRole("button", { name: /^design$/i }));
+		await user.click(screen.getByText("Design"));
 		expect(onSelect).toHaveBeenCalled();
 
-		await user.click(screen.getByRole("button", { name: /delete design/i }));
+		await user.click(
+			screen.getByRole("button", { name: "Actions for Design" }),
+		);
+		await user.click(screen.getByRole("menuitem", { name: "Delete tag" }));
 		await waitFor(() => expect(onDelete).toHaveBeenCalledWith("t1"));
 	});
 });
