@@ -3,8 +3,11 @@ import { useRouter } from "@tanstack/react-router";
 import { useContext } from "react";
 import { toast } from "sonner";
 import { ShortcutsContext } from "#/components/shortcuts/shortcuts-context";
-import ThemeToggle from "#/components/theme-toggle";
-import { DropdownMenuItem } from "#/components/ui/dropdown-menu";
+import { ThemeMenuItems } from "#/components/theme/theme-menu-items";
+import {
+	DropdownMenuItem,
+	DropdownMenuSeparator,
+} from "#/components/ui/dropdown-menu";
 import { authClient } from "#/lib/auth-client";
 import { showCookiePreferences } from "#/lib/cookie-consent";
 export function AccountMenuItems() {
@@ -12,7 +15,8 @@ export function AccountMenuItems() {
 	const shortcuts = useContext(ShortcutsContext);
 	return (
 		<>
-			<ThemeToggle variant="menu-item" />
+			<ThemeMenuItems />
+			<DropdownMenuSeparator />
 			{shortcuts && (
 				<DropdownMenuItem
 					className="hidden md:flex"

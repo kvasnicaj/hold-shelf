@@ -25,8 +25,8 @@ export function BulkActionButton({
 			aria-label={label}
 			onClick={onClick}
 			className={cn(
-				"h-8 text-inverse-foreground hover:bg-inverse-foreground/10 hover:text-inverse-foreground dark:hover:bg-inverse-foreground/10",
-				!showLabel && "w-8 px-0",
+				"h-8 min-w-8 text-inverse-foreground hover:bg-inverse-foreground/10 hover:text-inverse-foreground pointer-coarse:h-10 pointer-coarse:min-w-10 dark:hover:bg-inverse-foreground/10",
+				!showLabel && "px-0",
 			)}
 		>
 			<Icon />

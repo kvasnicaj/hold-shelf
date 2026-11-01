@@ -51,7 +51,18 @@ describe("Library article tags", () => {
 			const { rerender, queryClient } = renderWithProviders(
 				<ArchiveTable {...props} />,
 			);
-			await user.click(screen.getByRole("button", { name: "Manage tags" }));
+			// Phones reach tags through the row's labeled menu.
+			async function openTagEditor() {
+				if (!isMobile) {
+					await user.click(screen.getByRole("button", { name: "Manage tags" }));
+					return;
+				}
+				await user.click(
+					screen.getByRole("button", { name: /^more actions for/i }),
+				);
+				await user.click(screen.getByRole("menuitem", { name: "Tags…" }));
+			}
+			await openTagEditor();
 			expect(screen.getByRole("checkbox", { name: "Design" })).toBeChecked();
 			expect(
 				screen.getByRole("checkbox", { name: "Engineering" }),
@@ -98,7 +109,7 @@ describe("Library article tags", () => {
 			expect(
 				screen.queryByRole("textbox", { name: "Search or create tag" }),
 			).not.toBeInTheDocument();
-			await user.click(screen.getByRole("button", { name: "Manage tags" }));
+			await openTagEditor();
 			await user.keyboard("{Escape}");
 			expect(
 				screen.queryByRole("textbox", { name: "Search or create tag" }),

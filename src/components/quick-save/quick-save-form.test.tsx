@@ -1,4 +1,4 @@
-import { screen, waitFor } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { QuickSaveForm } from "#/components/quick-save/quick-save-form";
@@ -23,12 +23,44 @@ describe("QuickSaveForm", () => {
 			screen.getByText("overreacted.io · Saves to Unread"),
 		).toBeInTheDocument();
 
-		await user.click(screen.getByRole("button", { name: "React" }));
+		const tagsGroup = screen.getByRole("group", { name: "Tags" });
+		await user.click(
+			within(tagsGroup).getByRole("button", { name: "Choose tags" }),
+		);
+		await user.click(screen.getByRole("checkbox", { name: "React" }));
+		await user.click(screen.getByRole("button", { name: "Done" }));
+		expect(
+			within(tagsGroup).getByRole("button", { name: "Remove React" }),
+		).toBeInTheDocument();
+
 		await user.click(screen.getByLabelText("Link"));
 		await user.keyboard("{Enter}");
 
 		expect(onSubmit).toHaveBeenCalledWith(
 			"https://www.overreacted.io/impossible-components",
+			["t2"],
+			"save",
+		);
+	});
+
+	it("removes a chosen tag before saving", async () => {
+		const user = userEvent.setup();
+		const onSubmit = vi.fn().mockResolvedValue(undefined);
+		renderWithProviders(<QuickSaveForm tags={tags} onSubmit={onSubmit} />);
+
+		await user.click(screen.getByRole("button", { name: "Choose tags" }));
+		await user.click(screen.getByRole("checkbox", { name: "Design" }));
+		await user.click(screen.getByRole("checkbox", { name: "React" }));
+		await user.click(screen.getByRole("button", { name: "Done" }));
+		await user.click(screen.getByRole("button", { name: "Remove Design" }));
+
+		await user.type(
+			screen.getByLabelText("Link"),
+			"https://example.com/a{Enter}",
+		);
+
+		expect(onSubmit).toHaveBeenCalledWith(
+			"https://example.com/a",
 			["t2"],
 			"save",
 		);

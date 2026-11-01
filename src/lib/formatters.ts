@@ -38,3 +38,7 @@ export function formatFullDate(date: Date | null): string {
 		timeZone: "UTC",
 	}).format(date);
 }
+
+export function getArticleCountLabel(total: number): string {
+	return `${total} article${total !== 1 ? "s" : ""}`;
+}

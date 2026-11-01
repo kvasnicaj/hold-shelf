@@ -1,4 +1,4 @@
-import { screen } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { SettingsPage } from "#/components/settings/settings-page";
 import { renderWithProviders } from "#/test/render";
@@ -23,10 +23,6 @@ vi.mock("#/components/settings/delete-account-card", () => ({
 	DeleteAccountCard: () => <div>Delete account</div>,
 }));
 
-vi.mock("#/components/theme-toggle", () => ({
-	default: () => <button type="button">Theme toggle</button>,
-}));
-
 describe("SettingsPage", () => {
 	it("lists settings in one column, from everyday options to account removal", () => {
 		const { container } = renderWithProviders(<SettingsPage />);
@@ -34,9 +30,12 @@ describe("SettingsPage", () => {
 		expect(
 			screen.getByRole("heading", { name: "Settings" }),
 		).toBeInTheDocument();
-		expect(
-			screen.getByRole("button", { name: "Theme toggle" }),
-		).toBeInTheDocument();
+		const theme = screen.getByRole("radiogroup", { name: "Theme" });
+		for (const label of ["Light", "Dark", "System"]) {
+			expect(
+				within(theme).getByRole("radio", { name: label }),
+			).toBeInTheDocument();
+		}
 		expect(
 			screen.getByRole("link", { name: /add to chrome/i }),
 		).toBeInTheDocument();

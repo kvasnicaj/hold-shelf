@@ -100,10 +100,6 @@ vi.mock("#/components/articles/use-open-article", () => ({
 	}),
 }));
 
-vi.mock("#/components/layout/toolbar-actions", () => ({
-	ToolbarSlot: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-}));
-
 vi.mock("#/components/articles/article-list", () => ({
 	ArticleList: ({
 		articles,
@@ -196,6 +192,10 @@ describe("TagsPage", () => {
 		mobileState.value = true;
 		renderWithProviders(<TagsPage />);
 
+		expect(screen.getByRole("heading", { name: "Tags" })).toBeInTheDocument();
+		expect(
+			screen.getByRole("button", { name: "Create tag" }),
+		).toBeInTheDocument();
 		expect(screen.getByText("Design")).toBeInTheDocument();
 		expect(screen.getByText("Research")).toBeInTheDocument();
 
@@ -203,7 +203,10 @@ describe("TagsPage", () => {
 		expect(screen.queryByText("Design")).not.toBeInTheDocument();
 		expect(screen.getByText("Research")).toBeInTheDocument();
 
-		await user.click(screen.getByRole("button", { name: /rename research/i }));
+		await user.click(
+			screen.getByRole("button", { name: "Actions for Research" }),
+		);
+		await user.click(screen.getByRole("menuitem", { name: "Rename" }));
 		const input = screen.getByDisplayValue("Research");
 		await user.clear(input);
 		await user.type(input, "Knowledge");
@@ -214,7 +217,10 @@ describe("TagsPage", () => {
 			}),
 		);
 
-		await user.click(screen.getByRole("button", { name: /delete research/i }));
+		await user.click(
+			screen.getByRole("button", { name: "Actions for Research" }),
+		);
+		await user.click(screen.getByRole("menuitem", { name: "Delete tag" }));
 		await waitFor(() =>
 			expect(deleteTagMock).toHaveBeenCalledWith({
 				data: { id: "t2" },
@@ -225,8 +231,9 @@ describe("TagsPage", () => {
 	it("shows a desktop handoff state because tags live in the sidebar", () => {
 		renderWithProviders(<TagsPage />);
 
+		expect(screen.getByRole("heading", { name: "Tags" })).toBeInTheDocument();
 		expect(
-			screen.getByText("Select a tag from the sidebar"),
+			screen.getByText("Choose a tag in the sidebar to see its articles."),
 		).toBeInTheDocument();
 		expect(screen.queryByLabelText("Search tags")).not.toBeInTheDocument();
 	});

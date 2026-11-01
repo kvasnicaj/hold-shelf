@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, asc, desc, eq, getTableColumns, inArray, sql } from "drizzle-orm";
 import { getDb } from "#/db/index";
 import {
 	articleContentCache,
@@ -53,8 +53,9 @@ export function createArticlesRepository(): ArticlesRepository {
 				conditions.push(inArray(articles.id, articleIdsWithTag));
 			}
 
-			if (search?.trim()) {
-				const term = `%${search.trim()}%`;
+			const query = search?.trim();
+			if (query) {
+				const term = `%${query}%`;
 				conditions.push(
 					sql`(${articles.title} LIKE ${term} OR ${articles.description} LIKE ${term} OR ${articles.url} LIKE ${term} OR ${articles.hostname} LIKE ${term} OR EXISTS (SELECT 1 FROM article_content_cache WHERE article_content_cache.article_id = ${articles.id} AND article_content_cache.plain_text LIKE ${term}))`,
 				);
@@ -70,7 +71,16 @@ export function createArticlesRepository(): ArticlesRepository {
 
 			const [rows, countResult] = await Promise.all([
 				db
-					.select()
+					.select({
+						...getTableColumns(articles),
+						// About 240 characters of saved text around the first match,
+						// so a result found only in the body shows why it matched.
+						matchExcerpt: query
+							? sql<
+									string | null
+								>`(SELECT substr(article_content_cache.plain_text, max(1, instr(lower(article_content_cache.plain_text), lower(${query})) - 80), 240) FROM article_content_cache WHERE article_content_cache.article_id = ${articles.id} AND instr(lower(article_content_cache.plain_text), lower(${query})) > 0)`
+							: sql<null>`NULL`,
+					})
 					.from(articles)
 					.where(where)
 					.orderBy(orderBy, asc(articles.id))

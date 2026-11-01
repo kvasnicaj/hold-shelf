@@ -67,7 +67,7 @@ export function TagHeadingActions({
 			/>
 			<Button
 				type="button"
-				variant="outline"
+				variant="destructive-outline"
 				size="icon-sm"
 				onClick={() => void onDelete()}
 				aria-label={`Delete ${tagName}`}

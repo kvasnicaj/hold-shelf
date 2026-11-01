@@ -5,6 +5,7 @@ import { ArchiveTableMobile } from "#/components/archive/archive-table-mobile";
 import {
 	archiveTableFeatures,
 	createArchiveColumns,
+	getArchiveColumnClassName,
 	groupByMonth,
 	toArchiveRowSelection,
 } from "#/components/archive/helpers";
@@ -85,10 +86,6 @@ export function ArchiveTable({
 	const headers = table.getHeaderGroups()[0]?.headers ?? [];
 	const hasSelection = Object.keys(selectedRows).length > 0;
 
-	function columnWidth(size: number) {
-		return size !== 150 ? size : undefined;
-	}
-
 	return (
 		<ArchiveActionsContext
 			value={{
@@ -102,63 +99,70 @@ export function ArchiveTable({
 				onDelete,
 			}}
 		>
-			<table
-				className="group/table w-full table-fixed"
-				data-selecting={hasSelection}
-			>
-				<thead>
-					<tr className="h-8 border-b text-left">
-						{headers.map((header) => (
-							<th
-								key={header.id}
-								className={cn(
-									"px-2 text-xs font-semibold text-muted-foreground",
-									header.id === "createdAt" && "text-right",
-								)}
-								style={{ width: columnWidth(header.getSize()) }}
-							>
-								{header.isPlaceholder ? null : (
-									<table.FlexRender header={header} />
-								)}
-							</th>
-						))}
-					</tr>
-				</thead>
-				{groups.map((group) => (
-					<tbody key={group.key}>
-						{groupedByMonth && (
-							<tr>
+			<div className="@container/library">
+				<table
+					className="group/table w-full table-fixed"
+					data-selecting={hasSelection}
+				>
+					<thead>
+						<tr className="h-8 border-b text-left">
+							{headers.map((header) => (
 								<th
-									colSpan={headers.length}
-									scope="colgroup"
-									className="border-b px-2 pt-6 pb-1.5 text-left font-normal"
+									key={header.id}
+									className={cn(
+										"overflow-hidden px-2 text-xs font-semibold text-muted-foreground",
+										getArchiveColumnClassName(header.id),
+									)}
 								>
-									<MonthGroupLabel
-										label={group.label}
-										count={group.items.length}
-									/>
+									{header.isPlaceholder ? null : (
+										<table.FlexRender header={header} />
+									)}
 								</th>
-							</tr>
-						)}
-						{group.items.map((row) => (
-							<tr
-								key={row.id}
-								data-state={selectedRows[row.id] ? "selected" : undefined}
-								className="group/row h-11 cursor-pointer border-b transition-colors hover:bg-background data-[state=selected]:bg-select"
-								onClick={() =>
-									void onOpenArticle(row.original.id, row.original.isRead)
-								}
-							>
-								{row.getVisibleCells().map((cell) => (
-									<td key={cell.id} className="overflow-hidden px-2">
-										<table.FlexRender cell={cell} />
-									</td>
-								))}
-							</tr>
-						))}
-					</tbody>
-				))}
-			</table>
+							))}
+						</tr>
+					</thead>
+					{groups.map((group) => (
+						<tbody key={group.key}>
+							{groupedByMonth && (
+								<tr>
+									<th
+										colSpan={headers.length}
+										scope="colgroup"
+										className="border-b px-2 pt-6 pb-1.5 text-left font-normal"
+									>
+										<MonthGroupLabel
+											label={group.label}
+											count={group.items.length}
+										/>
+									</th>
+								</tr>
+							)}
+							{group.items.map((row) => (
+								<tr
+									key={row.id}
+									data-state={selectedRows[row.id] ? "selected" : undefined}
+									className="group/row h-11 cursor-pointer border-b transition-colors hover:bg-background data-[state=selected]:bg-select"
+									onClick={() =>
+										void onOpenArticle(row.original.id, row.original.isRead)
+									}
+								>
+									{row.getVisibleCells().map((cell) => (
+										<td
+											key={cell.id}
+											className={cn(
+												"overflow-hidden px-2",
+												getArchiveColumnClassName(cell.column.id),
+											)}
+										>
+											<table.FlexRender cell={cell} />
+										</td>
+									))}
+								</tr>
+							))}
+						</tbody>
+					))}
+				</table>
+			</div>
 		</ArchiveActionsContext>
 	);
 }

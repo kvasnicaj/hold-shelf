@@ -1,9 +1,10 @@
 import { Tag } from "@phosphor-icons/react";
 import { ArticleCollectionPage } from "#/components/articles/article-collection-page";
+import { PageHeading } from "#/components/layout/page-heading";
 import { PageSearchField } from "#/components/layout/page-search-field";
+import { CreateTagDialog } from "#/components/tags/create-tag-dialog";
 import { TagHeadingActions } from "#/components/tags/tag-heading-actions";
 import { TagsListView } from "#/components/tags/tags-list-view";
-import { TagsToolbarActions } from "#/components/tags/tags-toolbar-actions";
 import { useTagsPage } from "#/components/tags/use-tags-page";
 import { useIsMobile } from "#/hooks/use-mobile";
 
@@ -89,48 +90,40 @@ export function TagsPage() {
 		/>
 	) : null;
 
-	return (
-		<>
-			{isMobile ? <TagsToolbarActions onCreate={handleCreateTag} /> : null}
+	const tagsOverview = (
+		<div className="w-full space-y-4">
+			<PageHeading
+				title="Tags"
+				actions={<CreateTagDialog onCreate={handleCreateTag} />}
+			/>
 			{isMobile ? (
-				<div className="w-full space-y-4">
-					{!selectedTagId ? (
-						<>
-							<h1 className="font-serif text-2xl font-semibold">Tags</h1>
-							<PageSearchField
-								value={filter}
-								placeholder="Search tags..."
-								ariaLabel="Search tags"
-								onSearch={setFilter}
-							/>
-							<TagsListView
-								filteredTags={filteredTags}
-								filter={filter}
-								activeTagId={selectedTagId}
-								mobile
-								onSelectTag={navigateToTag}
-								onRename={handleRename}
-								onDelete={handleDeleteTag}
-							/>
-						</>
-					) : (
-						selectedTagArticles
-					)}
-				</div>
+				<>
+					<PageSearchField
+						value={filter}
+						placeholder="Search tags..."
+						ariaLabel="Search tags"
+						onSearch={setFilter}
+					/>
+					<TagsListView
+						filteredTags={filteredTags}
+						filter={filter}
+						activeTagId={selectedTagId}
+						onSelectTag={navigateToTag}
+						onRename={handleRename}
+						onDelete={handleDeleteTag}
+					/>
+				</>
 			) : (
-				<div className="w-full">
-					{selectedTagId && activeTag ? (
-						selectedTagArticles
-					) : (
-						<div className="flex flex-col items-center justify-center py-20 text-center">
-							<Tag className="mb-3 h-10 w-10 text-muted-foreground/40" />
-							<p className="text-lg text-muted-foreground">
-								Select a tag from the sidebar
-							</p>
-						</div>
-					)}
+				<div className="flex flex-col items-center justify-center py-20 text-center">
+					<Tag className="mb-3 size-10 text-faint-foreground" />
+					<p className="text-muted-foreground">
+						Choose a tag in the sidebar to see its articles.
+					</p>
 				</div>
 			)}
-		</>
+		</div>
 	);
+	const showsTag = isMobile ? Boolean(selectedTagId) : Boolean(activeTag);
+
+	return showsTag ? selectedTagArticles : tagsOverview;
 }

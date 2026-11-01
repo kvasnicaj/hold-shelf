@@ -6,12 +6,6 @@ import type { ArticleWithTags } from "#/components/articles/types";
 import type { Tag } from "#/components/tags/types";
 import { renderWithProviders } from "#/test/render";
 
-vi.mock("#/components/tags/tag-picker", () => ({
-	TagPicker: ({ selectedTagIds }: { selectedTagIds: string[] }) => (
-		<div data-testid="tag-picker">{selectedTagIds.join(",")}</div>
-	),
-}));
-
 const availableTags: Tag[] = [{ id: "t1", name: "Design", color: null }];
 
 function buildArticle(
@@ -33,7 +27,7 @@ function buildArticle(
 }
 
 describe("ArticleCardMobile", () => {
-	it("renders the mobile layout without description or favicon and keeps controls before tags", () => {
+	it("shows title, site and tags with one labeled actions menu instead of a row of icons", () => {
 		const { container } = renderWithProviders(
 			<ArticleCardMobile
 				article={buildArticle()}
@@ -55,59 +49,81 @@ describe("ArticleCardMobile", () => {
 		expect(container.querySelector("img")).toBeNull();
 		expect(screen.getByRole("img", { name: "Unread" })).toBeInTheDocument();
 		expect(screen.getByText("example.com")).toBeInTheDocument();
-		expect(screen.getByTestId("tag-picker")).toHaveTextContent("t1");
-		expect(screen.getAllByText("Design")).not.toHaveLength(0);
+		expect(screen.getByText("Design")).toBeInTheDocument();
+		expect(screen.queryByRole("checkbox")).not.toBeInTheDocument();
+		expect(
+			screen.getByRole("button", { name: "More actions for Design systems" }),
+		).toBeInTheDocument();
+		expect(screen.queryByTitle("Add to favorites")).not.toBeInTheDocument();
 	});
 
-	it("forwards selection and article actions", async () => {
+	it("forwards read, favorite, trash and select from the labeled menu", async () => {
 		const user = userEvent.setup();
 		const onSelect = vi.fn();
 		const onToggleRead = vi.fn();
 		const onToggleFavorite = vi.fn();
 		const onDelete = vi.fn();
+		const onOpenArticle = vi.fn();
 
 		renderWithProviders(
 			<ArticleCardMobile
 				article={buildArticle({ tags: [] })}
-				selected={true}
+				selected={false}
 				onSelect={onSelect}
-				onOpenArticle={vi.fn()}
+				onOpenArticle={onOpenArticle}
 				onToggleRead={onToggleRead}
 				onToggleFavorite={onToggleFavorite}
 				onDelete={onDelete}
 			/>,
 		);
+		const menu = () =>
+			user.click(
+				screen.getByRole("button", { name: "More actions for Design systems" }),
+			);
 
-		await user.click(screen.getByRole("checkbox"));
-		expect(onSelect).toHaveBeenCalledWith("a1", false);
-
-		await user.click(screen.getByTitle("Mark as read"));
+		await menu();
+		await user.click(screen.getByRole("menuitem", { name: "Mark as read" }));
 		expect(onToggleRead).toHaveBeenCalledWith("a1", true);
 
-		await user.click(screen.getByTitle("Add to favorites"));
+		await menu();
+		await user.click(
+			screen.getByRole("menuitem", { name: "Add to favorites" }),
+		);
 		expect(onToggleFavorite).toHaveBeenCalledWith("a1", true);
 
-		await user.click(screen.getByTitle("Delete"));
+		await menu();
+		await user.click(screen.getByRole("menuitem", { name: "Move to Trash" }));
 		expect(onDelete).toHaveBeenCalledWith("a1");
+
+		await menu();
+		await user.click(screen.getByRole("menuitem", { name: "Select" }));
+		expect(onSelect).toHaveBeenCalledWith("a1", true);
+		expect(onOpenArticle).not.toHaveBeenCalled();
 	});
 
-	it("uses larger mobile action icons", () => {
+	it("toggles selection instead of opening the article while selecting", async () => {
+		const user = userEvent.setup();
+		const onSelect = vi.fn();
+		const onOpenArticle = vi.fn();
+
 		renderWithProviders(
 			<ArticleCardMobile
 				article={buildArticle({ tags: [] })}
-				selected={false}
-				onSelect={vi.fn()}
-				onOpenArticle={vi.fn()}
+				selected
+				selectionMode
+				onSelect={onSelect}
+				onOpenArticle={onOpenArticle}
 				onToggleRead={vi.fn()}
 				onToggleFavorite={vi.fn()}
 				onDelete={vi.fn()}
 			/>,
 		);
 
-		const favoriteIcon = screen
-			.getByTitle("Add to favorites")
-			.querySelector("svg");
-
-		expect(favoriteIcon).toHaveClass("h-5", "w-5");
+		expect(
+			screen.getByRole("checkbox", { name: "Select Design systems" }),
+		).toBeChecked();
+		await user.click(screen.getByText("Design systems"));
+		expect(onSelect).toHaveBeenCalledWith("a1", false);
+		expect(onOpenArticle).not.toHaveBeenCalled();
 	});
 });

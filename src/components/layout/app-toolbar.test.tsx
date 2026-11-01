@@ -45,10 +45,8 @@ vi.mock("@tanstack/react-router", async () => {
 	};
 });
 
-vi.mock("#/components/theme-toggle", () => ({
-	default: ({ size }: { size?: string }) => (
-		<button type="button">ThemeToggle:{size}</button>
-	),
+vi.mock("#/components/theme/theme-menu-items", () => ({
+	ThemeMenuItems: () => <div>Theme choices</div>,
 }));
 
 vi.mock("#/components/ui/dropdown-menu", () => ({
@@ -61,6 +59,7 @@ vi.mock("#/components/ui/dropdown-menu", () => ({
 	DropdownMenuContent: ({ children }: { children: React.ReactNode }) => (
 		<div>{children}</div>
 	),
+	DropdownMenuSeparator: () => <hr />,
 	DropdownMenuItem: ({
 		children,
 		onClick,

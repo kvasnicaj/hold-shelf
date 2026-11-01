@@ -1,7 +1,9 @@
 import type { ReactNode } from "react";
 import { ArticleSortSelect } from "#/components/articles/article-sort-select";
 import type { ArticleSort } from "#/components/articles/types";
+import { PageHeading } from "#/components/layout/page-heading";
 import { PageSearchField } from "#/components/layout/page-search-field";
+import { getArticleCountLabel } from "#/lib/formatters";
 
 type ArticlesHeaderProps = {
 	title: string;
@@ -32,21 +34,11 @@ export function ArticlesHeader({
 }: ArticlesHeaderProps) {
 	return (
 		<>
-			<div className="flex min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-2">
-				<div className="flex min-w-0 items-baseline gap-3">
-					<h1 className="truncate font-serif text-[1.75rem] leading-tight font-semibold">
-						{title}
-					</h1>
-					<p className="shrink-0 text-sm tabular-nums text-muted-foreground">
-						{total} article{total !== 1 ? "s" : ""}
-					</p>
-				</div>
-				{headingActions ? (
-					<div className="flex shrink-0 items-center gap-1">
-						{headingActions}
-					</div>
-				) : null}
-			</div>
+			<PageHeading
+				title={title}
+				count={getArticleCountLabel(total)}
+				actions={headingActions}
+			/>
 
 			<div className="flex gap-2 sm:justify-end">
 				<PageSearchField

@@ -140,4 +140,108 @@ describe("SearchPanel", () => {
 			search: { q: "rust" },
 		});
 	});
+	it("reports searching, not an empty result, until the typed query has answered", async () => {
+		const user = userEvent.setup();
+		let finish: (value: unknown) => void = () => {};
+		getArticlesMock.mockReturnValue(
+			new Promise((resolve) => {
+				finish = resolve;
+			}),
+		);
+		renderWithProviders(<SearchPanel />);
+
+		await user.type(
+			screen.getByPlaceholderText("Search all saved articles..."),
+			"react",
+		);
+
+		await waitFor(() => expect(getArticles).toHaveBeenCalled());
+		expect(screen.getByRole("status")).toHaveTextContent("Searching…");
+		expect(
+			screen.queryByText(/no saved articles match/i),
+		).not.toBeInTheDocument();
+
+		finish({ items: [], total: 0 });
+		expect(
+			await screen.findByText("No saved articles match “react”."),
+		).toBeInTheDocument();
+	});
+
+	it("explains a failed search and retries it", async () => {
+		const user = userEvent.setup();
+		getArticlesMock.mockRejectedValueOnce(new Error("offline"));
+		renderWithProviders(<SearchPanel />);
+
+		await user.type(
+			screen.getByPlaceholderText("Search all saved articles..."),
+			"react",
+		);
+
+		expect(await screen.findByRole("alert")).toHaveTextContent(
+			"Search could not reach your library.",
+		);
+		expect(
+			screen.queryByText(/no saved articles match/i),
+		).not.toBeInTheDocument();
+
+		await user.click(screen.getByRole("button", { name: "Try again" }));
+		expect(
+			await screen.findByRole("button", { name: /design systems guide/i }),
+		).toBeInTheDocument();
+	});
+
+	it("shows the saved passage for a match found only in the article text", async () => {
+		const user = userEvent.setup();
+		getArticlesMock.mockResolvedValue({
+			items: [
+				{
+					...article,
+					title: "Notes from the week",
+					description: "Links and thoughts.",
+					matchExcerpt:
+						"ing the old patterns, Server Components move data fetching to the server. Th",
+				},
+			],
+			total: 1,
+		});
+		renderWithProviders(<SearchPanel />);
+
+		await user.type(
+			screen.getByPlaceholderText("Search all saved articles..."),
+			"server components",
+		);
+
+		const result = await screen.findByRole("button", {
+			name: /notes from the week/i,
+		});
+		expect(result).toHaveTextContent(
+			"…the old patterns, Server Components move data fetching to the server.…",
+		);
+	});
+
+	it("offers visible close and Library actions", async () => {
+		const user = userEvent.setup();
+		const onClose = vi.fn();
+		renderWithProviders(<SearchPanel onClose={onClose} />);
+
+		const showAll = screen.getByRole("button", {
+			name: /type to search the library/i,
+		});
+		expect(showAll).toBeDisabled();
+
+		await user.type(
+			screen.getByPlaceholderText("Search all saved articles..."),
+			"rust",
+		);
+		await user.click(
+			screen.getByRole("button", { name: /show all matches in library/i }),
+		);
+		expect(navigateMock).toHaveBeenCalledWith({
+			to: "/app/archive",
+			search: { q: "rust" },
+		});
+
+		await user.click(screen.getByRole("button", { name: "Close search" }));
+		expect(onClose).toHaveBeenCalled();
+	});
 });

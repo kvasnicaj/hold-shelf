@@ -15,9 +15,14 @@ import { useArticleReader } from "#/components/article-reader/use-article-reader
 import { useReaderSettings } from "#/components/article-reader/use-reader-settings";
 import { tagListOptions } from "#/components/articles/query-options";
 import { useArticleMutations } from "#/components/articles/use-article-mutations";
+import { ActionsMenu } from "#/components/layout/actions-menu";
 import { ColumnNavbar } from "#/components/layout/column-navbar";
 import { TagPicker } from "#/components/tags/tag-picker";
 import { Button } from "#/components/ui/button";
+import {
+	DropdownMenuItem,
+	DropdownMenuLabel,
+} from "#/components/ui/dropdown-menu";
 import { cn } from "#/lib/utils";
 import { getArticleReader } from "#/server/articles";
 import { refreshArticleContent } from "#/server/library";
@@ -32,6 +37,11 @@ export function ArticleReaderPanel() {
 		enabled: Boolean(articleId),
 	});
 	const actions = useArticleMutations();
+	const readLabel = data?.article.isRead ? "Mark as unread" : "Mark as read";
+	const favoriteLabel = data?.article.isFavorite
+		? "Remove from favorites"
+		: "Add to favorites";
+	const tagIds = data?.article.tags.map((tag) => tag.id) ?? [];
 	const { settings, updateSettings } = useReaderSettings();
 	const refresh = useMutation({
 		mutationFn: () => refreshArticleContent({ data: { id: articleId ?? "" } }),
@@ -61,13 +71,10 @@ export function ArticleReaderPanel() {
 										key="read"
 										variant="ghost"
 										size="icon-sm"
+										className="pointer-coarse:size-10"
 										disabled={actions.isPending}
-										aria-label={
-											data.article.isRead ? "Mark as unread" : "Mark as read"
-										}
-										title={
-											data.article.isRead ? "Mark as unread" : "Mark as read"
-										}
+										aria-label={readLabel}
+										title={readLabel}
 										onClick={() =>
 											void actions.handleToggleRead(
 												data.article.id,
@@ -85,17 +92,10 @@ export function ArticleReaderPanel() {
 										key="favorite"
 										variant="ghost"
 										size="icon-sm"
+										className="pointer-coarse:size-10"
 										disabled={actions.isPending}
-										aria-label={
-											data.article.isFavorite
-												? "Remove from favorites"
-												: "Add to favorites"
-										}
-										title={
-											data.article.isFavorite
-												? "Remove from favorites"
-												: "Add to favorites"
-										}
+										aria-label={favoriteLabel}
+										title={favoriteLabel}
 										onClick={() =>
 											void actions.handleToggleFavorite(
 												data.article.id,
@@ -114,11 +114,13 @@ export function ArticleReaderPanel() {
 									<TagPicker
 										key="tags"
 										availableTags={tagList}
-										selectedTagIds={data.article.tags.map((tag) => tag.id)}
+										selectedTagIds={tagIds}
 										onAddTag={actions.handleAddTag}
 										onRemoveTag={actions.handleRemoveTag}
 										onCreateTag={actions.handleCreateTag}
 										articleIds={[data.article.id]}
+										align="end"
+										triggerClassName="hidden size-9 md:inline-flex"
 									/>,
 									<ReaderPreferences
 										key="settings"
@@ -129,6 +131,7 @@ export function ArticleReaderPanel() {
 										key="refresh"
 										variant="ghost"
 										size="icon-sm"
+										className="hidden md:inline-flex"
 										aria-label="Refresh saved content"
 										title="Refresh saved content"
 										disabled={refresh.isPending}
@@ -141,7 +144,13 @@ export function ArticleReaderPanel() {
 											)}
 										/>
 									</Button>,
-									<Button key="original" variant="ghost" size="icon-sm" asChild>
+									<Button
+										key="original"
+										variant="ghost"
+										size="icon-sm"
+										className="hidden md:inline-flex"
+										asChild
+									>
 										<a
 											href={data.article.url}
 											target="_blank"
@@ -152,10 +161,50 @@ export function ArticleReaderPanel() {
 											<ArrowSquareOut className="size-[1.125rem]" />
 										</a>
 									</Button>,
+									// Phones keep read, bookmark and Aa in the bar; the rest is labeled here.
+									<ActionsMenu
+										key="more"
+										label="More reader actions"
+										triggerSize="icon-touch"
+										triggerClassName="md:hidden"
+										tagPicker={{
+											availableTags: tagList,
+											selectedTagIds: tagIds,
+											articleIds: [data.article.id],
+											onAddTag: actions.handleAddTag,
+											onRemoveTag: actions.handleRemoveTag,
+											onCreateTag: actions.handleCreateTag,
+										}}
+										footer={
+											<>
+												<DropdownMenuItem
+													disabled={refresh.isPending}
+													onSelect={() => refresh.mutate()}
+												>
+													<ArrowsClockwise />
+													Refresh saved content
+												</DropdownMenuItem>
+												<DropdownMenuItem asChild>
+													<a
+														href={data.article.url}
+														target="_blank"
+														rel="noopener noreferrer"
+														className="text-foreground no-underline"
+													>
+														<ArrowSquareOut />
+														Open original
+													</a>
+												</DropdownMenuItem>
+											</>
+										}
+									>
+										<DropdownMenuLabel className="truncate text-xs font-semibold text-muted-foreground">
+											{data.article.hostname ?? "Article"}
+										</DropdownMenuLabel>
+									</ActionsMenu>,
 								]
 							: []
 					}
-					mobileMenuLabel="Reader actions"
 				/>
 				{isError ? (
 					<div role="alert" className="space-y-3 p-6 text-sm">

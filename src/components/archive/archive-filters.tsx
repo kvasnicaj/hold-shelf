@@ -30,12 +30,12 @@ export function ArchiveFilters({
 	onSortChange,
 }: ArchiveFiltersProps) {
 	return (
-		<div className="flex flex-col gap-3">
-			<div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
+		<div className="@container/filters flex flex-col gap-3">
+			<div className="flex flex-col gap-2 @2xl/filters:flex-row @2xl/filters:items-center @2xl/filters:justify-between">
 				<ToggleGroup
 					type="single"
 					value={filter ?? "all"}
-					className="grid w-full grid-cols-3 lg:inline-flex lg:w-auto"
+					className="grid w-full shrink-0 grid-cols-3 @2xl/filters:inline-flex @2xl/filters:w-auto"
 					onValueChange={(value) => {
 						if (!value) return;
 						onFilterChange(
@@ -67,14 +67,14 @@ export function ArchiveFilters({
 					</ToggleGroupItem>
 				</ToggleGroup>
 
-				<div className="flex w-full gap-2 lg:w-auto lg:justify-end">
+				<div className="flex w-full min-w-0 gap-2 @2xl/filters:w-auto @2xl/filters:flex-1 @2xl/filters:justify-end">
 					<PageSearchField
 						debounceMs={250}
 						value={q ?? ""}
 						placeholder="Search library..."
 						ariaLabel="Search library"
 						onSearch={onSearch}
-						className="min-w-0 flex-1 lg:w-56 lg:flex-none"
+						className="min-w-0 flex-1 @2xl/filters:max-w-64"
 					/>
 					<div className="hidden md:block">
 						<ArchiveTagsCombobox

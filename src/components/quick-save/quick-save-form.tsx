@@ -1,8 +1,9 @@
-import { ClipboardText, LinkSimple } from "@phosphor-icons/react";
+import { ClipboardText, LinkSimple, Plus, X } from "@phosphor-icons/react";
 import { useState } from "react";
 import { getDisplayHost, toHttpUrl } from "#/components/quick-save/helpers";
 import type { QuickSaveMode } from "#/components/quick-save/types";
 import { TagChip } from "#/components/tags/tag-chip";
+import { TagPicker } from "#/components/tags/tag-picker";
 import type { Tag } from "#/components/tags/types";
 import { Button } from "#/components/ui/button";
 import { cn } from "#/lib/utils";
@@ -67,13 +68,17 @@ export function QuickSaveForm({
 		}
 	}
 
-	function toggleTag(tagId: string) {
+	function addTag(tagId: string) {
 		setSelectedTagIds((current) =>
-			current.includes(tagId)
-				? current.filter((id) => id !== tagId)
-				: [...current, tagId],
+			current.includes(tagId) ? current : [...current, tagId],
 		);
 	}
+
+	function removeTag(tagId: string) {
+		setSelectedTagIds((current) => current.filter((id) => id !== tagId));
+	}
+
+	const selectedTags = tags.filter((tag) => selectedTagIds.includes(tag.id));
 
 	return (
 		<form
@@ -92,7 +97,7 @@ export function QuickSaveForm({
 						: "h-12 rounded-lg border border-input bg-background px-3.5",
 				)}
 			>
-				<LinkSimple className="size-5 shrink-0 text-mark" />
+				<LinkSimple className="size-5 shrink-0 text-muted-foreground" />
 				<span className="sr-only">Link</span>
 				<input
 					id="quick-save-url"
@@ -114,7 +119,7 @@ export function QuickSaveForm({
 					aria-invalid={Boolean(error)}
 					aria-describedby="quick-save-status"
 					className={cn(
-						"min-w-0 flex-1 bg-transparent outline-none placeholder:text-faint-foreground",
+						"min-w-0 flex-1 bg-transparent outline-none placeholder:text-muted-foreground",
 						variant === "panel"
 							? "text-lg font-medium"
 							: "text-base font-medium",
@@ -143,17 +148,40 @@ export function QuickSaveForm({
 				</p>
 
 				{tags.length > 0 && (
-					<fieldset className="flex gap-1.5 overflow-x-auto [scrollbar-width:none]">
-						<legend className="sr-only">Tags</legend>
-						{tags.map((tag) => (
+					<fieldset className="flex flex-wrap items-center gap-1.5">
+						<legend className="float-left mr-1.5 py-1.5 text-sm font-semibold">
+							Tags
+						</legend>
+						{selectedTags.map((tag) => (
 							<TagChip
 								key={tag.id}
-								isActive={selectedTagIds.includes(tag.id)}
-								onClick={() => toggleTag(tag.id)}
+								isActive
+								label={`Remove ${tag.name}`}
+								onClick={() => removeTag(tag.id)}
 							>
 								{tag.name}
+								<X aria-hidden="true" className="size-3" />
 							</TagChip>
 						))}
+						<TagPicker
+							availableTags={tags}
+							selectedTagIds={selectedTagIds}
+							articleIds={[]}
+							onAddTag={addTag}
+							onRemoveTag={removeTag}
+							title="Tags for this link"
+							trigger={
+								<Button
+									type="button"
+									variant="ghost"
+									size="sm"
+									className="text-muted-foreground pointer-coarse:h-9"
+								>
+									<Plus />
+									{selectedTags.length > 0 ? "Change tags" : "Choose tags"}
+								</Button>
+							}
+						/>
 					</fieldset>
 				)}
 

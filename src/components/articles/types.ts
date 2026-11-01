@@ -19,6 +19,8 @@ export type ArticleWithTags = {
 	isFavorite: boolean;
 	createdAt: Date | null;
 	tags: Tag[];
+	/** Saved text around a search match, when the search matched the body. */
+	matchExcerpt?: string | null;
 };
 
 export type ArticleCollectionLoaderData = {

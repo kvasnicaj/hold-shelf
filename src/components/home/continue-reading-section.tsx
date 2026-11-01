@@ -38,7 +38,7 @@ export function ContinueReadingSection() {
 						{lead.title ?? lead.url}
 					</ArticleExternalLink>
 					{lead.hostname && (
-						<p className="flex items-center gap-2 text-xs text-muted-foreground">
+						<p className="flex items-center gap-2 text-meta text-muted-foreground">
 							{lead.faviconUrl && (
 								<img
 									src={lead.faviconUrl}
@@ -53,7 +53,7 @@ export function ContinueReadingSection() {
 						</p>
 					)}
 					<ReadingProgressBar percent={leadPercent} className="max-w-sm" />
-					<p className="text-xs tabular-nums text-muted-foreground">
+					<p className="text-meta tabular-nums text-muted-foreground">
 						{leadPercent}% read
 					</p>
 				</div>

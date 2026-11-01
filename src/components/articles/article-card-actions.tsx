@@ -3,6 +3,7 @@ import { useIsMutating } from "@tanstack/react-query";
 import { TagPicker } from "#/components/tags/tag-picker";
 import type { Tag } from "#/components/tags/types";
 import { Button } from "#/components/ui/button";
+import { cn } from "#/lib/utils";
 
 type ArticleCardActionsProps = {
 	articleId: string;
@@ -10,8 +11,7 @@ type ArticleCardActionsProps = {
 	isFavorite: boolean;
 	tagIds: string[];
 	availableTags?: Tag[];
-	persistent?: boolean;
-	iconSize?: "default" | "mobile";
+	className?: string;
 	onToggleRead: (id: string, isRead: boolean) => void;
 	onToggleFavorite: (id: string, isFavorite: boolean) => void;
 	onDelete: (id: string) => void;
@@ -26,8 +26,7 @@ export function ArticleCardActions({
 	isFavorite,
 	tagIds,
 	availableTags,
-	persistent = false,
-	iconSize = "default",
+	className,
 	onToggleRead,
 	onToggleFavorite,
 	onDelete,
@@ -36,16 +35,15 @@ export function ArticleCardActions({
 	onCreateTag,
 }: ArticleCardActionsProps) {
 	const pending = useIsMutating({ mutationKey: ["library-edit"] }) > 0;
-	const iconClassName =
-		iconSize === "mobile" ? "h-5 w-5" : "h-[1.125rem] w-[1.125rem]";
+	const iconClassName = "h-[1.125rem] w-[1.125rem]";
+	const buttonClassName = "pointer-coarse:size-10";
 
 	return (
 		<div
-			className={
-				persistent
-					? "flex shrink-0 items-center gap-1"
-					: "flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100"
-			}
+			className={cn(
+				"shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 pointer-coarse:opacity-100",
+				className,
+			)}
 		>
 			{availableTags && onAddTag && onRemoveTag && onCreateTag && (
 				<TagPicker
@@ -55,18 +53,22 @@ export function ArticleCardActions({
 					onRemoveTag={onRemoveTag}
 					onCreateTag={onCreateTag}
 					articleIds={[articleId]}
+					triggerClassName={buttonClassName}
 				/>
 			)}
 			<Button
 				disabled={pending}
 				variant="ghost"
-				size={iconSize === "mobile" ? "icon" : "icon-xs"}
+				size="icon-xs"
+				className={cn(
+					buttonClassName,
+					isFavorite && "text-favorite hover:text-favorite",
+				)}
 				onClick={(event) => {
 					event.stopPropagation();
 					onToggleFavorite(articleId, !isFavorite);
 				}}
 				title={isFavorite ? "Remove from favorites" : "Add to favorites"}
-				className={isFavorite ? "text-favorite hover:text-favorite" : undefined}
 			>
 				<BookmarkSimple
 					weight={isFavorite ? "fill" : "regular"}
@@ -76,7 +78,8 @@ export function ArticleCardActions({
 			<Button
 				disabled={pending}
 				variant="ghost"
-				size={iconSize === "mobile" ? "icon" : "icon-xs"}
+				size="icon-xs"
+				className={buttonClassName}
 				onClick={(event) => {
 					event.stopPropagation();
 					onToggleRead(articleId, !isRead);
@@ -92,12 +95,13 @@ export function ArticleCardActions({
 			<Button
 				disabled={pending}
 				variant="ghost"
-				size={iconSize === "mobile" ? "icon" : "icon-xs"}
+				size="icon-xs"
+				className={buttonClassName}
 				onClick={(event) => {
 					event.stopPropagation();
 					onDelete(articleId);
 				}}
-				title="Delete"
+				title="Move to Trash"
 			>
 				<Trash className={iconClassName} />
 			</Button>

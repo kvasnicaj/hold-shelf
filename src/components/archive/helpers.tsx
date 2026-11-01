@@ -1,5 +1,4 @@
 import {
-	columnSizingFeature,
 	columnVisibilityFeature,
 	createColumnHelper,
 	type RowSelectionState,
@@ -12,13 +11,12 @@ import type { ArchiveActions } from "#/components/archive/types";
 import { ArticleExternalLink } from "#/components/articles/article-external-link";
 import { ArticleStateMarks } from "#/components/articles/article-state-marks";
 import type { ArticleWithTags, MonthGroup } from "#/components/articles/types";
-import { Badge } from "#/components/ui/badge";
+import { TagLabel } from "#/components/tags/tag-label";
 import { Checkbox } from "#/components/ui/checkbox";
 import { formatDate, formatMonthYear } from "#/lib/formatters";
 import { cn } from "#/lib/utils";
 
 export const archiveTableFeatures = tableFeatures({
-	columnSizingFeature,
 	columnVisibilityFeature,
 	rowSelectionFeature,
 });
@@ -29,8 +27,31 @@ const columnHelper = createColumnHelper<
 >();
 
 // Checkboxes stay out of the way until the row is hovered or a selection exists.
+// Touch screens cannot hover, so they always show them.
 const revealCheckboxClassName =
-	"opacity-0 transition-opacity focus-visible:opacity-100 data-[state=checked]:opacity-100 group-data-[selecting=true]/table:opacity-100";
+	"opacity-0 transition-opacity focus-visible:opacity-100 data-[state=checked]:opacity-100 group-data-[selecting=true]/table:opacity-100 pointer-coarse:opacity-100";
+
+/**
+ * Column widths and visibility follow the Library's own width (the
+ * `@container/library` around the table), not the viewport, so the table
+ * also fits beside the wide reader. The title takes whatever is left; tags,
+ * then the date, step aside as the column narrows.
+ */
+const ARCHIVE_COLUMN_CLASSES: Record<string, string> = {
+	select: "w-8",
+	status: "w-7",
+	title: "",
+	// Collapsed columns keep their cells (zero width, invisible) so month
+	// headings that span every column never create a phantom column.
+	tags: "invisible w-0 px-0 @2xl/library:visible @2xl/library:w-36 @2xl/library:px-2 @4xl/library:w-48",
+	createdAt:
+		"invisible w-0 px-0 text-right @md/library:visible @md/library:w-[4.5rem] @md/library:px-2",
+	actions: "w-16 pointer-coarse:w-[5.5rem]",
+};
+
+export function getArchiveColumnClassName(columnId: string) {
+	return ARCHIVE_COLUMN_CLASSES[columnId] ?? "";
+}
 
 export function toArchiveRowSelection(
 	selection: Record<string, boolean>,
@@ -86,7 +107,6 @@ export function createArchiveColumns({
 					)}
 				</Subscribe>
 			),
-			size: 30,
 		}),
 		columnHelper.display({
 			id: "status",
@@ -97,11 +117,9 @@ export function createArchiveColumns({
 					isFavorite={row.original.isFavorite}
 				/>
 			),
-			size: 28,
 		}),
 		columnHelper.accessor("title", {
 			header: "Title",
-			size: 520,
 			cell: ({ row }) => {
 				const article = row.original;
 				return (
@@ -124,14 +142,14 @@ export function createArchiveColumns({
 							className={cn(
 								"min-w-0 truncate text-sm no-underline hover:underline",
 								article.isRead
-									? "text-muted-foreground"
-									: "font-medium text-foreground",
+									? "font-normal text-muted-foreground"
+									: "font-semibold text-foreground",
 							)}
 						>
 							{article.title ?? article.url}
 						</ArticleExternalLink>
 						{article.hostname && (
-							<span className="min-w-10 shrink-[1000] truncate text-xs text-muted-foreground">
+							<span className="min-w-10 shrink-[1000] truncate text-meta text-muted-foreground">
 								{article.hostname}
 							</span>
 						)}
@@ -144,32 +162,27 @@ export function createArchiveColumns({
 			cell: ({ row }) => (
 				<div className="flex min-w-0 items-center gap-1 overflow-hidden">
 					{row.original.tags.map((tag) => (
-						<Badge
+						<TagLabel
 							key={tag.id}
-							variant="secondary"
-							className="max-w-24 shrink-0 truncate px-1.5 py-0 text-[11px] font-semibold"
-						>
-							{tag.name}
-						</Badge>
+							name={tag.name}
+							className="max-w-24 shrink-0 truncate"
+						/>
 					))}
 				</div>
 			),
-			size: 200,
 		}),
 		columnHelper.accessor("createdAt", {
 			header: "Saved",
 			cell: (info) => (
-				<span className="block whitespace-nowrap text-right text-xs tabular-nums text-muted-foreground">
+				<span className="block whitespace-nowrap text-right text-meta tabular-nums text-muted-foreground">
 					{formatDate(info.getValue())}
 				</span>
 			),
-			size: 64,
 		}),
 		columnHelper.display({
 			id: "actions",
 			header: () => null,
 			cell: ArchiveActionsCell,
-			size: 72,
 		}),
 	]);
 }

@@ -30,7 +30,7 @@ export function ReaderPreferences({
 					size="icon-sm"
 					aria-label="Reading settings"
 					title="Reading settings"
-					className="font-serif text-base"
+					className="font-serif text-base pointer-coarse:size-10"
 				>
 					Aa
 				</Button>

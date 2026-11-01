@@ -32,7 +32,11 @@ export function BulkActionsPanel({
 					label="Mark unread"
 					onClick={onMarkUnread}
 				/>
-				<BulkActionButton icon={Trash} label="Delete" onClick={onDelete} />
+				<BulkActionButton
+					icon={Trash}
+					label="Move to Trash"
+					onClick={onDelete}
+				/>
 				<BulkActionButton
 					icon={X}
 					label="Clear selection"

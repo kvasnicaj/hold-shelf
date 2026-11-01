@@ -1,22 +1,22 @@
 import { PencilSimple, Trash } from "@phosphor-icons/react";
 import { useState } from "react";
-import { Badge } from "#/components/ui/badge";
-import { Button } from "#/components/ui/button";
+import { ActionsMenu } from "#/components/layout/actions-menu";
+import { DropdownMenuItem } from "#/components/ui/dropdown-menu";
 import { Input } from "#/components/ui/input";
+import { cn } from "#/lib/utils";
 
 type TagItemProps = {
 	tag: { id: string; name: string; articleCount: number };
 	isActive: boolean;
-	mobile?: boolean;
 	onSelect: () => void;
 	onRename: (id: string, name: string) => Promise<void>;
 	onDelete: (id: string) => Promise<void>;
 };
 
+/** One row of the phone tag list: open the tag, or rename or delete it from its menu. */
 export function TagItem({
 	tag,
 	isActive,
-	mobile = false,
 	onSelect,
 	onRename,
 	onDelete,
@@ -34,7 +34,7 @@ export function TagItem({
 	if (editing) {
 		return (
 			<form
-				className={mobile ? "px-0" : "flex items-center gap-1 px-2 py-1"}
+				className="py-1.5"
 				onSubmit={(event) => {
 					event.preventDefault();
 					void handleSave();
@@ -42,8 +42,9 @@ export function TagItem({
 			>
 				<Input
 					value={name}
+					aria-label={`New name for ${tag.name}`}
 					onChange={(event) => setName(event.target.value)}
-					className={mobile ? "h-10 text-sm" : "h-7 text-sm"}
+					className="h-10 text-sm"
 					autoFocus
 					onBlur={() => void handleSave()}
 					onKeyDown={(event) => {
@@ -59,69 +60,42 @@ export function TagItem({
 
 	return (
 		<div
-			className={
-				mobile
-					? `group/tag flex w-full items-center justify-between rounded-xl border bg-card px-3 py-3 text-left text-sm shadow-sm transition-colors ${
-							isActive
-								? "border-accent bg-accent/60 text-accent-foreground"
-								: "text-foreground hover:bg-accent/40"
-						}`
-					: `group/tag flex w-full items-center justify-between rounded-md px-2 py-1.5 text-left text-sm transition-colors ${
-							isActive
-								? "bg-accent text-accent-foreground"
-								: "text-foreground hover:bg-accent/50"
-						}`
-			}
+			className={cn(
+				"flex min-h-12 items-center gap-2 text-sm",
+				isActive && "bg-select",
+			)}
 		>
 			<button
 				type="button"
 				onClick={onSelect}
-				className="min-w-0 flex-1 text-left"
+				className="flex min-h-12 min-w-0 flex-1 items-center justify-between gap-3 py-2 pl-1 text-left"
 			>
-				<span className="block truncate font-medium">{tag.name}</span>
-			</button>
-			<div className="flex items-center gap-1.5">
-				<Badge
-					variant={mobile ? "secondary" : "outline"}
-					className="px-1.5 py-0 text-[10px]"
-				>
+				<span className="truncate font-medium">{tag.name}</span>
+				<span className="shrink-0 text-xs tabular-nums text-muted-foreground">
+					<span className="sr-only">, </span>
 					{tag.articleCount}
-				</Badge>
-				<div
-					className={
-						mobile
-							? "flex items-center gap-0.5"
-							: "flex items-center gap-0.5 opacity-0 group-hover/tag:opacity-100"
-					}
+					<span className="sr-only">
+						{tag.articleCount === 1 ? " article" : " articles"}
+					</span>
+				</span>
+			</button>
+			<ActionsMenu
+				label={`Actions for ${tag.name}`}
+				triggerSize="icon-touch"
+				triggerClassName="text-muted-foreground"
+			>
+				<DropdownMenuItem onSelect={() => setEditing(true)}>
+					<PencilSimple />
+					Rename
+				</DropdownMenuItem>
+				<DropdownMenuItem
+					variant="destructive"
+					onSelect={() => void onDelete(tag.id)}
 				>
-					<Button
-						type="button"
-						variant="ghost"
-						size="icon-xs"
-						onClick={(event) => {
-							event.stopPropagation();
-							setEditing(true);
-						}}
-						title="Rename"
-						aria-label={`Rename ${tag.name}`}
-					>
-						<PencilSimple className="h-3.5 w-3.5" />
-					</Button>
-					<Button
-						type="button"
-						variant="ghost"
-						size="icon-xs"
-						onClick={(event) => {
-							event.stopPropagation();
-							void onDelete(tag.id);
-						}}
-						title="Delete"
-						aria-label={`Delete ${tag.name}`}
-					>
-						<Trash className="h-3.5 w-3.5" />
-					</Button>
-				</div>
-			</div>
+					<Trash />
+					Delete tag
+				</DropdownMenuItem>
+			</ActionsMenu>
 		</div>
 	);
 }
