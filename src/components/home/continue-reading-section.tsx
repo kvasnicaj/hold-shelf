@@ -69,7 +69,7 @@ export function ContinueReadingSection({
 						variant="ghost"
 						disabled={isPending}
 						onClick={() => void handleFinishReading(lead.id)}
-						aria-label={`Mark ${lead.title ?? lead.url} as read`}
+						aria-label={`Mark as read: ${lead.title ?? lead.url}`}
 					>
 						<Check />
 						Mark as read

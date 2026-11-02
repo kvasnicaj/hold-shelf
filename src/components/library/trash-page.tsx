@@ -104,7 +104,7 @@ export function TrashPage() {
 								variant="ghost"
 								className="text-destructive hover:bg-destructive/10 hover:text-destructive"
 								disabled={busy}
-								aria-label={`Permanently delete ${article.title ?? article.url}`}
+								aria-label={`Delete forever: ${article.title ?? article.url}`}
 								onClick={() =>
 									requestDelete(
 										{ mode: "selected", ids: [article.id] },

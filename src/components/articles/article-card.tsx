@@ -28,8 +28,7 @@ export function ArticleCard({
 		(article.createdAt ? formatTimeAgo(article.createdAt) : "");
 
 	return (
-		// biome-ignore lint/a11y/useSemanticElements: The composite card contains nested controls, so it cannot be a native button.
-		<div
+		<article
 			className={cn(
 				"group flex cursor-pointer items-start gap-3 px-2 py-4 transition-colors hover:bg-background",
 				selected && "bg-select hover:bg-select",
@@ -40,8 +39,7 @@ export function ArticleCard({
 					void onOpenArticle(article.id, article.isRead);
 				}
 			}}
-			role="button"
-			tabIndex={0}
+			aria-label={article.title ?? article.url}
 		>
 			<Checkbox
 				aria-label={`Select ${article.title ?? article.url}`}
@@ -90,6 +88,6 @@ export function ArticleCard({
 				onRemoveTag={onRemoveTag}
 				onCreateTag={onCreateTag}
 			/>
-		</div>
+		</article>
 	);
 }

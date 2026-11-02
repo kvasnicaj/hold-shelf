@@ -79,9 +79,7 @@ export function ApiDocsEndpointCard({ endpoint }: ApiDocsEndpointCardProps) {
 									</span>
 								</div>
 								{response.body ? (
-									<pre className="overflow-x-auto rounded-md bg-muted/40 p-3 text-xs leading-6">
-										<code>{response.body}</code>
-									</pre>
+									<ApiDocsCodeBlock code={response.body} />
 								) : null}
 							</div>
 						))}

@@ -2,7 +2,11 @@ node_modules
 .DS_Store
 dist
 dist-ssr
+storybook-static
+*storybook.log
 coverage
+test-results
+.vitest
 *.local
 .env
 .env.*

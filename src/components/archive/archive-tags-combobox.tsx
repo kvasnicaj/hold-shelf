@@ -51,7 +51,7 @@ export function ArchiveTagsCombobox({
 					type="button"
 					variant="outline"
 					className="h-9 w-full justify-between px-3 font-normal md:w-44"
-					aria-label="Tag filters"
+					aria-label={`Tag filters: ${label}`}
 				>
 					<span className="flex min-w-0 items-center gap-2">
 						<TagIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
@@ -67,7 +67,7 @@ export function ArchiveTagsCombobox({
 					<CaretUpDown className="h-4 w-4 shrink-0 text-muted-foreground" />
 				</Button>
 			</PopoverTrigger>
-			<PopoverContent className="w-72 p-2" align="end">
+			<PopoverContent className="w-72 p-2" align="end" aria-label="Tag filters">
 				<Input
 					value={search}
 					onChange={(event) => setSearch(event.target.value)}

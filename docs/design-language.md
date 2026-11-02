@@ -21,6 +21,12 @@ styled through the tokens below.
   old-print textures. Library cues are structural: shelves, spines, labels.
 - **Calm motion.** 120 ms for hover and press, 180 ms for menus and dialogs,
   ease-out. No entrance animations on page load. Respect reduced motion.
+- **Independent controls.** Article rows use native article semantics; their
+  title links, selection checkboxes and action menus remain separate keyboard
+  targets. Never nest them inside an element with a button role.
+- **Accessible names and overflow.** Control names include their visible labels,
+  popovers have descriptive names, and tables name every column. Overflowing
+  code blocks in the reader and documentation are keyboard focusable for scrolling.
 
 ## Color
 

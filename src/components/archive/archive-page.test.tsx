@@ -195,7 +195,9 @@ describe("ArchivePage", () => {
 			navigateMock.mock.calls[0][0].search({ tag: "t1", page: 2 }),
 		).toMatchObject({ q: "design", tag: "t1", page: undefined });
 
-		await user.click(screen.getByRole("button", { name: "Tag filters" }));
+		await user.click(
+			screen.getByRole("button", { name: "Tag filters: Design" }),
+		);
 		await user.click(screen.getByRole("button", { name: "Clear tags" }));
 
 		await user.click(
