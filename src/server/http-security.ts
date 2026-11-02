@@ -45,6 +45,11 @@ export async function boundRequestBody(
 	} finally {
 		reader.releaseLock();
 	}
+	// Workers can expose an incoming GET/HEAD body stream, even when it is empty.
+	// The Request constructor rejects bodies for these methods, including zero bytes.
+	if (request.method === "GET" || request.method === "HEAD") {
+		return total === 0 ? new Request(request, { body: null }) : bodyError(400);
+	}
 	const body = new Uint8Array(total);
 	let offset = 0;
 	for (const chunk of chunks) {
