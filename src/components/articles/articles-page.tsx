@@ -1,5 +1,6 @@
 import { getRouteApi, useNavigate } from "@tanstack/react-router";
 import { ArticleCollectionRoutePage } from "#/components/articles/article-collection-route-page";
+import { UNREAD_PAGE_SIZE } from "#/components/articles/helpers";
 
 const route = getRouteApi("/app/articles");
 
@@ -15,6 +16,7 @@ export function ArticlesPage() {
 			navigate={navigate}
 			queryKey="unread"
 			filters={{ isRead: false }}
+			pageSize={UNREAD_PAGE_SIZE}
 			title="Unread"
 			searchPlaceholder="Search articles..."
 			emptyStateMessage="No unread articles yet."

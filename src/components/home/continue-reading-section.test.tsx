@@ -25,7 +25,7 @@ vi.mock("#/components/article-reader/use-article-reader", () => ({
 }));
 it("completes a partially read article even when opening already marked it read", async () => {
 	const user = userEvent.setup();
-	vi.mocked(getContinueReading).mockResolvedValue([
+	const initialData = [
 		{
 			id: "a1",
 			title: "My article",
@@ -35,12 +35,12 @@ it("completes a partially read article even when opening already marked it read"
 			isRead: true,
 			progress: 3500,
 		},
-	]);
+	];
 	vi.mocked(finishReading).mockImplementation(async () => {
 		vi.mocked(getContinueReading).mockResolvedValue([]);
 		return { success: true };
 	});
-	renderWithProviders(<ContinueReadingSection />);
+	renderWithProviders(<ContinueReadingSection initialData={initialData} />);
 	await user.click(
 		await screen.findByRole("button", { name: "Mark My article as read" }),
 	);

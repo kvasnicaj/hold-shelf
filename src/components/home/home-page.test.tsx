@@ -1,9 +1,11 @@
 import { screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { HomePage } from "#/components/home/home-page";
+import { getContinueReading } from "#/server/library";
 import { renderWithProviders } from "#/test/render";
 
 type HomeLoaderData = {
+	continueReading: Awaited<ReturnType<typeof getContinueReading>>;
 	stats: {
 		unread: number;
 		total: number;
@@ -51,6 +53,7 @@ const {
 } = vi.hoisted(() => ({
 	routeState: {
 		loaderData: {
+			continueReading: [],
 			stats: {
 				unread: 3,
 				total: 5,
@@ -111,6 +114,7 @@ describe("HomePage", () => {
 		vi.useFakeTimers();
 		vi.setSystemTime(new Date("2026-07-03T12:00:00.000Z"));
 		routeState.loaderData = {
+			continueReading: [],
 			stats: {
 				unread: 3,
 				total: 5,
@@ -184,8 +188,33 @@ describe("HomePage", () => {
 		expect(screen.getByTitle("Manage tags")).toBeInTheDocument();
 	});
 
+	it("renders continue reading immediately without a second request after mounting", () => {
+		routeState.loaderData.continueReading = [
+			{
+				id: "in-progress",
+				title: "Pick up where you left off",
+				url: "https://example.com/in-progress",
+				hostname: "example.com",
+				faviconUrl: null,
+				isRead: false,
+				progress: 3500,
+			},
+		];
+		vi.mocked(getContinueReading).mockClear();
+
+		renderWithProviders(<HomePage />);
+
+		expect(
+			screen.getByRole("region", { name: "Continue reading" }),
+		).toBeInTheDocument();
+		expect(screen.getByText("Pick up where you left off")).toBeInTheDocument();
+		expect(screen.getByText("35% read")).toBeInTheDocument();
+		expect(getContinueReading).not.toHaveBeenCalled();
+	});
+
 	it("shows the empty library guidance when there are no articles", () => {
 		routeState.loaderData = {
+			continueReading: [],
 			stats: {
 				unread: 0,
 				total: 0,
@@ -210,6 +239,7 @@ describe("HomePage", () => {
 
 	it("keeps the oldest unread widget visible when there are no unread articles", () => {
 		routeState.loaderData = {
+			continueReading: [],
 			stats: {
 				unread: 0,
 				total: 1,

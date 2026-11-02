@@ -115,7 +115,8 @@ The reader is its own mode: everything except the text steps back.
   field-style button, then Home, Unread, Favorites and Library, then Tags, then
   the account. The active item is a sheet with a hairline ring and a filled
   teal icon. Counts use tabular numbers; the unread count is teal. Only the tag
-  list scrolls.
+  list scrolls. Search shares the filter fields’ 36 px height, strong input
+  border and muted fill in both themes, distinct from the active navigation sheet.
 - **Mobile bottom bar:** Home, Unread, Save, Favorites, Library on a flat paper
   bar with one hairline. Save is a filled button in the middle. The active tab
   has a teal icon and a short teal line under it, echoing the logo's shelf.
@@ -178,6 +179,7 @@ The reader is its own mode: everything except the text steps back.
 ## Unread and Favorites
 
 - Comfortable density: one hairline-divided list, no per-article card frames.
+  Unread shows 10 articles per page; Favorites keeps 20.
 - Each row: hover checkbox, unread spine, favicon, a 15 px title (semibold
   unread, regular read) that wraps to two lines, a two-line excerpt, then site,
   time and tag labels.
@@ -192,6 +194,8 @@ The reader is its own mode: everything except the text steps back.
 - Spacious density. The header is a serif line ("Make time for a good read"),
   a sentence about what is waiting, and the counts as one quiet line instead
   of tiles.
+- Continue reading loads with the Home route, so its final space is present
+  on the first render and the shelves do not move down after loading.
 - Continue reading leads: a serif title, the site, a 3 px teal progress line,
   Continue as the primary action and Mark as read beside it. Other articles in
   progress follow as compact rows.

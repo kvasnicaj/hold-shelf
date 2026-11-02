@@ -4,13 +4,20 @@ import { ArticleExternalLink } from "#/components/articles/article-external-link
 import { ReadingProgressBar } from "#/components/articles/reading-progress-bar";
 import { useArticleMutations } from "#/components/articles/use-article-mutations";
 import { useOpenArticle } from "#/components/articles/use-open-article";
+import { continueReadingOptions } from "#/components/home/query-options";
 import { Button } from "#/components/ui/button";
-import { getContinueReading } from "#/server/library";
+import type { getContinueReading } from "#/server/library";
 
-export function ContinueReadingSection() {
+type ContinueReadingSectionProps = {
+	initialData: Awaited<ReturnType<typeof getContinueReading>>;
+};
+
+export function ContinueReadingSection({
+	initialData,
+}: ContinueReadingSectionProps) {
 	const { data = [] } = useQuery({
-		queryKey: ["continue-reading"],
-		queryFn: () => getContinueReading(),
+		...continueReadingOptions(),
+		initialData,
 	});
 	const { handleFinishReading, isPending } = useArticleMutations();
 	const { handleOpenArticle } = useOpenArticle();

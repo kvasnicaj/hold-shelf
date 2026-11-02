@@ -19,6 +19,7 @@ type ArticleCollectionRoutePageProps = {
 	emptyStateMessage: string;
 	filteredEmptyStateMessage: string;
 	emptyStateHint: string;
+	pageSize?: number;
 };
 
 export function ArticleCollectionRoutePage({
@@ -32,6 +33,7 @@ export function ArticleCollectionRoutePage({
 	emptyStateMessage,
 	filteredEmptyStateMessage,
 	emptyStateHint,
+	pageSize,
 }: ArticleCollectionRoutePageProps) {
 	const pageState = useArticleCollectionPage({
 		initialData,
@@ -39,6 +41,7 @@ export function ArticleCollectionRoutePage({
 		queryKey,
 		filters,
 		navigate,
+		pageSize,
 	});
 
 	return (

@@ -1,6 +1,8 @@
 import { MagnifyingGlass } from "@phosphor-icons/react";
+import { SEARCH_FIELD_CLASS_NAME } from "#/components/layout/helpers";
 import { usePageSearch } from "#/components/layout/use-page-search";
 import { Input } from "#/components/ui/input";
+import { cn } from "#/lib/utils";
 
 type PageSearchFieldProps = {
 	value: string;
@@ -36,7 +38,7 @@ export function PageSearchField({
 					onCompositionEnd={() => setComposing(false)}
 					placeholder={placeholder}
 					aria-label={ariaLabel}
-					className="bg-muted/35 pl-9 shadow-none"
+					className={cn(SEARCH_FIELD_CLASS_NAME, "pl-9")}
 				/>
 			</div>
 		</div>

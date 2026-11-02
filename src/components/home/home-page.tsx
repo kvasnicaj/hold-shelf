@@ -10,7 +10,7 @@ import { RecentArticlesSection } from "#/components/home/recent-articles-section
 const route = getRouteApi("/app/home");
 
 export function HomePage() {
-	const { stats, recent, tags } = route.useLoaderData();
+	const { stats, recent, tags, continueReading } = route.useLoaderData();
 	const { handleOpenArticle } = useOpenArticle();
 	const { handleAddTag, handleRemoveTag, handleCreateTag } =
 		useArticleMutations();
@@ -27,7 +27,7 @@ export function HomePage() {
 				<HomeStatsSection stats={stats} />
 			</header>
 
-			<ContinueReadingSection />
+			<ContinueReadingSection initialData={continueReading} />
 			{stats.total === 0 ? (
 				<EmptyLibraryCta />
 			) : (
