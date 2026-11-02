@@ -2,6 +2,7 @@ import { MagnifyingGlass, Plus } from "@phosphor-icons/react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { BrandLogo } from "#/components/brand/brand-logo";
+import { SEARCH_FIELD_CLASS_NAME } from "#/components/layout/helpers";
 import { primaryNavItems, unreadNavHref } from "#/components/layout/nav-items";
 import { NavLink } from "#/components/layout/nav-link";
 import { SaveLinkAction } from "#/components/layout/save-link-action";
@@ -10,6 +11,7 @@ import { SidebarUserMenu } from "#/components/layout/sidebar-user-menu";
 import { useUnreadCount } from "#/components/layout/use-unread-count";
 import { useSearch } from "#/components/search/use-search";
 import { Button } from "#/components/ui/button";
+import { cn } from "#/lib/utils";
 import { getTags } from "#/server/tags";
 
 export function AppSidebar() {
@@ -47,7 +49,10 @@ export function AppSidebar() {
 					type="button"
 					onClick={search.open}
 					aria-keyshortcuts="/"
-					className="flex h-8 w-full items-center gap-2.5 rounded-md border border-sidebar-border bg-card px-2.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+					className={cn(
+						SEARCH_FIELD_CLASS_NAME,
+						"flex w-full items-center gap-2 rounded-md border px-3 text-sm text-muted-foreground outline-none transition-[color,box-shadow] hover:text-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50",
+					)}
 				>
 					<MagnifyingGlass className="size-4 shrink-0" />
 					Search

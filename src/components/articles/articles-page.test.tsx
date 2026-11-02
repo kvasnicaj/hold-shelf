@@ -2,9 +2,13 @@ import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ArticlesPage } from "#/components/articles/articles-page";
+import {
+	loadArticleCollectionRoute,
+	UNREAD_PAGE_SIZE,
+} from "#/components/articles/helpers";
 import type { ArticleWithTags } from "#/components/articles/types";
 import type { Tag } from "#/components/tags/types";
-import { renderWithProviders } from "#/test/render";
+import { createTestQueryClient, renderWithProviders } from "#/test/render";
 
 const {
 	routeState,
@@ -254,6 +258,56 @@ describe("ArticlesPage", () => {
 			sort: "title",
 			page: undefined,
 		});
+	});
+
+	it("keeps unread loader offsets and pagination aligned across ten-article pages", async () => {
+		const user = userEvent.setup();
+		const queryClient = createTestQueryClient();
+		const articles = Array.from({ length: 23 }, (_, index) => ({
+			...articleFixtures[0],
+			id: `a${index + 1}`,
+			title: `Unread article ${index + 1}`,
+		}));
+		getArticlesMock.mockImplementation(async ({ data }) => ({
+			items: articles.slice(data.offset, data.offset + data.limit),
+			total: articles.length,
+		}));
+		routeState.search = { page: 2 };
+		routeState.loaderData = await loadArticleCollectionRoute({
+			queryClient,
+			filters: { isRead: false },
+			search: routeState.search,
+			pageSize: UNREAD_PAGE_SIZE,
+		});
+
+		const { unmount } = renderWithProviders(<ArticlesPage />, { queryClient });
+
+		expect(screen.getAllByRole("button", { name: /^select-/ })).toHaveLength(
+			10,
+		);
+		expect(screen.getByText("Unread article 11")).toBeInTheDocument();
+		expect(screen.getByText("Unread article 20")).toBeInTheDocument();
+		expect(screen.queryByText("Unread article 21")).not.toBeInTheDocument();
+		await user.click(screen.getByRole("link", { name: "Go to page 3" }));
+		routeState.search = navigateMock.mock.calls
+			.at(-1)?.[0]
+			.search(routeState.search);
+		routeState.loaderData = await loadArticleCollectionRoute({
+			queryClient,
+			filters: { isRead: false },
+			search: routeState.search,
+			pageSize: UNREAD_PAGE_SIZE,
+		});
+		unmount();
+		renderWithProviders(<ArticlesPage />, { queryClient });
+
+		expect(screen.getAllByRole("button", { name: /^select-/ })).toHaveLength(3);
+		expect(screen.getByText("Unread article 21")).toBeInTheDocument();
+		expect(screen.getByText("Unread article 23")).toBeInTheDocument();
+		expect(screen.getByRole("link", { name: "Go to page 3" })).toHaveAttribute(
+			"aria-current",
+			"page",
+		);
 	});
 
 	it("runs toggle and delete mutations and invalidates cached state", async () => {

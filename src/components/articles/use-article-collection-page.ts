@@ -23,6 +23,7 @@ type UseArticleCollectionPageOptions = {
 	filters: ArticleCollectionFilters;
 	navigate: ArticleCollectionNavigate;
 	enabled?: boolean;
+	pageSize?: number;
 };
 
 export function useArticleCollectionPage({
@@ -31,6 +32,7 @@ export function useArticleCollectionPage({
 	filters,
 	navigate,
 	enabled = true,
+	pageSize = ARTICLE_COLLECTION_PAGE_SIZE,
 }: UseArticleCollectionPageOptions) {
 	const { q, sort, page: searchPage } = search;
 	const page = searchPage ?? 1;
@@ -53,8 +55,8 @@ export function useArticleCollectionPage({
 			...filters,
 			search: q,
 			sort,
-			limit: ARTICLE_COLLECTION_PAGE_SIZE,
-			offset: (page - 1) * ARTICLE_COLLECTION_PAGE_SIZE,
+			limit: pageSize,
+			offset: (page - 1) * pageSize,
 		}),
 		initialData: initialData.articles,
 		enabled,
@@ -66,7 +68,7 @@ export function useArticleCollectionPage({
 
 	const articles = result?.items ?? [];
 	const total = result?.total ?? 0;
-	const totalPages = Math.ceil(total / ARTICLE_COLLECTION_PAGE_SIZE);
+	const totalPages = Math.ceil(total / pageSize);
 	useEffect(() => {
 		if (enabled && result && page > Math.max(1, totalPages))
 			void navigate({

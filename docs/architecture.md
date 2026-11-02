@@ -433,6 +433,7 @@ Loader dependencies:
 - `getDashboardStats()`
 - `getRecentArticles()`
 - `getTags()`
+- `getContinueReading()` via the shared `continueReadingOptions()` query
 
 Component tree:
 
@@ -450,6 +451,12 @@ HomePage
 |  |- Shelf "Recently saved" -> ShelfItem* + TagPicker*
 |  |- Shelf "Favorites" -> ShelfItem*
 ```
+
+The loader awaits all four requests in parallel. Continue reading uses the
+same query cache in the loader and component, with a 30-second freshness window,
+so it renders with the shelves instead of appearing after them. Stale progress
+is refreshed before a returning Home page renders; reader and article mutations
+continue to invalidate the query.
 
 Purpose:
 
@@ -494,7 +501,8 @@ Core functionality:
 
 - save a new URL with `createArticle()`
 - article creation stores URL metadata only, not the full article body
-- fetch unread articles with search/sort/pagination
+- fetch unread articles with search/sort/pagination (10 articles per page;
+  loader offsets, client queries and page counts share the same page size)
 - mark one or many articles read/unread with `updateArticle()`
 - delete one or many articles with `deleteArticles()`
 - assign/remove tags with `addTagToArticles()` and
