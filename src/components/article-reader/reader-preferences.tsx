@@ -35,7 +35,11 @@ export function ReaderPreferences({
 					Aa
 				</Button>
 			</PopoverTrigger>
-			<PopoverContent align="end" className="w-64 space-y-4 p-3">
+			<PopoverContent
+				align="end"
+				className="w-64 space-y-4 p-3"
+				aria-label="Reading settings"
+			>
 				<ReaderSettingRow label="Text size">
 					<div className="flex items-center justify-between">
 						<Button

@@ -14,6 +14,7 @@ import remarkRehype from "remark-rehype";
 import { unified } from "unified";
 
 export function renderMarkdownToHtml(markdown: string): string {
+	// Let keyboard users scroll overflowing code after the content is sanitized.
 	return String(
 		unified()
 			.use(remarkParse)
@@ -23,7 +24,7 @@ export function renderMarkdownToHtml(markdown: string): string {
 			.use(rehypeSanitize)
 			.use(rehypeStringify)
 			.processSync(markdown),
-	);
+	).replaceAll("<pre>", '<pre tabindex="0">');
 }
 
 function renderChildren(

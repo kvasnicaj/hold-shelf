@@ -37,8 +37,7 @@ export function ArticleCardMobile({
 	}
 
 	return (
-		// biome-ignore lint/a11y/useSemanticElements: The composite card contains nested controls, so it cannot be a native button.
-		<div
+		<article
 			className={cn(
 				"grid cursor-pointer grid-cols-[auto_minmax(0,1fr)_auto] items-start gap-x-2.5 py-3 pr-1 pl-3",
 				selected && "bg-select",
@@ -49,8 +48,7 @@ export function ArticleCardMobile({
 					activate();
 				}
 			}}
-			role="button"
-			tabIndex={0}
+			aria-label={article.title ?? article.url}
 		>
 			<div className="flex items-center gap-3 pt-0.5">
 				{selectionMode && (
@@ -108,6 +106,6 @@ export function ArticleCardMobile({
 				onRemoveTag={onRemoveTag}
 				onCreateTag={onCreateTag}
 			/>
-		</div>
+		</article>
 	);
 }

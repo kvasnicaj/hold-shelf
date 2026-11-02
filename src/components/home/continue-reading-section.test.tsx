@@ -42,7 +42,7 @@ it("completes a partially read article even when opening already marked it read"
 	});
 	renderWithProviders(<ContinueReadingSection initialData={initialData} />);
 	await user.click(
-		await screen.findByRole("button", { name: "Mark My article as read" }),
+		await screen.findByRole("button", { name: "Mark as read: My article" }),
 	);
 	expect(finishReading).toHaveBeenCalledWith({ data: { id: "a1" } });
 	await waitFor(() =>

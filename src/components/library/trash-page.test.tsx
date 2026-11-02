@@ -25,7 +25,7 @@ it("requires confirmation, supports cancel, and preserves the dialog after a fai
 	renderWithProviders(<TrashPage />);
 	await user.click(
 		await screen.findByRole("button", {
-			name: "Permanently delete Saved article",
+			name: "Delete forever: Saved article",
 		}),
 	);
 	const dialog = screen.getByRole("dialog");

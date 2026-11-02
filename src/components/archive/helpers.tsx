@@ -110,7 +110,7 @@ export function createArchiveColumns({
 		}),
 		columnHelper.display({
 			id: "status",
-			header: () => null,
+			header: () => <span className="sr-only">Reading state</span>,
 			cell: ({ row }) => (
 				<ArticleStateMarks
 					isRead={row.original.isRead}
@@ -181,7 +181,7 @@ export function createArchiveColumns({
 		}),
 		columnHelper.display({
 			id: "actions",
-			header: () => null,
+			header: () => <span className="sr-only">Actions</span>,
 			cell: ArchiveActionsCell,
 		}),
 	]);

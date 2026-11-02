@@ -2,10 +2,10 @@ import babel from "@rolldown/plugin-babel";
 import viteReact, { reactCompilerPreset } from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
 
-const plugins = [
-	viteReact(),
-	babel({ presets: [reactCompilerPreset()] }),
-];
+const plugins = [viteReact(), babel({ presets: [reactCompilerPreset()] })];
+
+// The @storybook/addon-vitest UI collects coverage in a browser-only project.
+const storybookCoverage = process.env.VITEST_STORYBOOK === "true";
 
 export default defineConfig({
 	resolve: {
@@ -15,8 +15,12 @@ export default defineConfig({
 		coverage: {
 			provider: "v8",
 			reporter: ["text", "html"],
-			include: ["src/**/*.{ts,tsx}"],
+			include: storybookCoverage
+				? ["src/components/**/*.{ts,tsx}", "src/hooks/**/*.{ts,tsx}"]
+				: ["src/**/*.{ts,tsx}"],
 			exclude: [
+				"src/**/*.stories.{ts,tsx}",
+				"src/stories/**",
 				"src/**/*.test.{ts,tsx}",
 				"src/test/**",
 				"src/routeTree.gen.ts",
@@ -24,6 +28,7 @@ export default defineConfig({
 			],
 		},
 		projects: [
+			"./.storybook/vitest.config.ts",
 			{
 				plugins,
 				test: {

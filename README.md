@@ -40,9 +40,15 @@ emulated D1 database; production credentials are not needed for local developmen
 pnpm dev          # Start dev server (local D1 emulator)
 pnpm build        # Production build
 pnpm deploy       # Build + deploy to Cloudflare Workers
-pnpm test         # Run tests
+pnpm test         # Run app, API contract, and CLI unit tests
+pnpm test:storybook # Browser interaction + accessibility tests
+pnpm test:all     # Unit + Storybook tests in light and dark
 pnpm check        # Lint + format (Biome)
 pnpm typecheck    # TypeScript checks
+pnpm storybook    # Component workshop at http://localhost:6006
+pnpm build-storybook # Build the static component workshop
+pnpm test:storybook:watch # Watch component tests while editing
+pnpm test:storybook:coverage # Browser coverage report
 pnpm brand:generate # Rebuild logos, app icons, and social card
 ```
 
@@ -82,6 +88,7 @@ system credential store; CI can provide `HOLD_SHELF_TOKEN` without persistence.
 ## Documentation
 
 - [Architecture and component tree](./docs/architecture.md)
+- [Storybook component development](./docs/storybook.md)
 - [Brand assets and usage](./docs/branding.md)
 - [Authentication](./docs/auth.md)
 - [CLI architecture and command contract](./docs/cli.md)
