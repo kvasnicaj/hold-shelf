@@ -1,6 +1,15 @@
 const APP_ORIGIN = "https://hold-shelf.com";
 const SUCCESS_BADGE_COLOR = "#23767e";
 const ERROR_BADGE_COLOR = "#b03f2c";
+// Standalone extension equivalents of the shared design-language tokens.
+const TOAST_THEME = {
+	background: "#173a40",
+	foreground: "#d7ece8",
+	errorBackground: "#b03f2c",
+	errorForeground: "#fbfcf9",
+	border: "#2f565d",
+	shadow: "0 8px 24px rgb(13 31 35 / 18%)",
+};
 
 chrome.runtime.onInstalled.addListener(() => {
 	chrome.contextMenus.create({
@@ -57,7 +66,7 @@ async function saveUrl(tabId, url) {
 			return;
 		}
 
-		if (response.status === 409) {
+		if (response.status === 409 && payload.code === "ARTICLE_EXISTS") {
 			await showToast(tabId, "Already saved in Hold Shelf.", "success");
 			await showBadge(
 				tabId,
@@ -124,7 +133,7 @@ async function showErrorFeedback(tabId, message) {
 }
 
 function getExtensionSaveUrl(url) {
-	const loginUrl = new URL("/extension/save", APP_ORIGIN);
+	const loginUrl = new URL("/save", APP_ORIGIN);
 	loginUrl.searchParams.set("url", url);
 	return loginUrl.toString();
 }
@@ -137,7 +146,7 @@ async function showToast(tabId, message, kind) {
 	try {
 		await chrome.scripting.executeScript({
 			target: { tabId },
-			func: (toastMessage, toastKind) => {
+			func: (toastMessage, toastKind, theme) => {
 				const existing = document.getElementById("hold-shelf-extension-toast");
 				if (existing) {
 					existing.remove();
@@ -146,26 +155,31 @@ async function showToast(tabId, message, kind) {
 				const toast = document.createElement("div");
 				toast.id = "hold-shelf-extension-toast";
 				toast.textContent = toastMessage;
+				toast.setAttribute("role", toastKind === "error" ? "alert" : "status");
 				toast.style.position = "fixed";
 				toast.style.top = "20px";
 				toast.style.right = "20px";
 				toast.style.zIndex = "2147483647";
 				toast.style.maxWidth = "320px";
 				toast.style.padding = "12px 14px";
-				toast.style.borderRadius = "14px";
+				toast.style.borderRadius = "8px";
 				toast.style.background =
-					toastKind === "success" ? "#113f3c" : "#5c1f1f";
-				toast.style.color = "#ffffff";
-				toast.style.boxShadow = "0 10px 30px rgba(0, 0, 0, 0.25)";
+					toastKind === "success" ? theme.background : theme.errorBackground;
+				toast.style.color =
+					toastKind === "success" ? theme.foreground : theme.errorForeground;
+				toast.style.boxShadow = theme.shadow;
 				toast.style.fontFamily =
 					'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
 				toast.style.fontSize = "14px";
-				toast.style.lineHeight = "1.4";
-				toast.style.border = "1px solid rgba(255, 255, 255, 0.12)";
+				toast.style.lineHeight = "22px";
+				toast.style.border = `1px solid ${toastKind === "success" ? theme.border : theme.errorBackground}`;
 				toast.style.opacity = "0";
 				toast.style.transform = "translateY(-8px)";
-				toast.style.transition =
-					"opacity 160ms ease, transform 160ms ease";
+				toast.style.transition = window.matchMedia(
+					"(prefers-reduced-motion: reduce)",
+				).matches
+					? "none"
+					: "opacity 180ms ease-out, transform 180ms ease-out";
 
 				document.documentElement.appendChild(toast);
 
@@ -180,7 +194,7 @@ async function showToast(tabId, message, kind) {
 					window.setTimeout(() => toast.remove(), 180);
 				}, 2400);
 			},
-			args: [message, kind],
+			args: [message, kind, TOAST_THEME],
 		});
 	} catch (error) {
 		console.warn("Hold Shelf toast injection failed", { tabId, error });

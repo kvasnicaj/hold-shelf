@@ -364,8 +364,8 @@ Responsibilities:
 - authenticates the request from the Hold Shelf session cookie
 - returns `401` with a `loginUrl` when the user needs to sign in on the site
 - saves the article with the same metadata extraction flow as the web app
-- returns `409` for duplicates so the extension can treat repeat saves as
-  success
+- returns `409 ARTICLE_EXISTS` for duplicates so the extension can treat repeat
+  saves as success; `409 QUOTA_EXCEEDED` remains an actionable error
 
 ### Personal REST API
 
