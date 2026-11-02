@@ -16,6 +16,27 @@ This Manifest V3 extension saves pages into Hold Shelf.
 - right-clicking a link saves the link target
 - if the user is not signed in on `hold-shelf.com`, the extension opens the
   website login handoff flow and the site finishes the save there
+- repeat saves succeed only for `ARTICLE_EXISTS`; account-limit errors show
+  the server's explanation instead of a misleading success notification
+- notifications use the app's inverse, danger and floating-layer design tokens,
+  announce their status to assistive technology, and respect reduced motion
+
+## 0.1.2
+
+- Align save notifications with the current Hold Shelf design.
+- Correct feedback when an account's storage limit prevents a save.
+- Use the current `/save` page for the sign-in fallback.
+
+Version 0.1.1 is already published; changed extension code requires a higher
+version for the next Chrome Web Store upload.
+
+## Validation and store listing
+
+Run the extension's save-response regression checks with
+`node --test extension/background.test.js`.
+
+Store copy and upload-ready artwork live in [`store/`](./store/listing.md).
+The explicit distribution file list below excludes tests and listing assets.
 
 ## Permissions
 
