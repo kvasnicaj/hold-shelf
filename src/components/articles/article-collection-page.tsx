@@ -19,7 +19,7 @@ type ArticleCollectionPageProps = {
 	total: number;
 	totalPages: number;
 	tagList: Tag[];
-	selected: Set<string>;
+	selected: ReadonlySet<string>;
 	selectedIds: string[];
 	handleSelect: (id: string, selected: boolean) => void;
 	handleOpenArticle: (id: string, isRead: boolean) => Promise<void>;

@@ -1,6 +1,7 @@
 const APP_ORIGIN = "https://hold-shelf.com";
 const SUCCESS_BADGE_COLOR = "#23767e";
 const ERROR_BADGE_COLOR = "#b03f2c";
+const badgeResetTimers = new Map();
 
 chrome.runtime.onInstalled.addListener(() => {
 	chrome.contextMenus.create({
@@ -103,10 +104,16 @@ async function showBadge(tabId, text, color, title) {
 	await chrome.action.setBadgeText({ tabId, text });
 	await chrome.action.setTitle({ tabId, title });
 
-	setTimeout(() => {
-		void chrome.action.setBadgeText({ tabId, text: "" });
-		void chrome.action.setTitle({ tabId, title: "Save to Hold Shelf" });
-	}, 4000);
+	// A newer save on the same tab replaces this feedback; its own timer resets it.
+	clearTimeout(badgeResetTimers.get(tabId));
+	badgeResetTimers.set(
+		tabId,
+		setTimeout(() => {
+			badgeResetTimers.delete(tabId);
+			void chrome.action.setBadgeText({ tabId, text: "" });
+			void chrome.action.setTitle({ tabId, title: "Save to Hold Shelf" });
+		}, 4000),
+	);
 }
 
 async function showErrorFeedback(tabId, message) {

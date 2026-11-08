@@ -6,7 +6,7 @@ import { useIsMobile } from "#/hooks/use-mobile";
 
 type ArticleListProps = {
 	articles: ArticleWithTags[];
-	selected: Set<string>;
+	selected: ReadonlySet<string>;
 	onSelect: (id: string, selected: boolean) => void;
 	onOpenArticle: (id: string, isRead: boolean) => void | Promise<void>;
 	onToggleRead: (id: string, isRead: boolean) => void;

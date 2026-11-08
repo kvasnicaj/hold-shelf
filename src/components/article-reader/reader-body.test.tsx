@@ -109,6 +109,70 @@ it("marks an unread article read once the reader reaches the end", async () => {
 	scroller.scrollTop = 1500;
 	fireEvent.scroll(scroller);
 	fireEvent.scroll(scroller);
-	expect(finishReading).toHaveBeenCalledTimes(1);
+	await waitFor(() => expect(finishReading).toHaveBeenCalledTimes(1));
 	expect(finishReading).toHaveBeenCalledWith({ data: { id: "a2" } });
+});
+
+it("finishes only after an earlier position save settles and drops the superseded position", async () => {
+	const article = {
+		id: "a3",
+		userId: "u1",
+		url: "https://example.com/slow",
+		title: "Slow article",
+		description: null,
+		hostname: "example.com",
+		faviconUrl: null,
+		isRead: false,
+		isFavorite: false,
+		createdAt: new Date(),
+		updatedAt: new Date(),
+		readAt: null,
+		tags: [],
+	};
+	const content = {
+		status: "ready" as const,
+		markdown: "Slow body",
+		plainText: "Slow body",
+		wordCount: 2,
+		fetchedAt: new Date(),
+	};
+	vi.spyOn(HTMLElement.prototype, "scrollHeight", "get").mockReturnValue(2000);
+	vi.spyOn(HTMLElement.prototype, "clientHeight", "get").mockReturnValue(500);
+	vi.mocked(getReadingProgress).mockResolvedValue(1000);
+	let releaseSave = () => {};
+	vi.mocked(saveReadingProgress).mockImplementation(
+		() =>
+			new Promise((resolve) => {
+				releaseSave = () => resolve({ success: true });
+			}),
+	);
+	vi.mocked(finishReading).mockResolvedValue({ success: true });
+	const view = renderWithProviders(
+		<ReaderBody
+			data={{ article, content }}
+			settings={DEFAULT_READER_SETTINGS}
+		/>,
+	);
+	const scroller = view.container.firstElementChild as HTMLElement;
+	await waitFor(() => expect(scroller.scrollTop).toBe(150));
+
+	scroller.scrollTop = 750;
+	fireEvent.scroll(scroller);
+	fireEvent(window, new Event("pagehide"));
+	await waitFor(() =>
+		expect(saveReadingProgress).toHaveBeenCalledWith({
+			data: { id: "a3", progress: 5000 },
+		}),
+	);
+
+	scroller.scrollTop = 1500;
+	fireEvent.scroll(scroller);
+	fireEvent(window, new Event("pagehide"));
+	await Promise.resolve();
+	expect(finishReading).not.toHaveBeenCalled();
+
+	releaseSave();
+	await waitFor(() => expect(finishReading).toHaveBeenCalledTimes(1));
+	view.unmount();
+	expect(saveReadingProgress).toHaveBeenCalledTimes(1);
 });

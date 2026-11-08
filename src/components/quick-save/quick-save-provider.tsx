@@ -25,8 +25,14 @@ export function QuickSaveProvider({ children }: QuickSaveProviderProps) {
 				key={state.session}
 				open={state.open}
 				initialUrl={state.url}
+				// Bound to its session so a late save from a closed session cannot
+				// close a newer one.
 				onOpenChange={(isOpen) =>
-					setState((current) => ({ ...current, open: isOpen }))
+					setState((current) =>
+						current.session === state.session
+							? { ...current, open: isOpen }
+							: current,
+					)
 				}
 			/>
 		</QuickSaveContext>

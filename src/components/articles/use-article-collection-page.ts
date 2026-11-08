@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { ARTICLE_COLLECTION_PAGE_SIZE } from "#/components/articles/helpers";
 import {
 	articleListOptions,
@@ -15,6 +15,9 @@ import type {
 } from "#/components/articles/types";
 import { useArticleMutations } from "#/components/articles/use-article-mutations";
 import { useOpenArticle } from "#/components/articles/use-open-article";
+import { useScopedState } from "#/hooks/use-scoped-state";
+
+const NO_SELECTION: ReadonlySet<string> = new Set();
 
 type UseArticleCollectionPageOptions = {
 	initialData: ArticleCollectionLoaderData;
@@ -36,7 +39,11 @@ export function useArticleCollectionPage({
 }: UseArticleCollectionPageOptions) {
 	const { q, sort, page: searchPage } = search;
 	const page = searchPage ?? 1;
-	const [selected, setSelected] = useState<Set<string>>(new Set());
+	// Selection belongs to the list currently shown; filters and pages reset it.
+	const [selected, setSelected] = useScopedState(
+		JSON.stringify([filters, q, sort, page]),
+		NO_SELECTION,
+	);
 	const { handleOpenArticle } = useOpenArticle();
 	const {
 		handleToggleRead,

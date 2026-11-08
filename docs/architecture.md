@@ -642,6 +642,8 @@ Core functionality:
 - mobile Library rows keep one labeled row menu (Select, read, favorite,
   Tags…, Move to Trash); selecting a row starts selection mode, where taps
   toggle rows and the floating bulk bar acts on them
+- selection belongs to the rows on screen: changing search, sort, filters, tags
+  or page clears it (`useScopedState`), so bulk actions never reach hidden rows
 - mobile filters tags with a scrolling row of chips; Manage tags stays fixed
   outside the scrolling strip
 
@@ -698,9 +700,13 @@ Flow:
    and Choose tags opens the searchable `TagPicker` with existing tags.
 3. Enter saves; Shift+Enter (or Save and read) saves and opens the reader.
 4. `useSaveArticle` calls `createArticle`, assigns the chosen tags with
-   `addTagToArticles`, and refreshes article and tag queries.
+   `addTagToArticles`, and refreshes article and tag queries. The article is
+   committed before tagging, so a tag that cannot be added is reported as a
+   partial success (the panel closes with a warning toast), not as a failed save.
 5. A plain save shows a "Saved to Unread" toast with Read now. Errors such as
    an already saved link stay in the panel so the user can correct them.
+6. Each opening is its own session: a save that finishes after the panel was
+   closed and reopened cannot close the new session or open the reader over it.
 
 Desktop shows a panel near the top of the screen; phones show a bottom sheet
 with a Paste from clipboard button.
@@ -883,7 +889,9 @@ Flow when opening an article in the reader:
    preserve code/whitespace/images/tables/lists, convert to Markdown/plain text,
    and upsert the `markdown-v3` cache
 6. cache temporary extraction failures as `unavailable` and retry stale failures
-   later
+   later; the upsert never replaces a `ready` copy with `unavailable`, even one
+   written by a concurrent save-time capture or refresh after this request read
+   the cache
 
 Chrome extension flow:
 
@@ -1053,7 +1061,9 @@ screens use a non-modal side column. The reader saves scroll position after an
 800ms pause and flushes on close/page hide, then updates Continue reading. A page
 shutdown can still interrupt an in-flight request. Opening an article never
 changes its read state; when the reader scrolls past 98% of an unread article it
-calls `finishReading`, which marks it read and completes its progress. The older
+calls `finishReading`, which marks it read and completes its progress. Position
+saves and the finish share one write queue per open reader, so an earlier slow
+position save cannot land after the finish and lower its 100% progress. The older
 `markReadOnOpen` user setting is still stored but no longer used by the app. Text size (15–24 px), line
 width (56, 64 or 76ch) and font (serif or sans) are local browser preferences set
 from the toolbar's Aa menu (`ReaderPreferences`, `useReaderSettings`); older stored

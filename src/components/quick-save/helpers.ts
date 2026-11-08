@@ -25,3 +25,10 @@ export function toHttpUrl(value: string): string | null {
 export function getDisplayHost(url: string): string {
 	return new URL(url).hostname.replace(/^www\./, "");
 }
+
+/** Toast text for a link that saved but could not get all of its tags. */
+export function getTagFailureMessage(failedTagCount: number): string {
+	return failedTagCount === 1
+		? "Saved, but one tag could not be added."
+		: `Saved, but ${failedTagCount} tags could not be added.`;
+}

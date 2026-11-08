@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { buildTagShareUrl } from "#/components/tags/helpers";
-import type { TagShare } from "#/components/tags/types";
+import type { SharePending, TagShare } from "#/components/tags/types";
 import {
 	createTagShare,
 	getTagShare,
@@ -13,7 +13,7 @@ export function useTagShare(
 	onShareChange: (share: TagShare | null) => void,
 ) {
 	const [share, setShare] = useState<TagShare | null>(initialShare);
-	const [loading, setLoading] = useState(false);
+	const [pending, setPending] = useState<SharePending>(null);
 	const [copying, setCopying] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [status, setStatus] = useState<string | null>(null);
@@ -22,46 +22,55 @@ export function useTagShare(
 		typeof window === "undefined" ? undefined : window.location.origin;
 	const shareUrl = share ? buildTagShareUrl(share.token, origin) : null;
 
-	async function loadShare() {
-		setLoading(true);
+	/** Runs one share request; resolves whether it succeeded. */
+	async function run(
+		kind: Exclude<SharePending, null>,
+		request: () => Promise<TagShare | null>,
+		failure: string,
+		success?: string,
+	) {
+		setPending(kind);
 		setError(null);
 		setStatus(null);
 		try {
-			updateShare(await getTagShare({ data: { tagId } }));
+			updateShare(await request());
+			if (success) setStatus(success);
+			return true;
 		} catch (err) {
-			setError(getErrorMessage(err, "Failed to load sharing settings."));
+			setError(getErrorMessage(err, failure));
+			return false;
 		} finally {
-			setLoading(false);
+			setPending(null);
 		}
 	}
 
-	async function createShare() {
-		setLoading(true);
-		setError(null);
-		setStatus(null);
-		try {
-			updateShare(await createTagShare({ data: { tagId } }));
-			setStatus("Sharing link created.");
-		} catch (err) {
-			setError(getErrorMessage(err, "Failed to create sharing link."));
-		} finally {
-			setLoading(false);
-		}
+	function loadShare() {
+		return run(
+			"load",
+			() => getTagShare({ data: { tagId } }),
+			"Failed to load sharing settings.",
+		);
 	}
 
-	async function revokeShare() {
-		setLoading(true);
-		setError(null);
-		setStatus(null);
-		try {
-			await revokeTagShare({ data: { tagId } });
-			updateShare(null);
-			setStatus("Sharing stopped. The old link no longer works.");
-		} catch (err) {
-			setError(getErrorMessage(err, "Failed to stop sharing."));
-		} finally {
-			setLoading(false);
-		}
+	function createShare() {
+		return run(
+			"create",
+			() => createTagShare({ data: { tagId } }),
+			"Failed to create sharing link.",
+			"Sharing link created.",
+		);
+	}
+
+	function revokeShare() {
+		return run(
+			"revoke",
+			async () => {
+				await revokeTagShare({ data: { tagId } });
+				return null;
+			},
+			"Failed to stop sharing.",
+			"Sharing stopped. The old link no longer works.",
+		);
 	}
 
 	function updateShare(nextShare: TagShare | null) {
@@ -90,7 +99,9 @@ export function useTagShare(
 	return {
 		share,
 		shareUrl,
-		loading,
+		loading: pending !== null,
+		/** A create or revoke is in flight and cannot be canceled. */
+		mutating: pending === "create" || pending === "revoke",
 		copying,
 		error,
 		status,

@@ -7,6 +7,8 @@ const source = await readFile(new URL("./background.js", import.meta.url), "utf8
 
 function loadExtension({ status = 200, payload = {}, fetchError } = {}) {
 	const feedback = [];
+	const timers = new Map();
+	let nextTimer = 0;
 	const logs = [];
 	const openedTabs = [];
 	let onClick;
@@ -16,7 +18,12 @@ function loadExtension({ status = 200, payload = {}, fetchError } = {}) {
 	runInNewContext(source, {
 		URL,
 		console: { debug: log, warn: log, error: log },
-		setTimeout: noop,
+		setTimeout: (callback) => {
+			nextTimer++;
+			timers.set(nextTimer, callback);
+			return nextTimer;
+		},
+		clearTimeout: (id) => timers.delete(id),
 		fetch: async () => {
 			requestCount++;
 			if (fetchError) throw fetchError;
@@ -37,6 +44,12 @@ function loadExtension({ status = 200, payload = {}, fetchError } = {}) {
 	return {
 		click: (url = "https://example.com/article") => onClick({ id: 1, url }),
 		feedback,
+		runTimers: () => {
+			for (const [id, callback] of [...timers]) {
+				timers.delete(id);
+				callback();
+			}
+		},
 		logs,
 		openedTabs,
 		requestCount: () => requestCount,
@@ -115,4 +128,16 @@ test("save diagnostics never log the saved URL or server response", async () => 
 		const logged = JSON.stringify(extension.logs);
 		assert.doesNotMatch(logged, /example\.com|secret|loginUrl|article/);
 	}
+});
+
+test("a newer save keeps its feedback until its own reset", async () => {
+	const extension = loadExtension();
+	await extension.click();
+	await extension.click();
+	extension.runTimers();
+	assert.deepEqual(extension.feedback, [
+		{ badge: "OK", title: "Saved to Hold Shelf." },
+		{ badge: "OK", title: "Saved to Hold Shelf." },
+		{ badge: "", title: "Save to Hold Shelf" },
+	]);
 });

@@ -81,4 +81,75 @@ describe("ShareTagDialog", () => {
 		).toBeInTheDocument();
 		expect(onShareChange).toHaveBeenLastCalledWith(null);
 	});
+
+	it("keeps the revoke confirmation open when stopping fails", async () => {
+		const user = userEvent.setup();
+		const share = {
+			tagId: "tag-1",
+			token: `hss_${"b".repeat(32)}`,
+			createdAt: new Date("2026-07-31T00:00:00.000Z"),
+		};
+		getTagShareMock.mockResolvedValue(share);
+		revokeTagShareMock.mockRejectedValue(new Error("Network down"));
+		renderWithProviders(
+			<ShareTagDialog
+				tagId="tag-1"
+				tagName="Research"
+				initialShare={share}
+				onShareChange={vi.fn()}
+			/>,
+		);
+
+		await user.click(screen.getByRole("button", { name: "Share Research" }));
+		await user.click(
+			await screen.findByRole("button", { name: "Stop sharing" }),
+		);
+		await user.click(screen.getByRole("button", { name: "Stop sharing" }));
+
+		expect(await screen.findByRole("alert")).toHaveTextContent("Network down");
+		expect(screen.getByText(/Stop sharing this tag\?/)).toBeInTheDocument();
+		expect(screen.getByLabelText("Sharing link for Research")).toHaveValue(
+			`http://localhost/share/hss_${"b".repeat(32)}`,
+		);
+	});
+
+	it("cannot be dismissed while a sharing link is being created", async () => {
+		const user = userEvent.setup();
+		let finishCreate = () => {};
+		createTagShareMock.mockImplementation(
+			() =>
+				new Promise((resolve) => {
+					finishCreate = () =>
+						resolve({
+							tagId: "tag-1",
+							token: `hss_${"c".repeat(32)}`,
+							createdAt: new Date("2026-07-31T00:00:00.000Z"),
+						});
+				}),
+		);
+		renderWithProviders(
+			<ShareTagDialog
+				tagId="tag-1"
+				tagName="Research"
+				initialShare={null}
+				onShareChange={vi.fn()}
+			/>,
+		);
+
+		await user.click(screen.getByRole("button", { name: "Share Research" }));
+		await user.click(
+			await screen.findByRole("button", { name: "Create link" }),
+		);
+		await user.keyboard("{Escape}");
+		expect(screen.getByRole("dialog")).toBeInTheDocument();
+
+		finishCreate();
+		expect(
+			await screen.findByLabelText("Sharing link for Research"),
+		).toHaveValue(`http://localhost/share/hss_${"c".repeat(32)}`);
+		await user.keyboard("{Escape}");
+		await waitFor(() =>
+			expect(screen.queryByRole("dialog")).not.toBeInTheDocument(),
+		);
+	});
 });

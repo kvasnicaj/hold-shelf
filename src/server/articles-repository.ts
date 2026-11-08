@@ -210,15 +210,28 @@ export function createArticlesRepository(): ArticlesRepository {
 							fetchedAt: data.fetchedAt,
 							updatedAt: data.updatedAt,
 						},
+						// Background capture, reader visits and refresh can extract
+						// concurrently. A failed extraction never replaces a ready copy,
+						// including one written after this request read the cache.
+						setWhere: sql`excluded.status = 'ready' OR ${articleContentCache.status} <> 'ready'`,
 					})
 					.returning(),
 			);
+			const stored =
+				cache ??
+				(
+					await db
+						.select()
+						.from(articleContentCache)
+						.where(eq(articleContentCache.articleId, data.articleId))
+						.limit(1)
+				)[0];
 
-			if (!cache) {
+			if (!stored) {
 				throw new Error("Failed to store article content cache.");
 			}
 
-			return cache;
+			return stored;
 		},
 		updateArticle: async ({ userId, id, changes }) => {
 			await db

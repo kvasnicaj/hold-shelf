@@ -1,8 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { tagListOptions } from "#/components/articles/query-options";
 import { useOpenArticle } from "#/components/articles/use-open-article";
 import { useSaveArticle } from "#/components/articles/use-save-article";
+import { getTagFailureMessage } from "#/components/quick-save/helpers";
 import { QuickSaveForm } from "#/components/quick-save/quick-save-form";
 import type { QuickSaveMode } from "#/components/quick-save/types";
 import {
@@ -36,15 +38,27 @@ export function QuickSaveDialog({
 	const { handleAdd } = useSaveArticle();
 	const { handleOpenArticle } = useOpenArticle();
 	const { data: tags = [] } = useQuery({ ...tagListOptions(), enabled: open });
+	// A newer Quick save session remounts this dialog; a save that finishes
+	// afterwards must not open the reader over the new session.
+	const current = useRef(true);
+	useEffect(() => {
+		current.current = true;
+		return () => {
+			current.current = false;
+		};
+	}, []);
 
 	async function handleSubmit(
 		url: string,
 		tagIds: string[],
 		mode: QuickSaveMode,
 	) {
-		const article = await handleAdd(url, tagIds);
+		const { article, failedTagCount } = await handleAdd(url, tagIds);
 		onOpenChange(false);
-		if (mode === "read") {
+		if (failedTagCount > 0) {
+			toast.warning(getTagFailureMessage(failedTagCount));
+		}
+		if (mode === "read" && current.current) {
 			await handleOpenArticle(article.id, false);
 			return;
 		}
