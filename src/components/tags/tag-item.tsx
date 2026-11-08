@@ -1,5 +1,5 @@
 import { PencilSimple, Trash } from "@phosphor-icons/react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ActionsMenu } from "#/components/layout/actions-menu";
 import { DropdownMenuItem } from "#/components/ui/dropdown-menu";
 import { Input } from "#/components/ui/input";
@@ -23,12 +23,33 @@ export function TagItem({
 }: TagItemProps) {
 	const [editing, setEditing] = useState(false);
 	const [name, setName] = useState(tag.name);
+	const [error, setError] = useState("");
+	// Submit and blur both save; only one rename may be in flight.
+	const saving = useRef(false);
+
+	function stopEditing() {
+		setName(tag.name);
+		setError("");
+		setEditing(false);
+	}
 
 	async function handleSave() {
-		if (name.trim() && name.trim() !== tag.name) {
-			await onRename(tag.id, name.trim());
+		if (saving.current) return;
+		const nextName = name.trim();
+		if (!nextName || nextName === tag.name) {
+			stopEditing();
+			return;
 		}
-		setEditing(false);
+		saving.current = true;
+		setError("");
+		try {
+			await onRename(tag.id, nextName);
+			setEditing(false);
+		} catch (err) {
+			setError(err instanceof Error ? err.message : "Failed to rename tag.");
+		} finally {
+			saving.current = false;
+		}
 	}
 
 	if (editing) {
@@ -43,17 +64,25 @@ export function TagItem({
 				<Input
 					value={name}
 					aria-label={`New name for ${tag.name}`}
+					aria-invalid={Boolean(error)}
+					aria-describedby={error ? `tag-rename-error-${tag.id}` : undefined}
 					onChange={(event) => setName(event.target.value)}
 					className="h-10 text-sm"
 					autoFocus
 					onBlur={() => void handleSave()}
 					onKeyDown={(event) => {
-						if (event.key === "Escape") {
-							setName(tag.name);
-							setEditing(false);
-						}
+						if (event.key === "Escape") stopEditing();
 					}}
 				/>
+				{error ? (
+					<p
+						id={`tag-rename-error-${tag.id}`}
+						role="alert"
+						className="pt-1 text-sm text-destructive"
+					>
+						{error}
+					</p>
+				) : null}
 			</form>
 		);
 	}
@@ -84,7 +113,12 @@ export function TagItem({
 				triggerSize="icon-touch"
 				triggerClassName="text-muted-foreground"
 			>
-				<DropdownMenuItem onSelect={() => setEditing(true)}>
+				<DropdownMenuItem
+					onSelect={() => {
+						setError("");
+						setEditing(true);
+					}}
+				>
 					<PencilSimple />
 					Rename
 				</DropdownMenuItem>

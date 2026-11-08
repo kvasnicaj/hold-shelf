@@ -332,6 +332,55 @@ it("captures saved content through the request background context before any rea
 	});
 });
 
+it("keeps a ready content copy when a concurrent extraction fails afterwards", async () => {
+	await database.db.insert(articles).values({
+		id: "raced",
+		userId: "owner",
+		url: "https://example.com/raced",
+	});
+	const repo = createArticlesRepository();
+	const base = {
+		articleId: "raced",
+		sourceUrl: "https://example.com/raced",
+		extractionVersion: "markdown-v3",
+		fetchedAt: new Date(),
+		updatedAt: new Date(),
+	};
+	await repo.upsertArticleContentCache({
+		...base,
+		status: "ready",
+		markdown: "Ready body",
+		plainText: "Ready body",
+		wordCount: 2,
+		failureReason: null,
+	});
+
+	const stored = await repo.upsertArticleContentCache({
+		...base,
+		status: "unavailable",
+		markdown: null,
+		plainText: null,
+		wordCount: null,
+		failureReason: "Timed out",
+	});
+
+	expect(stored).toMatchObject({ status: "ready", markdown: "Ready body" });
+	expect(await repo.getArticleContentCache("raced")).toMatchObject({
+		status: "ready",
+		markdown: "Ready body",
+	});
+	await expect(
+		repo.upsertArticleContentCache({
+			...base,
+			status: "ready",
+			markdown: "Newer body",
+			plainText: "Newer body",
+			wordCount: 2,
+			failureReason: null,
+		}),
+	).resolves.toMatchObject({ status: "ready", markdown: "Newer body" });
+});
+
 it("permanently deletes only owned articles still in Trash and cascades related data", async () => {
 	await database.db.insert(articles).values([
 		{ id: "trashed", userId: "owner", url: "https://example.com/trashed" },

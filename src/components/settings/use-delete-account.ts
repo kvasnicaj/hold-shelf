@@ -58,6 +58,8 @@ export function useDeleteAccount() {
 		setConfirmation,
 		handleDeleteAccount,
 		handleOpenChange: (value: boolean) => {
+			// Deletion cannot be canceled once sent; keep the dialog until it settles.
+			if (!value && loading) return;
 			setOpen(value);
 			if (!value) reset();
 		},

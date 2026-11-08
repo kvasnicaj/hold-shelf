@@ -40,6 +40,7 @@ export function ShareTagDialog({
 		share,
 		shareUrl,
 		loading,
+		mutating,
 		copying,
 		error,
 		status,
@@ -50,6 +51,9 @@ export function ShareTagDialog({
 	} = useTagShare(tagId, initialShare, onShareChange);
 
 	function handleOpenChange(nextOpen: boolean) {
+		// Keep the dialog until a create or revoke settles, so a reopen cannot
+		// load sharing state that races the pending change.
+		if (!nextOpen && mutating) return;
 		setOpen(nextOpen);
 		setConfirmingRevoke(false);
 		if (nextOpen) {
@@ -58,8 +62,8 @@ export function ShareTagDialog({
 	}
 
 	async function handleRevoke() {
-		await revokeShare();
-		setConfirmingRevoke(false);
+		// On failure the share still exists; keep the confirmation open to retry.
+		if (await revokeShare()) setConfirmingRevoke(false);
 	}
 
 	return (

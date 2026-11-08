@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { getRouteApi, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
 	articleListOptions,
 	tagListOptions,
@@ -8,6 +8,9 @@ import {
 import type { ArticleSort } from "#/components/articles/types";
 import { useArticleMutations } from "#/components/articles/use-article-mutations";
 import { useOpenArticle } from "#/components/articles/use-open-article";
+import { useScopedState } from "#/hooks/use-scoped-state";
+
+const NO_SELECTION: Record<string, boolean> = {};
 
 const route = getRouteApi("/app/archive");
 
@@ -17,7 +20,11 @@ export function useArchivePage() {
 	const page = searchPage ?? 1;
 	const selectedTagIds = tags?.length ? tags : tag ? [tag] : [];
 	const navigate = useNavigate({ from: "/app/archive" });
-	const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
+	// Selection belongs to the rows currently shown; filters and pages reset it.
+	const [rowSelection, setRowSelection] = useScopedState(
+		JSON.stringify([q, filter, sort, selectedTagIds, page]),
+		NO_SELECTION,
+	);
 	const { handleOpenArticle } = useOpenArticle();
 	const {
 		handleToggleRead,

@@ -51,6 +51,8 @@ export function useCreateTagDialog(onCreate: (name: string) => Promise<void>) {
 		setName,
 		submit,
 		handleOpenChange: (value: boolean) => {
+			// A pending create cannot be canceled; keep this session until it settles.
+			if (!value && loading) return;
 			setOpen(value);
 			if (!value) reset();
 		},

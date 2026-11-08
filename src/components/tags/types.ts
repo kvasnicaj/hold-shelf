@@ -10,3 +10,6 @@ export type TagShare = {
 	token: string;
 	createdAt: Date;
 };
+
+/** The share request in flight, if any. */
+export type SharePending = "load" | "create" | "revoke" | null;

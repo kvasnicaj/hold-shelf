@@ -24,7 +24,7 @@ type ReaderBodyProps = {
 };
 export function ReaderBody({ data, settings }: ReaderBodyProps) {
 	const client = useQueryClient();
-	const saves = useRef(Promise.resolve());
+	const saves = useRef<Promise<unknown>>(Promise.resolve());
 	const scroll = useRef<HTMLDivElement>(null);
 	const restored = useRef(false);
 	const [readPercent, setReadPercent] = useState(0);
@@ -57,29 +57,63 @@ export function ReaderBody({ data, settings }: ReaderBodyProps) {
 		let pending: number | null = null;
 		let finished = data.article.isRead;
 		let timer: ReturnType<typeof setTimeout> | undefined;
+		// One queue owns every progress write for this reader, so a slow earlier
+		// position save can never land after (and overwrite) a newer one or the
+		// atomic finish, which writes read status and 100% progress together.
+		const enqueue = (write: () => Promise<unknown>) => {
+			saves.current = saves.current.then(write).then(
+				() => true,
+				() => {
+					void client.invalidateQueries({
+						queryKey: ["reading-progress", data.article.id],
+					});
+					return false;
+				},
+			);
+			return saves.current;
+		};
 		const flush = () => {
 			if (pending === null) return;
 			const value = pending;
 			pending = null;
 			client.setQueryData(["reading-progress", data.article.id], value);
-			// Serialize writes so a slow earlier request cannot overwrite a newer position.
-			saves.current = saves.current
-				.then(() =>
-					saveReadingProgress({
-						data: { id: data.article.id, progress: value },
-					}),
-				)
-				.then(() => {
+			void enqueue(() =>
+				saveReadingProgress({
+					data: { id: data.article.id, progress: value },
+				}),
+			).then((saved) => {
+				if (saved) {
 					void client.invalidateQueries({ queryKey: ["continue-reading"] });
-				})
-				.catch(() => {
-					void client.invalidateQueries({
-						queryKey: ["reading-progress", data.article.id],
-					});
-					toast.error("Reading position could not be saved.", {
-						id: "reading-progress-error",
-					});
+					return;
+				}
+				toast.error("Reading position could not be saved.", {
+					id: "reading-progress-error",
 				});
+			});
+		};
+		const finish = () => {
+			finished = true;
+			// Finishing supersedes the position that triggered it.
+			clearTimeout(timer);
+			pending = null;
+			client.setQueryData(["reading-progress", data.article.id], 10000);
+			void enqueue(() => finishReading({ data: { id: data.article.id } })).then(
+				(done) => {
+					if (!done) {
+						finished = false;
+						toast.error("This article could not be marked as read.", {
+							id: "read-at-end-error",
+						});
+						return;
+					}
+					void client.invalidateQueries({ queryKey: ["articles"] });
+					void client.invalidateQueries({
+						queryKey: ["article-reader", data.article.id],
+					});
+					void client.invalidateQueries({ queryKey: ["continue-reading"] });
+					toast.success("Marked as read", { id: "read-at-end" });
+				},
+			);
 		};
 		const onScroll = () => {
 			const range = element.scrollHeight - element.clientHeight;
@@ -91,22 +125,8 @@ export function ReaderBody({ data, settings }: ReaderBodyProps) {
 				Math.min(10000, Math.round((element.scrollTop / range) * 10000)),
 			);
 			if (!finished && pending >= READ_AT_END_PROGRESS) {
-				finished = true;
-				void finishReading({ data: { id: data.article.id } })
-					.then(() => {
-						void client.invalidateQueries({ queryKey: ["articles"] });
-						void client.invalidateQueries({
-							queryKey: ["article-reader", data.article.id],
-						});
-						void client.invalidateQueries({ queryKey: ["continue-reading"] });
-						toast.success("Marked as read", { id: "read-at-end" });
-					})
-					.catch(() => {
-						finished = false;
-						toast.error("This article could not be marked as read.", {
-							id: "read-at-end-error",
-						});
-					});
+				finish();
+				return;
 			}
 			clearTimeout(timer);
 			timer = setTimeout(flush, 800);

@@ -35,30 +35,41 @@ export function RenameTagDialog({
 	const [open, setOpen] = useState(false);
 	const [name, setName] = useState(tagName);
 	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState("");
 
 	useEffect(() => {
 		if (!open) {
 			setName(tagName);
+			setError("");
 		}
 	}, [open, tagName]);
 
 	async function submit() {
 		const nextName = name.trim();
-		if (!nextName) return;
+		if (!nextName || loading) return;
 
 		setLoading(true);
+		setError("");
 		try {
 			if (nextName !== tagName) {
 				await onRename(nextName);
 			}
 			setOpen(false);
+		} catch (err) {
+			setError(err instanceof Error ? err.message : "Failed to rename tag.");
 		} finally {
 			setLoading(false);
 		}
 	}
 
 	return (
-		<Dialog open={open} onOpenChange={setOpen}>
+		<Dialog
+			open={open}
+			onOpenChange={(next) => {
+				// A pending rename cannot be canceled; keep the dialog until it settles.
+				if (next || !loading) setOpen(next);
+			}}
+		>
 			<DialogTrigger asChild>
 				<Button
 					type="button"
@@ -89,8 +100,14 @@ export function RenameTagDialog({
 						value={name}
 						onChange={(event) => setName(event.target.value)}
 						aria-label="Tag name"
+						aria-invalid={Boolean(error)}
 						autoFocus
 					/>
+					{error ? (
+						<p role="alert" className="text-sm text-destructive">
+							{error}
+						</p>
+					) : null}
 					<div className="flex justify-end gap-2">
 						<Button
 							type="button"

@@ -56,4 +56,40 @@ describe("TagItem", () => {
 		await user.click(screen.getByRole("menuitem", { name: "Delete tag" }));
 		await waitFor(() => expect(onDelete).toHaveBeenCalledWith("t1"));
 	});
+
+	it("renames once when submit is followed by blur and shows a failed rename", async () => {
+		const user = userEvent.setup();
+		let rejectRename = (_error: Error) => {};
+		const onRename = vi.fn(
+			() =>
+				new Promise<void>((_resolve, reject) => {
+					rejectRename = reject;
+				}),
+		);
+		renderWithProviders(
+			<TagItem
+				tag={{ id: "t1", name: "Design", articleCount: 2 }}
+				isActive={false}
+				onSelect={vi.fn()}
+				onRename={onRename}
+				onDelete={vi.fn()}
+			/>,
+		);
+
+		await user.click(
+			screen.getByRole("button", { name: "Actions for Design" }),
+		);
+		await user.click(screen.getByRole("menuitem", { name: "Rename" }));
+		const input = screen.getByDisplayValue("Design");
+		await user.clear(input);
+		await user.type(input, "Research{Enter}");
+		await user.tab();
+		expect(onRename).toHaveBeenCalledTimes(1);
+
+		rejectRename(new Error("A tag with that name already exists."));
+		expect(await screen.findByRole("alert")).toHaveTextContent(
+			"A tag with that name already exists.",
+		);
+		expect(screen.getByDisplayValue("Research")).toBeInTheDocument();
+	});
 });
