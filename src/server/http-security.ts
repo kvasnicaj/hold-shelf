@@ -1,5 +1,11 @@
-const API_BODY_LIMIT = 64 * 1024;
-const SERVER_BODY_LIMIT = 10 * 1024 * 1024;
+const DEFAULT_BODY_LIMIT = 64 * 1024;
+// Library imports travel as server function RPCs. TanStack Start dispatches
+// these by a case-sensitive prefix match, so this check selects the larger
+// limit for exactly the requests it routes there; any other spelling (for
+// example `/API/...`, which the router matches case-insensitively) keeps the
+// small default.
+const SERVER_FN_PREFIX = "/_serverFn/";
+const SERVER_FN_BODY_LIMIT = 10 * 1024 * 1024;
 
 const BASELINE_CSP =
 	"frame-ancestors 'none'; base-uri 'self'; object-src 'none'";
@@ -18,9 +24,9 @@ export async function boundRequestBody(
 	request: Request,
 ): Promise<Request | Response> {
 	if (!request.body) return request;
-	const limit = new URL(request.url).pathname.startsWith("/api/")
-		? API_BODY_LIMIT
-		: SERVER_BODY_LIMIT;
+	const limit = new URL(request.url).pathname.startsWith(SERVER_FN_PREFIX)
+		? SERVER_FN_BODY_LIMIT
+		: DEFAULT_BODY_LIMIT;
 	const length = request.headers.get("content-length");
 	if (length && /^\d+$/.test(length) && Number(length) > limit) {
 		void request.body.cancel().catch(() => {});

@@ -7,13 +7,15 @@ const source = await readFile(new URL("./background.js", import.meta.url), "utf8
 
 function loadExtension({ status = 200, payload = {}, fetchError } = {}) {
 	const feedback = [];
+	const logs = [];
 	const openedTabs = [];
 	let onClick;
 	let requestCount = 0;
 	const noop = () => {};
+	const log = (...args) => logs.push(args);
 	runInNewContext(source, {
 		URL,
-		console: { debug: noop, warn: noop, error: noop },
+		console: { debug: log, warn: log, error: log },
 		setTimeout: noop,
 		fetch: async () => {
 			requestCount++;
@@ -26,11 +28,8 @@ function loadExtension({ status = 200, payload = {}, fetchError } = {}) {
 			action: {
 				onClicked: { addListener: (handler) => (onClick = handler) },
 				setBadgeBackgroundColor: noop,
-				setBadgeText: noop,
-				setTitle: noop,
-			},
-			scripting: {
-				executeScript: async ({ args }) => feedback.push([...args]),
+				setBadgeText: ({ text }) => feedback.push({ badge: text }),
+				setTitle: ({ title }) => Object.assign(feedback.at(-1), { title }),
 			},
 			tabs: { create: async (tab) => openedTabs.push(tab) },
 		},
@@ -38,6 +37,7 @@ function loadExtension({ status = 200, payload = {}, fetchError } = {}) {
 	return {
 		click: (url = "https://example.com/article") => onClick({ id: 1, url }),
 		feedback,
+		logs,
 		openedTabs,
 		requestCount: () => requestCount,
 	};
@@ -46,8 +46,9 @@ function loadExtension({ status = 200, payload = {}, fetchError } = {}) {
 test("a saved article receives success feedback", async () => {
 	const extension = loadExtension();
 	await extension.click();
-	assert.equal(extension.feedback[0][0], "Saved to Hold Shelf.");
-	assert.equal(extension.feedback[0][1], "success");
+	assert.deepEqual(extension.feedback, [
+		{ badge: "OK", title: "Saved to Hold Shelf." },
+	]);
 });
 
 test("an existing article receives repeat-save success feedback", async () => {
@@ -56,8 +57,9 @@ test("an existing article receives repeat-save success feedback", async () => {
 		payload: { code: "ARTICLE_EXISTS" },
 	});
 	await extension.click();
-	assert.equal(extension.feedback[0][0], "Already saved in Hold Shelf.");
-	assert.equal(extension.feedback[0][1], "success");
+	assert.deepEqual(extension.feedback, [
+		{ badge: "OK", title: "This article is already in your library." },
+	]);
 });
 
 test("a storage conflict reports the server explanation as an error", async () => {
@@ -66,14 +68,15 @@ test("a storage conflict reports the server explanation as an error", async () =
 		payload: { code: "QUOTA_EXCEEDED", message: "Your library is full." },
 	});
 	await extension.click();
-	assert.equal(extension.feedback[0][0], "Your library is full.");
-	assert.equal(extension.feedback[0][1], "error");
+	assert.deepEqual(extension.feedback, [
+		{ badge: "!", title: "Your library is full." },
+	]);
 });
 
 test("an unknown conflict is not reported as saved", async () => {
 	const extension = loadExtension({ status: 409 });
 	await extension.click();
-	assert.equal(extension.feedback[0][1], "error");
+	assert.equal(extension.feedback[0].badge, "!");
 });
 
 test("a signed-out save falls back to the current save page", async () => {
@@ -90,12 +93,26 @@ test("unsupported browser pages are rejected without a save request", async () =
 	const extension = loadExtension();
 	await extension.click("chrome://extensions");
 	assert.equal(extension.requestCount(), 0);
-	assert.equal(extension.feedback[0][1], "error");
+	assert.equal(extension.feedback[0].badge, "!");
 });
 
 test("a network failure produces error feedback", async () => {
 	const extension = loadExtension({ fetchError: new Error("Offline") });
 	await extension.click();
-	assert.equal(extension.feedback[0][0], "Could not reach Hold Shelf.");
-	assert.equal(extension.feedback[0][1], "error");
+	assert.deepEqual(extension.feedback, [
+		{ badge: "!", title: "Could not reach Hold Shelf." },
+	]);
+});
+
+test("save diagnostics never log the saved URL or server response", async () => {
+	for (const options of [
+		{ status: 200, payload: { article: { url: "https://example.com/private" } } },
+		{ status: 401, payload: { loginUrl: "https://hold-shelf.com/save?url=x" } },
+		{ fetchError: new Error("Offline") },
+	]) {
+		const extension = loadExtension(options);
+		await extension.click("https://example.com/private?token=secret");
+		const logged = JSON.stringify(extension.logs);
+		assert.doesNotMatch(logged, /example\.com|secret|loginUrl|article/);
+	}
 });

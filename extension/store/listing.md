@@ -2,7 +2,7 @@
 
 Extension ID: `pbadpcgedkohkechgiciabdafiddhjkj`
 
-Package: 0.1.2 (updates the published 0.1.1).
+Package: 0.1.3 (updates the published 0.1.1).
 
 ## Description
 
@@ -15,7 +15,7 @@ SAVE FROM CHROME
 
 - Click the toolbar button to save the current page.
 - Right-click a page or link and choose Save to Hold Shelf.
-- Get a quick confirmation without leaving the page.
+- Get a quick confirmation on the toolbar button without touching the page.
 - Already saved it? The extension tells you without creating a duplicate.
 
 COME BACK TO YOUR LIBRARY
@@ -38,7 +38,6 @@ It does not monitor your browsing history or save pages in the background.
 
 - activeTab: read the current page URL when you click the toolbar button.
 - contextMenus: add Save page and Save link to the right-click menu.
-- scripting: show save confirmation or an error on the page.
 - hold-shelf.com access: save to your library using your signed-in session.
 
 Website: https://hold-shelf.com/

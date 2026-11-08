@@ -142,7 +142,7 @@ AppLayout
 
 Responsibilities:
 
-- blocks unauthenticated access with `getSession()`
+- blocks unauthenticated access with `isSignedIn()`
 - provides shared desktop/mobile navigation
 - shows no top bar on desktop, so every page heading starts in the same place;
   phones keep a top bar with the brand mark, search and account
