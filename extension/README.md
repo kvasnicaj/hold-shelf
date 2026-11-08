@@ -18,8 +18,16 @@ This Manifest V3 extension saves pages into Hold Shelf.
   website login handoff flow and the site finishes the save there
 - repeat saves succeed only for `ARTICLE_EXISTS`; account-limit errors show
   the server's explanation instead of a misleading success notification
-- notifications use the app's inverse, danger and floating-layer design tokens,
-  announce their status to assistive technology, and respect reduced motion
+- save results appear on the toolbar button: a badge (`OK` or `!`) and a
+  tooltip with the message. Nothing is injected into the page, so the page
+  cannot read whether an article was new or already in the library
+- console diagnostics never include the saved URL or the server response
+
+## 0.1.3
+
+- Show save results only on the toolbar badge and tooltip instead of an
+  in-page notification, and drop the `scripting` permission.
+- Stop logging saved URLs and server responses to the extension console.
 
 ## 0.1.2
 
@@ -42,7 +50,6 @@ The explicit distribution file list below excludes tests and listing assets.
 
 - `activeTab`: read the current page URL when the toolbar button is clicked
 - `contextMenus`: add "Save page" and "Save link" entries to the browser menu
-- `scripting`: show lightweight in-page success and error feedback
 - `https://hold-shelf.com/*`: call the Hold Shelf save API and open the login
   handoff page
 

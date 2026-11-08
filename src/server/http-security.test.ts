@@ -48,6 +48,28 @@ describe("request size boundary", () => {
 		},
 	);
 
+	it.each([
+		"/api/v1/articles",
+		"/API/v1/articles",
+		"/Api/extension/articles",
+		"/_SERVERFN/import",
+		"/save",
+	])(
+		"limits %s to 64 KiB because only server functions take imports",
+		async (path) => {
+			for (const length of [undefined, "1"]) {
+				const bounded = await boundRequestBody(
+					new Request(`https://hold-shelf.com${path}`, {
+						method: "POST",
+						body: "a".repeat(65537),
+						headers: length ? { "Content-Length": length } : undefined,
+					}),
+				);
+				expect((bounded as Response).status).toBe(413);
+			}
+		},
+	);
+
 	it("permits import overhead within 10 MiB but rejects larger RPC bodies", async () => {
 		for (const size of [100_000, 10 * 1024 * 1024 + 1]) {
 			const bounded = await boundRequestBody(

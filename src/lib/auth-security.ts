@@ -30,7 +30,13 @@ export function getAuthSecurityOptions(
 				ipAddressHeaders: isDevelopment ? [] : ["cf-connecting-ip"],
 			},
 		},
-		account: { storeAccountCookie: false },
+		account: {
+			storeAccountCookie: false,
+			// A verified email is not a stable identity: GitHub lets an address move
+			// to another account. Only the provider's own account ID may resolve to
+			// an existing library, so a new GitHub ID never joins one by email.
+			accountLinking: { disableImplicitLinking: true },
+		},
 		databaseHooks: {
 			account: {
 				create: { before: removeProviderTokens },

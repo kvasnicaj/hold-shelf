@@ -44,31 +44,26 @@ export function createTagSharesRepository(): TagSharesRepository {
 			await db.delete(tagShares).where(eq(tagShares.tagId, tagId));
 		},
 		getSharedTag: async ({ token, limit, offset }) => {
-			const [share] = await db
-				.select({
-					tagId: tags.id,
-					tagName: tags.name,
-					ownerId: tags.userId,
-					ownerName: user.name,
-				})
-				.from(tagShares)
-				.innerJoin(tags, eq(tags.id, tagShares.tagId))
-				.innerJoin(user, eq(user.id, tags.userId))
-				.where(eq(tagShares.token, token))
-				.limit(1);
-
-			if (!share) {
-				return null;
-			}
-
-			const conditions = and(
-				eq(articleTags.tagId, share.tagId),
-				eq(articles.userId, share.ownerId),
-				activeArticle(),
-			);
-			const [items, countRows] = await Promise.all([
+			// One statement, so the token check and the article page read the same
+			// D1 snapshot: a revoked link can never return articles tagged later.
+			const share = db.$with("share").as(
 				db
 					.select({
+						tagId: sql<string>`${tags.id}`.as("share_tag_id"),
+						ownerId: sql<string>`${tags.userId}`.as("share_owner_id"),
+						tagName: sql<string>`${tags.name}`.as("share_tag_name"),
+						ownerName: sql<string>`${user.name}`.as("share_owner_name"),
+					})
+					.from(tagShares)
+					.innerJoin(tags, eq(tags.id, tagShares.tagId))
+					.innerJoin(user, eq(user.id, tags.userId))
+					.where(eq(tagShares.token, token))
+					.limit(1),
+			);
+			const shared = db.$with("shared").as(
+				db
+					.select({
+						id: articles.id,
 						url: articles.url,
 						title: articles.title,
 						description: articles.description,
@@ -76,24 +71,56 @@ export function createTagSharesRepository(): TagSharesRepository {
 						faviconUrl: articles.faviconUrl,
 						createdAt: articles.createdAt,
 					})
-					.from(articleTags)
-					.innerJoin(articles, eq(articles.id, articleTags.articleId))
-					.where(conditions)
-					.orderBy(desc(articles.createdAt))
-					.limit(limit)
-					.offset(offset),
-				db
-					.select({ count: sql<number>`count(*)` })
-					.from(articleTags)
-					.innerJoin(articles, eq(articles.id, articleTags.articleId))
-					.where(conditions),
-			]);
+					.from(share)
+					.innerJoin(articleTags, eq(articleTags.tagId, share.tagId))
+					.innerJoin(
+						articles,
+						and(
+							eq(articles.id, articleTags.articleId),
+							eq(articles.userId, share.ownerId),
+						),
+					)
+					.where(activeArticle()),
+			);
+			const page = db
+				.$with("page")
+				.as(
+					db
+						.select()
+						.from(shared)
+						.orderBy(desc(shared.createdAt), desc(shared.id))
+						.limit(limit)
+						.offset(offset),
+				);
+			const rows = await db
+				.with(share, shared, page)
+				.select({
+					tagName: share.tagName,
+					ownerName: share.ownerName,
+					total: sql<number>`(SELECT count(*) FROM ${shared})`,
+					article: {
+						url: page.url,
+						title: page.title,
+						description: page.description,
+						hostname: page.hostname,
+						faviconUrl: page.faviconUrl,
+						createdAt: page.createdAt,
+					},
+				})
+				.from(share)
+				.leftJoin(page, sql`1 = 1`)
+				.orderBy(desc(page.createdAt), desc(page.id));
+
+			const [first] = rows;
+			if (!first) {
+				return null;
+			}
 
 			return {
-				ownerName: share.ownerName,
-				tagName: share.tagName,
-				items,
-				total: countRows[0]?.count ?? 0,
+				ownerName: first.ownerName,
+				tagName: first.tagName,
+				items: rows.flatMap((row) => (row.article ? [row.article] : [])),
+				total: Number(first.total),
 			};
 		},
 	};

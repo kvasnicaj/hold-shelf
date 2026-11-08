@@ -95,7 +95,7 @@ describe("production authentication security", () => {
 		},
 	);
 
-	it("completes first and returning OAuth logins without retaining provider tokens", async () => {
+	it("completes returning OAuth logins by GitHub ID only, without retaining provider tokens", async () => {
 		const storage: Record<string, Record<string, unknown>[]> = {
 			user: [],
 			account: [],
@@ -124,16 +124,16 @@ describe("production authentication security", () => {
 			accessTokenExpiresAt: new Date(Date.now() + 60_000),
 			refreshTokenExpiresAt: new Date(Date.now() + 120_000),
 		});
+		let githubId = 424242;
 		provider.getUserInfo = async () => ({
 			user: {
 				name: "Synthetic User",
 				email: "synthetic@example.test",
 				emailVerified: true,
 			},
-			data: { id: 424242 },
+			data: { id: githubId },
 		});
-
-		for (let login = 0; login < 2; login++) {
+		const completeLogin = async () => {
 			const signIn = await auth.handler(
 				new Request("https://hold-shelf.com/api/auth/sign-in/social", {
 					method: "POST",
@@ -166,6 +166,16 @@ describe("production authentication security", () => {
 					},
 				),
 			);
+			const sessionCookie = callback.headers
+				.getSetCookie()
+				.find((cookie) =>
+					cookie.startsWith("__Secure-better-auth.session_token="),
+				);
+			return { callback, sessionCookie };
+		};
+
+		for (let login = 0; login < 2; login++) {
+			const { callback, sessionCookie } = await completeLogin();
 			expect(callback.status).toBe(302);
 			expect(callback.headers.get("location")).toBe(
 				"https://hold-shelf.com/app/home",
@@ -180,11 +190,6 @@ describe("production authentication security", () => {
 				accessTokenExpiresAt: null,
 				refreshTokenExpiresAt: null,
 			});
-			const sessionCookie = callback.headers
-				.getSetCookie()
-				.find((cookie) =>
-					cookie.startsWith("__Secure-better-auth.session_token="),
-				);
 			expect(sessionCookie).toMatch(/; Secure/i);
 			expect(sessionCookie).toMatch(/; HttpOnly/i);
 			expect(sessionCookie).toMatch(/; SameSite=Lax/i);
@@ -202,6 +207,27 @@ describe("production authentication security", () => {
 			});
 			expect(legacySession).toBeNull();
 		}
+
+		// GitHub can reassign a verified email to a different account. That
+		// account must not inherit the existing library through the email.
+		githubId = 777777;
+		const reassigned = await completeLogin();
+		expect(reassigned.callback.status).toBe(302);
+		expect(reassigned.callback.headers.get("location")).toContain(
+			"error=account_not_linked",
+		);
+		expect(reassigned.sessionCookie).toBeUndefined();
+		expect(storage.account).toHaveLength(1);
+		expect(storage.account[0]).toMatchObject({ accountId: "424242" });
+		expect(storage.session).toHaveLength(2);
+
+		// The original GitHub account keeps signing in to its library.
+		githubId = 424242;
+		const original = await completeLogin();
+		expect(original.callback.headers.get("location")).toBe(
+			"https://hold-shelf.com/app/home",
+		);
+		expect(original.sessionCookie).toBeDefined();
 		expect(JSON.stringify(storage.account)).not.toContain(
 			"synthetic-github-access-token",
 		);

@@ -36,11 +36,16 @@ export default {
 
 	// Use HTTP rather than Node's Request, which cannot represent incoming GET/HEAD
 	// bodies. Workerd also exposes a stream for Content-Length: 0 requests.
-	function send(method: string, body: string, chunked = false) {
+	function send(
+		method: string,
+		body: string,
+		chunked = false,
+		path = "/api/v1/articles",
+	) {
 		return new Promise<{ status: number | undefined; body: string }>(
 			(resolve, reject) => {
 				const request = httpRequest(
-					new URL("/api/v1/articles", address),
+					new URL(path, address),
 					{
 						method,
 						headers: chunked
@@ -92,6 +97,16 @@ export default {
 		const response = await send("GET", "x".repeat(65537), true);
 		expect(response.status).toBe(413);
 	});
+
+	it.each(["/api/v1/articles", "/API/V1/ARTICLES"])(
+		"rejects oversized POST bodies to %s before parsing",
+		async (path) => {
+			for (const chunked of [false, true]) {
+				const response = await send("POST", "x".repeat(65537), chunked, path);
+				expect(response.status).toBe(413);
+			}
+		},
+	);
 
 	it("preserves POST request bodies", async () => {
 		const response = await send("POST", "synthetic");

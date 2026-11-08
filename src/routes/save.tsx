@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { SavePage } from "#/components/save/save-page";
-import { getSession } from "#/server/auth";
+import { isSignedIn } from "#/server/auth";
 
 type SaveSearch = {
 	url?: string;
@@ -13,8 +13,7 @@ export const Route = createFileRoute("/save")({
 	beforeLoad: async ({ search }) => {
 		if (!search.url) return;
 
-		const session = await getSession();
-		if (!session) {
+		if (!(await isSignedIn())) {
 			throw redirect({
 				to: "/login",
 				search: {

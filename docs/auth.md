@@ -89,8 +89,9 @@ When the limit is exceeded, the route returns:
 
 Flow:
 
-1. `beforeLoad` calls `getSession()`
-2. if no session exists, the route redirects to `/login`
+1. `beforeLoad` calls `isSignedIn()`, which returns only a boolean so no
+   session or user fields reach route context or SSR hydration data
+2. if the user is not signed in, the route redirects to `/login`
 3. authenticated users continue into the `/app/*` route tree
 
 ### Public route redirects

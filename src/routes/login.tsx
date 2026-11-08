@@ -1,7 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { safeReturnPath } from "#/components/auth/helpers";
 import { LoginRoutePage } from "#/components/auth/login-route-page";
-import { getSession } from "#/server/auth";
+import { isSignedIn } from "#/server/auth";
 
 type LoginSearch = {
 	redirectTo?: string;
@@ -12,8 +12,7 @@ export const Route = createFileRoute("/login")({
 		redirectTo: safeReturnPath(search.redirectTo),
 	}),
 	beforeLoad: async ({ search }) => {
-		const session = await getSession();
-		if (session) {
+		if (await isSignedIn()) {
 			if (search.redirectTo) {
 				throw redirect({ href: search.redirectTo });
 			}

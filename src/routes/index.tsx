@@ -6,12 +6,11 @@ import {
 	LANDING_PAGE_TITLE,
 } from "#/components/home/helpers";
 import { LandingPage } from "#/components/home/landing-page";
-import { getSession } from "#/server/auth";
+import { isSignedIn } from "#/server/auth";
 
 export const Route = createFileRoute("/")({
 	beforeLoad: async () => {
-		const session = await getSession();
-		if (session) {
+		if (await isSignedIn()) {
 			throw redirect({ to: "/app/home" });
 		}
 	},
