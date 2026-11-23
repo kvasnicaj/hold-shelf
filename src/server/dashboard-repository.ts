@@ -25,54 +25,44 @@ export function createDashboardRepository(): DashboardRepository {
 			return stats ?? null;
 		},
 		getRecentArticles: async (userId) => {
-			const [recentlySavedResult, oldestUnread, recentlyFavorite] =
-				await Promise.all([
-					getArticlesForUser({
-						repo: articleRepository,
-						userId,
-						data: { sort: "newest", limit: 5 },
-					}),
-					db
-						.select({
-							id: articles.id,
-							title: articles.title,
-							hostname: articles.hostname,
-							url: articles.url,
-							faviconUrl: articles.faviconUrl,
-							createdAt: articles.createdAt,
-							isRead: articles.isRead,
-						})
-						.from(articles)
-						.where(
-							and(
-								eq(articles.userId, userId),
-								eq(articles.isRead, false),
-								activeArticle(),
-							),
-						)
-						.orderBy(asc(articles.createdAt))
-						.limit(5),
-					db
-						.select({
-							id: articles.id,
-							title: articles.title,
-							hostname: articles.hostname,
-							url: articles.url,
-							faviconUrl: articles.faviconUrl,
-							createdAt: articles.createdAt,
-							isRead: articles.isRead,
-						})
-						.from(articles)
-						.where(
-							and(
-								eq(articles.userId, userId),
-								eq(articles.isFavorite, true),
-								activeArticle(),
-							),
-						)
-						.orderBy(desc(articles.updatedAt))
-						.limit(5),
-				]);
+			const shelfArticles = () =>
+				db
+					.select({
+						id: articles.id,
+						title: articles.title,
+						hostname: articles.hostname,
+						url: articles.url,
+						faviconUrl: articles.faviconUrl,
+						createdAt: articles.createdAt,
+						isRead: articles.isRead,
+					})
+					.from(articles);
+			const ownedActive = and(eq(articles.userId, userId), activeArticle());
+			const unread = and(ownedActive, eq(articles.isRead, false));
+			const [
+				recentlySavedResult,
+				latestUnread,
+				oldestUnread,
+				recentlyFavorite,
+			] = await Promise.all([
+				getArticlesForUser({
+					repo: articleRepository,
+					userId,
+					data: { sort: "newest", limit: 5 },
+				}),
+				shelfArticles()
+					.where(unread)
+					.orderBy(desc(articles.createdAt), desc(articles.id))
+					.limit(4),
+				shelfArticles()
+					.where(unread)
+					.orderBy(asc(articles.createdAt), asc(articles.id))
+					.limit(5),
+				shelfArticles()
+					.where(and(ownedActive, eq(articles.isFavorite, true)))
+					.orderBy(desc(articles.updatedAt))
+					.limit(5),
+			]);
 
 			return {
 				recentlySaved: recentlySavedResult.items.map((article) => ({
@@ -86,6 +76,7 @@ export function createDashboardRepository(): DashboardRepository {
 					tags: article.tags,
 				})),
 				recentlyFavorite,
+				latestUnread,
 				oldestUnread,
 			};
 		},

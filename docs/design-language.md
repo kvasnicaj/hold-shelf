@@ -105,8 +105,8 @@ where the `Tag` type is also used.
 | Level | Job | Screens |
 | --- | --- | --- |
 | Compact | Find, sort and act on many articles | Library, Trash, tag management |
-| Comfortable | Choose what to read next | Unread, Favorites, tag pages, search, shared tags |
-| Spacious | Come back, pick up, browse | Home, landing page, empty states |
+| Comfortable | Choose what to read next | Mobile Home, Unread, Favorites, tag pages, search, shared tags |
+| Spacious | Come back, pick up, browse | Desktop Home, landing page, empty states |
 
 The reader is its own mode: everything except the text steps back.
 
@@ -123,11 +123,12 @@ The reader is its own mode: everything except the text steps back.
   teal icon. Counts use tabular numbers; the unread count is teal. Only the tag
   list scrolls. Search shares the filter fields’ 36 px height, strong input
   border and muted fill in both themes, distinct from the active navigation sheet.
-- **Mobile bottom bar:** Home, Unread, Save, Favorites, Library on a flat paper
-  bar with one hairline. Save is a filled button in the middle. The active tab
+- **Mobile bottom bar:** Home, Unread, Save, Favorites, Library on an opaque Raised
+  surface with a Line strong top border. The bar accounts for the bottom safe
+  area, and the final row scrolls fully above it. Save is a filled button in the middle. The active tab
   has a teal icon and a short teal line under it, echoing the logo's shelf.
   Labels are always visible.
-- **Mobile top bar:** brand symbol on the left, search and the account avatar
+- **Mobile top bar:** horizontal brand logo on the left, search and the account avatar
   on the right. Pages put their own actions in their heading, never in the top
   bar. On mobile, tags are reached from Library's Manage tags link.
 - **Overflow:** no unlabeled icon strips. Secondary actions sit in
@@ -197,17 +198,21 @@ The reader is its own mode: everything except the text steps back.
 
 ## Home
 
-- Spacious density. The header is a serif line ("Make time for a good read"),
-  a sentence about what is waiting, and the counts as one quiet line instead
-  of tiles.
-- Continue reading loads with the Home route, so its final space is present
-  on the first render and the shelves do not move down after loading.
-- Continue reading leads: a serif title, the site, a 3 px teal progress line,
-  Continue as the primary action and Mark as read beside it. Other articles in
-  progress follow as compact rows.
-- Three shelves follow: Oldest unread, Recently saved, Favorites. Each heading
-  sits on a 2 px ink line, the shelf from the logo, with a link to the full
-  page. Items use serif titles.
+- On phones, Home opens with one tappable Continue reading row on the Sheet
+  surface. Its two-line title, source, percentage and chevron open the reader.
+  The row appears only when there is reading progress.
+- Latest unread shows the four newest active unread articles by save date.
+  The “All N” link opens Unread and carries the total. Each row has a short
+  unread spine, a serif title and one source line.
+- Other unfinished articles follow under In progress. Oldest unread then shows
+  older items that have yet to appear on the screen. Library and Favorites are
+  available in the bottom bar. An empty library offers guidance for the first save.
+- On desktop the serif greeting, summary and counts lead into Continue reading.
+  The lead article has a progress bar, Continue and Mark as read. Remaining
+  in-progress articles sit inside the card. Oldest unread, Recently saved
+  and Favorites follow, each with a 2 px shelf line and a link to its full page.
+- Reading progress loads with the route so the initial layout is stable at
+  both densities.
 
 ## Reader
 

@@ -18,7 +18,30 @@ export const Reading: Story = {
 	parameters: { routePath: "/app/home#article=article-1" },
 };
 export const Phone: Story = {
-	globals: { viewport: { value: "phone", isRotated: false } },
+	parameters: {
+		mockScenario: "full-shelf",
+		viewport: {
+			options: {
+				phoneWithToolbar: {
+					name: "Phone with browser controls",
+					styles: { width: "402px", height: "658px" },
+					type: "mobile",
+				},
+			},
+		},
+	},
+	globals: { viewport: { value: "phoneWithToolbar", isRotated: false } },
+	play: async ({ canvas, canvasElement }) => {
+		const latest = within(
+			await canvas.findByRole("region", { name: "Latest unread" }),
+		);
+		const nav = canvas.getByRole("navigation", { name: "Primary" });
+		await canvasElement.ownerDocument.fonts.ready;
+		const rows = latest.getAllByRole("listitem");
+		await expect(rows[2].getBoundingClientRect().bottom).toBeLessThanOrEqual(
+			nav.getBoundingClientRect().top,
+		);
+	},
 };
 export const SaveAndReadWithKeyboard: Story = {
 	play: async ({ canvas, canvasElement, step }) => {
@@ -69,7 +92,7 @@ export const PhoneSaveFlow: Story = {
 	globals: { viewport: { value: "phone", isRotated: false } },
 	play: async ({ canvas, canvasElement, step }) => {
 		const body = within(canvasElement.ownerDocument.body);
-		await canvas.findByRole("heading", { name: "Make time for a good read" });
+		await canvas.findByRole("heading", { name: "Latest unread" });
 		await step("Save from the phone navigation", async () => {
 			await userEvent.click(
 				canvas.getByRole("button", { name: "Save a link" }),
@@ -86,7 +109,7 @@ export const PhoneSaveFlow: Story = {
 				expect(body.getByText("Saved to Unread")).toBeVisible(),
 			);
 			await expect(
-				await canvas.findByText("3 articles are waiting for you."),
+				await canvas.findByRole("link", { name: "All 3" }),
 			).toBeVisible();
 		});
 		await step("Open the saved article from the confirmation", async () => {

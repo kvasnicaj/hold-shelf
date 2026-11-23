@@ -63,6 +63,35 @@ export const sampleArticles: ArticleWithTagsRecord[] = [
 	},
 ];
 export const sampleArticle = sampleArticles[0];
+// A full shelf with long titles for the phone Home preview.
+export const phoneShelfArticles = [
+	...sampleArticles,
+	...[
+		["The Codebase Rewrite is Back", "read.engineerscodex.com", "2026-11-04"],
+		[
+			"Incident Report: October 21st Security Attack",
+			"blog.railway.com",
+			"2026-11-03",
+		],
+		[
+			"Nobody pays for open source. We can force them to.",
+			"seldo.com",
+			"2026-11-02",
+		],
+		["Impossible Components", "overreacted.io", "2026-11-01"],
+		["Augmented Coding", "tidyfirst.substack.com", "2026-05-01"],
+		["The Web’s Grain", "frankchimero.com", "2026-05-02"],
+	].map(([title, hostname, date]) => ({
+		...sampleArticle,
+		id: hostname,
+		title,
+		hostname,
+		url: `https://${hostname}/`,
+		createdAt: new Date(date),
+		isFavorite: false,
+		tags: [],
+	})),
+];
 export const sampleMarkdown = `# Making room for a reading habit
 
 A reading list is a promise to your future self. **A little space** in your day helps you keep it.
@@ -120,6 +149,7 @@ export const sampleStats = {
 	savedThisWeek: 3,
 };
 export const sampleRecent = {
+	latestUnread: sampleArticles.filter(({ isRead }) => !isRead),
 	recentlySaved: sampleArticles,
 	recentlyFavorite: [sampleArticle],
 	oldestUnread: [sampleArticles[2], sampleArticle],

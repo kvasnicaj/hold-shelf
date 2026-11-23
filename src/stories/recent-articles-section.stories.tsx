@@ -1,13 +1,22 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { RecentArticlesSection } from "#/components/home/recent-articles-section";
 
-import { sampleRecent } from "#/stories/fixtures";
+import {
+	sampleContinueReading,
+	sampleRecent,
+	sampleStats,
+} from "#/stories/fixtures";
 import { articleActions } from "#/stories/helpers";
 
 const meta = {
 	title: "Home/Recent articles",
 	component: RecentArticlesSection,
-	args: { ...sampleRecent, ...articleActions },
+	args: {
+		...sampleRecent,
+		unreadCount: sampleStats.unread,
+		inProgress: sampleContinueReading,
+		...articleActions,
+	},
 	decorators: [
 		(Story) => (
 			<div className="w-[min(72rem,calc(100vw-2rem))]">
@@ -22,5 +31,12 @@ type Story = StoryObj<typeof meta>;
 
 export const Populated: Story = {};
 export const Empty: Story = {
-	args: { recentlySaved: [], recentlyFavorite: [], oldestUnread: [] },
+	args: {
+		latestUnread: [],
+		unreadCount: 0,
+		inProgress: [],
+		recentlySaved: [],
+		recentlyFavorite: [],
+		oldestUnread: [],
+	},
 };

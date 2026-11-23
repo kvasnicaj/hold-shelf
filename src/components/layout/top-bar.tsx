@@ -12,7 +12,7 @@ export function TopBar() {
 	return (
 		<ColumnNavbar
 			aria-label="Main content navigation"
-			className="md:hidden"
+			className="pr-2 pl-4 md:hidden"
 			left={[<AppBrandMark key="brand" />]}
 			right={[
 				<Button

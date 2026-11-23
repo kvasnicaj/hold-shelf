@@ -127,7 +127,7 @@ AppLayout
 |  |- main content (sheet inset into the paper ground on desktop)
 |  |  |- TopBar (phones only)
 |  |  |  |- ColumnNavbar
-|  |  |  |  |- AppBrandMark -> BrandLogo (symbol)
+|  |  |  |  |- AppBrandMark -> BrandLogo (horizontal)
 |  |  |  |  |- search button and AppToolbar (account menu) -> UserAvatar
 |  |  |
 |  |  |- Outlet
@@ -152,8 +152,8 @@ Responsibilities:
   Favorites or Library. Shortcuts ignore text fields and open dialogs
 - places Save a link at the top of the desktop sidebar and as the center tab of
   the mobile bottom bar; both open the shared Quick save panel
-- renders a flat mobile bottom bar with four destinations around Save; the
-  active tab sits on a short teal line, and Unread shows its count
+- renders an opaque Raised mobile bottom bar with four destinations around Save,
+  a strong top divider and a short teal line under the active icon
 - leaves Tags out of the mobile bottom bar; Library's tag row links to tag management
 - renders column-owned navbars through `ColumnNavbar`, which accepts left,
   center, and right item arrays and shows every item. It never hides items in an
@@ -439,17 +439,14 @@ Component tree:
 
 ```text
 HomePage
-|- page header
-|  |- summary sentence (getHomeSummary)
-|  |- HomeStatsSection (one line of counts)
+|- desktop page header with summary and HomeStatsSection
 |- ContinueReadingSection
-|  |- lead article with ReadingProgressBar, Continue and Mark as read
-|  |- other in-progress articles as compact rows
+|  |- phone: one tappable lead article with source and percentage
+|  |- desktop: lead article with progress and actions, then in-progress rows
 |- EmptyLibraryCta (when the library is empty)
 |- RecentArticlesSection (otherwise)
-|  |- Shelf "Oldest unread" -> ShelfItem* with unread age
-|  |- Shelf "Recently saved" -> ShelfItem* + TagPicker*
-|  |- Shelf "Favorites" -> ShelfItem*
+|  |- phone: Latest unread with the total, In progress, Oldest unread
+|  |- desktop: Oldest unread, Recently saved with TagPicker, Favorites
 ```
 
 The loader awaits all four requests in parallel. Continue reading uses the
@@ -460,9 +457,9 @@ continue to invalidate the query.
 
 Purpose:
 
-- spacious entry point after login: what is waiting, what to resume, and three
-  shelves of recent content rather than a stats dashboard
-- each shelf sits on a 2px ink line from the logo and links to its full page
+- mobile Home puts the four newest active unread articles directly below the
+  resume row. Its oldest shelf skips articles already displayed above
+- desktop Home keeps the activity summary and three browsable shelves
 - dashboard article links use the shared `useOpenArticle` handler, which opens
   the reader without changing read state
 - recently saved articles reuse `TagPicker` and the shared article mutation hook
@@ -718,7 +715,7 @@ with a Paste from clipboard button.
 - `AppSidebar`: Save a link, desktop navigation, unread counter, dynamic tag links
 - `MobileNavigation`: mobile bottom bar with the Save action
 - `SaveLinkAction`: makes any trigger element open Quick save
-- `useUnreadCount`: shared unread total for the sidebar and bottom bar
+- `useUnreadCount`: unread total for the desktop sidebar
 - `ColumnNavbar`: shared column header chrome for left, center, and right controls
 - `PageHeading`: Title 1 page heading with count, description and actions
 - `ActionsMenu`: labeled vertical menu of secondary actions, optionally with Tags…

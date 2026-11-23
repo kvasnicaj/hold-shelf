@@ -1,5 +1,6 @@
 export type MockScenario =
 	| "default"
+	| "full-shelf"
 	| "empty"
 	| "error"
 	| "loading"

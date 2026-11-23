@@ -18,9 +18,9 @@ export function AppLayout() {
 							<div className="sticky top-0 hidden h-screen shrink-0 md:flex">
 								<AppSidebar />
 							</div>
-							<main className="min-w-0 flex-1 pb-24 md:my-2 md:mr-2 md:min-h-[calc(100vh-1rem)] md:rounded-xl md:border md:bg-card md:pb-0">
+							<main className="min-w-0 flex-1 pb-[calc(4rem+env(safe-area-inset-bottom))] md:my-2 md:mr-2 md:min-h-[calc(100vh-1rem)] md:rounded-xl md:border md:bg-card md:pb-0">
 								<TopBar />
-								<div className="mx-auto w-full max-w-6xl px-3 py-6 sm:px-6 md:py-8">
+								<div className="mx-auto w-full max-w-6xl px-4 py-4 sm:px-6 md:py-8">
 									<Outlet />
 								</div>
 							</main>

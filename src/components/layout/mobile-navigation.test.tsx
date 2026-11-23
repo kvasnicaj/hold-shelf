@@ -5,17 +5,12 @@ import { MobileNavigation } from "#/components/layout/mobile-navigation";
 import { QuickSaveContext } from "#/components/quick-save/quick-save-context";
 import { renderWithProviders } from "#/test/render";
 
-const { getArticlesMock, routerState } = vi.hoisted(() => ({
-	getArticlesMock: vi.fn(),
+const { routerState } = vi.hoisted(() => ({
 	routerState: {
 		location: {
 			pathname: "/app/favorites",
 		},
 	},
-}));
-
-vi.mock("#/server/articles", () => ({
-	getArticles: getArticlesMock,
 }));
 
 vi.mock("@tanstack/react-router", async () => {
@@ -46,7 +41,6 @@ describe("MobileNavigation", () => {
 	it("renders four destinations around a one-tap save action", async () => {
 		const user = userEvent.setup();
 		const openQuickSave = vi.fn();
-		getArticlesMock.mockResolvedValue({ total: 3 });
 		renderWithProviders(
 			<QuickSaveContext value={{ open: openQuickSave }}>
 				<MobileNavigation />
@@ -61,9 +55,10 @@ describe("MobileNavigation", () => {
 		const favoritesLink = screen.getByRole("link", { name: /favorites/i });
 		expect(favoritesLink).toHaveAttribute("href", "/app/favorites");
 		expect(favoritesLink).toHaveAttribute("aria-current", "page");
-		expect(
-			await screen.findByRole("link", { name: /unread\s*3/i }),
-		).toHaveAttribute("href", "/app/articles");
+		expect(screen.getByRole("link", { name: "Unread" })).toHaveAttribute(
+			"href",
+			"/app/articles",
+		);
 		expect(screen.getAllByRole("link")).toHaveLength(4);
 
 		await user.click(screen.getByRole("button", { name: "Save a link" }));
