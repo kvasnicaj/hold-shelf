@@ -13,3 +13,7 @@ export type RecentArticle = {
 export type RecentlySavedArticle = RecentArticle & {
 	tags: Tag[];
 };
+
+export type InProgressArticle = RecentArticle & {
+	progress: number;
+};

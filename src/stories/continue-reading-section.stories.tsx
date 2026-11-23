@@ -6,7 +6,7 @@ import { sampleContinueReading } from "#/stories/fixtures";
 const meta = {
 	title: "Home/Continue reading",
 	component: ContinueReadingSection,
-	args: { initialData: sampleContinueReading },
+	args: { articles: sampleContinueReading },
 	tags: ["!autodocs"],
 	decorators: [
 		(Story) => (
@@ -22,6 +22,6 @@ type Story = StoryObj<typeof meta>;
 
 export const InProgress: Story = {};
 export const Empty: Story = {
-	args: { initialData: [] },
+	args: { articles: [] },
 	parameters: { mockScenario: "empty" },
 };

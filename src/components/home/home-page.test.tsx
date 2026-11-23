@@ -1,48 +1,19 @@
 import { screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { HomePage } from "#/components/home/home-page";
+import type { Tag } from "#/components/tags/types";
+import type { getDashboardStats, getRecentArticles } from "#/server/dashboard";
 import { getContinueReading } from "#/server/library";
 import { renderWithProviders } from "#/test/render";
 
 type HomeLoaderData = {
 	continueReading: Awaited<ReturnType<typeof getContinueReading>>;
-	stats: {
-		unread: number;
-		total: number;
-		readThisWeek: number;
-		savedThisWeek: number;
-	};
-	recent: {
-		recentlySaved: Array<{
-			id: string;
-			url: string;
-			title: string | null;
-			hostname: string | null;
-			faviconUrl: string | null;
-			isRead: boolean;
-			createdAt?: Date | null;
-			tags: Array<{ id: string; name: string; color: string | null }>;
-		}>;
-		recentlyFavorite: Array<{
-			id: string;
-			url: string;
-			title: string | null;
-			hostname: string | null;
-			faviconUrl: string | null;
-			isRead: boolean;
-			createdAt?: Date | null;
-		}>;
-		oldestUnread: Array<{
-			id: string;
-			url: string;
-			title: string | null;
-			hostname: string | null;
-			faviconUrl: string | null;
-			isRead: boolean;
-			createdAt?: Date | null;
-		}>;
-	};
-	tags: Array<{ id: string; name: string; color: string | null }>;
+	stats: Pick<
+		Awaited<ReturnType<typeof getDashboardStats>>,
+		"unread" | "total" | "readThisWeek" | "savedThisWeek"
+	>;
+	recent: Awaited<ReturnType<typeof getRecentArticles>>;
+	tags: Tag[];
 };
 
 const {
@@ -61,6 +32,7 @@ const {
 				savedThisWeek: 4,
 			},
 			recent: {
+				latestUnread: [],
 				recentlySaved: [],
 				recentlyFavorite: [],
 				oldestUnread: [],
@@ -122,6 +94,7 @@ describe("HomePage", () => {
 				savedThisWeek: 4,
 			},
 			recent: {
+				latestUnread: [],
 				recentlySaved: [
 					{
 						id: "saved-1",
@@ -222,6 +195,7 @@ describe("HomePage", () => {
 				savedThisWeek: 0,
 			},
 			recent: {
+				latestUnread: [],
 				recentlySaved: [],
 				recentlyFavorite: [],
 				oldestUnread: [],
@@ -247,6 +221,7 @@ describe("HomePage", () => {
 				savedThisWeek: 1,
 			},
 			recent: {
+				latestUnread: [],
 				recentlySaved: [
 					{
 						id: "saved-1",

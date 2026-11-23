@@ -5,6 +5,7 @@ import type {
 } from "#/server/articles-service";
 import type { BackupArticle, DeleteTrashInput } from "#/server/library-schemas";
 import {
+	phoneShelfArticles,
 	sampleArticles,
 	sampleContinueReading,
 	sampleDate,
@@ -28,7 +29,12 @@ const progress = new Map<string, number>();
 
 export function resetMockApi(nextScenario: MockScenario = "default") {
 	scenario = nextScenario;
-	articles = nextScenario === "empty" ? [] : structuredClone(sampleArticles);
+	articles =
+		nextScenario === "empty"
+			? []
+			: structuredClone(
+					nextScenario === "full-shelf" ? phoneShelfArticles : sampleArticles,
+				);
 	tags = nextScenario === "empty" ? [] : structuredClone(sampleTags);
 	trash = nextScenario === "empty" ? [] : structuredClone(sampleTrash);
 	share = nextScenario === "token" ? structuredClone(sampleShare) : null;
@@ -48,6 +54,11 @@ export function getMockHomeData() {
 			savedThisWeek: articles.length,
 		},
 		recent: {
+			latestUnread: [...unread]
+				.sort(
+					(left, right) => right.createdAt.getTime() - left.createdAt.getTime(),
+				)
+				.slice(0, 4),
 			recentlySaved: articles.slice(0, 5),
 			recentlyFavorite: articles
 				.filter((article) => article.isFavorite)

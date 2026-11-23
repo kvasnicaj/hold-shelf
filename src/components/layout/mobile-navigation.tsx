@@ -2,13 +2,11 @@ import { Plus } from "@phosphor-icons/react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { getMobileTabClassName } from "#/components/layout/helpers";
 import { MobileNavTabContent } from "#/components/layout/mobile-nav-tab-content";
-import { primaryNavItems, unreadNavHref } from "#/components/layout/nav-items";
+import { primaryNavItems } from "#/components/layout/nav-items";
 import { SaveLinkAction } from "#/components/layout/save-link-action";
-import { useUnreadCount } from "#/components/layout/use-unread-count";
 
 export function MobileNavigation() {
 	const currentPath = useRouterState().location.pathname;
-	const unreadCount = useUnreadCount();
 
 	const tabs = primaryNavItems.map((item) => {
 		const isActive = currentPath === item.href;
@@ -24,11 +22,6 @@ export function MobileNavigation() {
 						icon={item.icon}
 						label={item.label}
 						isActive={isActive}
-						badge={
-							item.href === unreadNavHref && unreadCount > 0
-								? unreadCount
-								: undefined
-						}
 					/>
 				</Link>
 			</li>
@@ -38,7 +31,7 @@ export function MobileNavigation() {
 	return (
 		<nav
 			aria-label="Primary"
-			className="fixed inset-x-0 bottom-0 z-40 border-t bg-background px-1.5 pt-1 pb-[calc(env(safe-area-inset-bottom)+0.25rem)] md:hidden"
+			className="fixed inset-x-0 bottom-0 z-40 border-t border-input bg-muted px-1.5 pt-1 pb-[calc(env(safe-area-inset-bottom)+0.25rem)] md:hidden"
 		>
 			<ul className="grid grid-cols-5">
 				{tabs.slice(0, 2)}

@@ -5,7 +5,6 @@ type MobileNavTabContentProps = {
 	icon: PhosphorIcon;
 	label: string;
 	isActive?: boolean;
-	badge?: number;
 	primary?: boolean;
 };
 
@@ -13,7 +12,6 @@ export function MobileNavTabContent({
 	icon: Icon,
 	label,
 	isActive = false,
-	badge,
 	primary = false,
 }: MobileNavTabContentProps) {
 	return (
@@ -31,19 +29,8 @@ export function MobileNavTabContent({
 					weight={isActive || primary ? "fill" : "regular"}
 					className={primary ? "size-5" : "size-[1.375rem]"}
 				/>
-				{badge !== undefined && (
-					<span
-						aria-hidden="true"
-						className="absolute -top-0.5 right-0 min-w-[1.125rem] rounded-sm bg-primary px-1 text-center text-xs font-bold leading-[1.125rem] tabular-nums text-primary-foreground"
-					>
-						{badge}
-					</span>
-				)}
 			</span>
-			<span className="max-w-full truncate">
-				{label}
-				{badge !== undefined && <span className="sr-only"> {badge}</span>}
-			</span>
+			<span className="max-w-full truncate">{label}</span>
 		</>
 	);
 }

@@ -13,6 +13,7 @@ import * as extraction from "#/server/article-content";
 import { createArticlesRepository } from "#/server/articles-repository";
 import { ArticleAlreadyExistsError } from "#/server/articles-service";
 import { withBackgroundContext } from "#/server/background";
+import { createDashboardRepository } from "#/server/dashboard-repository";
 import { importBackupArticles } from "#/server/library-import";
 import {
 	deleteTrashForUser,
@@ -94,6 +95,27 @@ it("handles 100 article operations within D1 limits and excludes Trash without l
 	expect(await repo.listArticleTags(["a0"])).toHaveLength(1);
 	await tagRepo.removeTagFromArticles({ tagId: "tag", articleIds: ids });
 	expect(await repo.listArticleTags(ids)).toHaveLength(0);
+});
+it("finds the latest unread saves even when the five most recent saves are read", async () => {
+	const rows = Array.from({ length: 12 }, (_, index) => ({
+		id: `article-${index}`,
+		userId: index === 11 ? "other" : "owner",
+		url: `https://example.com/${index}`,
+		createdAt: new Date(Date.UTC(2026, 0, index + 1)),
+		isRead: index >= 5 && index < 10,
+	}));
+	await database.db.insert(articles).values(rows);
+	await database.db.insert(articleTrash).values({ articleId: "article-10" });
+
+	const { latestUnread, recentlySaved } =
+		await createDashboardRepository().getRecentArticles("owner");
+	expect(recentlySaved.every(({ isRead }) => isRead)).toBe(true);
+	expect(latestUnread.map(({ id }) => id)).toEqual([
+		"article-4",
+		"article-3",
+		"article-2",
+		"article-1",
+	]);
 });
 it("returns the saved text around a body match with search results", async () => {
 	const repo = createArticlesRepository();

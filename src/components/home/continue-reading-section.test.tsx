@@ -1,7 +1,7 @@
 import { screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { expect, it, vi } from "vitest";
-import { ContinueReadingSection } from "#/components/home/continue-reading-section";
+import { HomePage } from "#/components/home/home-page";
 import { finishReading, getContinueReading } from "#/server/library";
 import { renderWithProviders } from "#/test/render";
 
@@ -14,7 +14,12 @@ vi.mock("#/server/tags", () => ({
 	removeTagFromArticles: vi.fn(),
 	createTag: vi.fn(),
 }));
+const { homeLoader } = vi.hoisted(() => ({ homeLoader: vi.fn() }));
 vi.mock("@tanstack/react-router", () => ({
+	getRouteApi: () => ({ useLoaderData: homeLoader }),
+	Link: ({ children, to }: { children: React.ReactNode; to: string }) => (
+		<a href={to}>{children}</a>
+	),
 	useRouter: () => ({ invalidate: vi.fn() }),
 }));
 vi.mock("#/components/articles/use-open-article", () => ({
@@ -40,7 +45,18 @@ it("completes a partially read article even when opening already marked it read"
 		vi.mocked(getContinueReading).mockResolvedValue([]);
 		return { success: true };
 	});
-	renderWithProviders(<ContinueReadingSection initialData={initialData} />);
+	homeLoader.mockReturnValue({
+		continueReading: initialData,
+		stats: { total: 1, unread: 0, readThisWeek: 1, savedThisWeek: 1 },
+		recent: {
+			latestUnread: [],
+			oldestUnread: [],
+			recentlySaved: [],
+			recentlyFavorite: [],
+		},
+		tags: [],
+	});
+	renderWithProviders(<HomePage />);
 	await user.click(
 		await screen.findByRole("button", { name: "Mark as read: My article" }),
 	);

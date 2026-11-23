@@ -30,6 +30,7 @@ export type DashboardRepository = {
 	getRecentArticles: (userId: string) => Promise<{
 		recentlySaved: DashboardRecentlySavedArticle[];
 		recentlyFavorite: DashboardRecentArticle[];
+		latestUnread: DashboardRecentArticle[];
 		oldestUnread: DashboardRecentArticle[];
 	}>;
 };
